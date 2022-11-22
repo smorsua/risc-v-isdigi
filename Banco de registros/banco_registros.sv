@@ -1,6 +1,6 @@
 module banco_registros (CLK, RESET, reg1r, reg2r, regW, writeData, RegWrite, Data1, Data2);
   
-	input CLK,RESET;
+	input CLK, RESET;
     input [SIZE-1:0] reg1r, reg2r, regW; //seleccion de registro
     input  [SIZE-1:0] writeData;
     input RegWrite;
