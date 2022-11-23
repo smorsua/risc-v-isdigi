@@ -11,7 +11,7 @@ module ram
 
 	always @ (ENABLE_R)
 	begin
-		Q_R <= ram[ADRR_R];
+		Q_R = ram[ADRR_R];
 	
 	end
 

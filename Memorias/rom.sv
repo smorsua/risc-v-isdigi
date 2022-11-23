@@ -14,7 +14,7 @@ module rom
 
 	always @ (ENABLE_R)
 	begin
-		Q_R <= rom[ADRR_R];
+		Q_R = rom[ADRR_R];
 	
 	end
 

@@ -1,5 +1,5 @@
 `timescale 1ns/1ps
-localparam  T = 5, addr_width = 10, data_width = 32;
+localparam  T = 20, addr_width = 10, data_width = 32;
 
 
 
@@ -29,15 +29,27 @@ begin
     write(1);
     write(2);
     read(1);
+    #(T/4)
     read(2);
+    #(T/2)
+    @(negedge CLK)
     fork
-    begin
-        read(2,4);
-        write(2);
-   
-    end
+        begin
+        #(T);
+        ADRR_R = 2;
+        ENABLE_R = 1;
+        #(T);
+        end
+        begin 
+        ADRR_W = 2;
+        Q_W = $random();
+        ENABLE_W = 1;
+        #(2*T);
+        ENABLE_W = 0; 
+        end
+    
     join
-
+    #(T*2)
     $stop;
 	
 end
@@ -46,13 +58,13 @@ task  read(input [addr_width-1:0] address_read, input [7:0] cicles = 1);
     ADRR_R = address_read; 
     #(cicles*T)
     ENABLE_R = 0;
-endtask //automatic
+endtask 
 
 task  write(input [addr_width-1:0] address_write);
-    ENABLE_W = 1; 
     @(negedge CLK)
-    ADRR_W = address_write;
+    ENABLE_W = 1; 
     Q_W = $random();
+    ADRR_W = address_write;
     @(negedge CLK); 
     ENABLE_W = 0; 
 endtask
