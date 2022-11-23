@@ -20,8 +20,19 @@ ROM #(.data_width(SIZE),.addr_width(ADDR_WIDTH)) instruction_memory (
     .Q_R(instruction_wire)
 );
 
+wire Branch, MemRed, MemtoReg, ALUOp, MemWrite, ALUSrc, RegWrite;
+CONTROL control(
+    .INSTRUCTION_FORMAT(instruction_wire[6_0]),
+    .BRANCH(Branch),
+    .MEM_READ(MemRed),
+    .MEM_TO_REG(MemtoReg),
+    .ALU_OP(ALUOp),
+    .MEM_WRITE(MemWrite),
+    .ALU_SRC(ALUSrc),
+    .REG_WRITE(RegWrite)
+);
+
 wire [SIE-1:0] data_1_wire, data_2_wire;
-wire RegWrite;
 BANCO_REGISTROS #(.SIZE(SIZE)) registros(
     .CLK(CLK),
     .RESET_N(RESET_N),
@@ -41,7 +52,6 @@ IMMEDIATE_GENERATOR imm_gen(
     .IMMEDIATE(imm_wire)
 );
 
-wire ALUSrc;
 wire [SIZE-1:0] second_operand_wire;
 MUX #(.SIZE(SIZE)) alu_src_mux (
     .A(data_2_wire),
@@ -50,18 +60,23 @@ MUX #(.SIZE(SIZE)) alu_src_mux (
     .RESULT(second_operand_wire)
 );
 
+wire [SIZE-1:0] address_alu_operation_wire;
+ALU_CONTROL alu_control(
+    .(),
+    .ALU_OPERATION(ALUOp),
+    .ADDRESS_ALU_OPERATION(address_alu_operation_wire)
+);
+
 wire [SIZE-1:0] alu_operation_wire;
-wire [SIZE1:0] alu_address_wire;
 wire address_alu_zero;
 ALU #(.SIZE(SIZE)) address_alu(
     .A(data_1_wire),
     .B(second_operand_wire),
-    .OPERATION(alu_operation_wire),
+    .OPERATION(address_alu_operation_wire),
     .RESULT(alu_address_wire),
     .ZERO(address_alu_zero)
 );
 
-wire MemWrite, MemRead;
 wire [SIZE-1:0] read_data_wire;
 RAM #(.data_width(SIZE), .addr_width(ADDR_WIDTH)) data_memory (
     .CLK(CLK),
@@ -73,7 +88,6 @@ RAM #(.data_width(SIZE), .addr_width(ADDR_WIDTH)) data_memory (
 
 );
 
-wire MemtoReg;
 wire [SIZE-1:0] data_mux_result_wire;
 MUX #(.SIZE(SIZE)) data_mux (
     .A(alu_address_wire),
@@ -91,6 +105,7 @@ ALU #(.SIZE(SIZE)) jump_alu(
 );
 
 wire PCSrc;
+assign PCSrc = Branch & address_alu_zero;
 wire [SIZE-1:0] next_pc_wire;
 MUX #(.SIZE(SIZE)) pc_mux(
     .A(next_consecutive_pc_wire),
