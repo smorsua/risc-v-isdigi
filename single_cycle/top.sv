@@ -80,7 +80,6 @@ ALU #(.SIZE(SIZE)) address_alu(
 wire [SIZE-1:0] read_data_wire;
 RAM #(.data_width(SIZE), .addr_width(ADDR_WIDTH)) data_memory (
     .CLK(CLK),
-    .ENABLE_R(MemRead), //IMPLEMENTAR ENABLE_R
     .ENABLE_W(MemWrite),
     .ADDR_R(alu_address_wire),
     .ADDR_W(alu_address_wire),
