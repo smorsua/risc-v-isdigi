@@ -3,7 +3,7 @@ module RAM
 (
 	input CLK,
 	input  [(addr_width-1):0] ADDR_W,
-	input ENABLE_W,
+	input ENABLE_W, 
     input  [(data_width-1):0] Q_W,
 	input [(addr_width-1):0] ADDR_R,
 	output reg [(data_width-1):0] Q_R
@@ -12,7 +12,7 @@ module RAM
 
 
 
-	assign 	Q_R = ram[ADDR_R];
+	assign 	Q_R = ram[ADDR_R] ;
 	
 
     always @ (posedge CLK && ENABLE_W)
