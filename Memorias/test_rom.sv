@@ -9,10 +9,10 @@ module test_rom (
 );
 
 	logic CLK;
-	logic [(addr_width-1):0] ADRR_R;
+	logic [(addr_width-1):0] ADDR_R;
 	logic [(data_width-1):0] Q_R;
 
-rom rom(.ADRR_R(ADRR_R), .Q_R(Q_R));
+rom rom(.ADDR_R(ADDR_R), .Q_R(Q_R));
 defparam rom.addr_width = addr_width;
 defparam rom.data_width = data_width;
 
@@ -30,7 +30,7 @@ begin
 end
 task  read(input [addr_width-1:0] address_read, input [7:0] cicles = 1); 
    
-    ADRR_R = address_read; 
+    ADDR_R = address_read; 
 endtask 
 
 
