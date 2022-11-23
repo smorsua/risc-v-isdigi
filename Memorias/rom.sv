@@ -1,7 +1,6 @@
 module rom
 #(parameter data_width=32, parameter addr_width=10)
 (
-	input CLK,
 	input [(addr_width-1):0] ADRR_R,
 	output reg [(data_width-1):0] Q_R
 );
@@ -14,6 +13,8 @@ module rom
 
 
 	assign Q_R = rom[ADRR_R];
+
+
 	
 
 
