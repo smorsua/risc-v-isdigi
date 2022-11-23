@@ -25,9 +25,9 @@ wire RegWrite;
 BANCO_REGISTROS #(.SIZE(SIZE)) registros(
     .CLK(CLK),
     .RESET_N(RESET_N),
-    .reg1r(instruction_wire),
-    .reg2r(instruction_wire),
-    .regW(instruction_wire),
+    .reg1r(instruction_wire[19:15]),
+    .reg2r(instruction_wire[24:20]),
+    .regW(instruction_wire[11:7]),
     .writeData(data_mux_result_wire),
     .RegWrite(RegWrite),
     .Data1(data_1_wire),
