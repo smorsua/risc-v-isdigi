@@ -1,4 +1,4 @@
-module RAM
+module ram
 #(parameter data_width=32, parameter addr_width=10)
 (
 	input CLK,
@@ -20,5 +20,5 @@ module RAM
 		ram[ADDR_W] <= Q_W ;
 	
 	end
-	assert property (@(posedge CLK) ENABLE_W |=>  (ram[$past(ADRR_W, 1)] == $past(Q_W, 1))) else  $error ("No escribe");
+	assert property (@(posedge CLK) ENABLE_W |=>  (ram[$past(ADDR_W, 1)] == $past(Q_W, 1))) else  $error ("No escribe");
 endmodule
