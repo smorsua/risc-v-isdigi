@@ -1,4 +1,4 @@
-module rom
+module ROM
 #(parameter data_width=32, parameter addr_width=10)
 (
 	input [(addr_width-1):0] ADDR_R,

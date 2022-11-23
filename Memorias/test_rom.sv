@@ -12,7 +12,7 @@ module test_rom (
 	logic [(addr_width-1):0] ADDR_R;
 	logic [(data_width-1):0] Q_R;
 
-rom rom(.ADDR_R(ADDR_R), .Q_R(Q_R));
+ROM rom(.ADDR_R(ADDR_R), .Q_R(Q_R));
 defparam rom.addr_width = addr_width;
 defparam rom.data_width = data_width;
 

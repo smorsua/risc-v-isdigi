@@ -1,4 +1,4 @@
-module ram
+module RAM
 #(parameter data_width=32, parameter addr_width=10)
 (
 	input CLK,
