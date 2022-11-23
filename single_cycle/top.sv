@@ -5,13 +5,13 @@ module top(
 localparam SIZE = 32, ADDR_WIDTH = 10;
 
 bit [SIZE-1:0] PC;
-wire [SIZE1:0] next_pc_wire;
+wire [SIZE1:0] next_consecutive_pc_wire;
 
 ALU #(.SIZE(SIZE)) pc_alu(
     .A(PC),
     .B('d4),
     .OPERATION(ADD),
-    .RESULT(next_pc_wire),
+    .RESULT(next_consecutive_pc_wire),
 );
 
 wire [SIZE-1:0] instruction_wire;
@@ -21,14 +21,15 @@ ROM #(.data_width(SIZE),.addr_width(ADDR_WIDTH)) instruction_memory (
 );
 
 wire [SIE-1:0] data_1_wire, data_2_wire;
+wire RegWrite;
 BANCO_REGISTROS #(.SIZE(SIZE)) registros(
     .CLK(CLK),
     .RESET_N(RESET_N),
     .reg1r(instruction_wire),
     .reg2r(instruction_wire),
-    .regW(),
-    .writeData(),
-    .RegWrite(),
+    .regW(instruction_wire),
+    .writeData(data_mux_result_wire),
+    .RegWrite(RegWrite),
     .Data1(data_1_wire),
     .Data2(data_2_wire)
 );
@@ -49,9 +50,37 @@ MUX #(.SIZE(SIZE)) alu_src_mux (
     .RESULT(second_operand_wire)
 );
 
+wire [SIZE-1:0] alu_operation_wire;
+wire [SIZE1:0] alu_address_wire;
+wire address_alu_zero;
+ALU #(.SIZE(SIZE)) address_alu(
+    .A(data_1_wire),
+    .B(second_operand_wire),
+    .OPERATION(alu_operation_wire),
+    .RESULT(alu_address_wire),
+    .ZERO(address_alu_zero)
+);
+
+wire MemWrite, MemRead;
+wire [SIZE-1:0] read_data_wire;
 RAM #(.data_width(SIZE), .addr_width(ADDR_WIDTH)) data_memory (
     .CLK(CLK),
-    .ADDR_W
+    .ENABLE_R(MemRead), //IMPLEMENTAR ENABLE_R
+    .ENABLE_W(MemWrite),
+    .ADDR_R(alu_address_wire),
+    .ADDR_W(alu_address_wire),
+    .Q_W(data_2_wire),
+    .Q_R(read_data_wire)
+
+);
+
+wire MemtoReg;
+wire [SIZE-1:0] data_mux_result_wire;
+MUX #(.SIZE(SIZE)) data_mux (
+    .A(alu_address_wire),
+    .B(read_data_wire),
+    .SEL(MemtoReg),
+    .RESULT(data_mux_result_wire)
 );
 
 wire [SIZE-1:0] branch_target_wire;
@@ -62,16 +91,15 @@ ALU #(.SIZE(SIZE)) jump_alu(
     .RESULT(branch_target_wire)
 );
 
-wire [SIZE-1:0] alu_operation_wire;
-wire [SIZE1:0] address_wire;
-wire address_alu_zero;
-ALU #(.SIZE(SIZE)) address_alu(
-    .A(data_1_wire),
-    .B(data_2_wire),
-    .OPERATION(alu_operation_wire),
-    .RESULT(address_wire),
-    .ZERO(address_alu_zero)
+wire PCSrc;
+wire [SIZE-1:0] next_pc_wire;
+MUX #(.SIZE(SIZE)) pc_mux(
+    .A(next_consecutive_pc_wire),
+    .B(branch_target_wire),
+    .SEL(PCSrc),
+    .RESULT(next_pc_wire)
 );
+
 
 always @(posedge CLK or negedge RESET_N) begin
     if(RESET_N == 0) begin
