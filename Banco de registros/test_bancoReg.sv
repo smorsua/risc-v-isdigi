@@ -14,7 +14,7 @@ module test_bancoReg();
 
     //instancias 
      
-    banco_registros DUV #(.SIZE(32))( 
+    BANCO_REGISTROS DUV #(.SIZE(32))( 
     .CLK(CLK),
     .reg1r(reg1), 
     .reg2r(reg2), 

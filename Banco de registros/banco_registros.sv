@@ -1,6 +1,6 @@
-module banco_registros #(parameter SIZE = 32) (CLK,RESET,reg1r,reg2r,regW, writeData,RegWrite,Data1,Data2);
+module BANCO_REGISTROS #(parameter SIZE = 32) (CLK,RESET_n,reg1r,reg2r,regW, writeData,RegWrite,Data1,Data2);
   
-	 input CLK,RESET;
+	 input CLK,RESET_N;
     input [$clog2(SIZE)-1:0] reg1r, reg2r, regW; //seleccion de registro DIRECCIONES
     input  [SIZE-1:0] writeData;
     input RegWrite;
