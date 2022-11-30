@@ -1,6 +1,13 @@
 module top(
     input CLK, 
-    input RESET_N
+    input RESET_N,
+    input  [(data_width-1):0]Q_ROM,
+    output  [(addr_width-1):0] ADDR_ROM,
+    output  [(addr_width-1):0] ADDR_RAM,
+    input  [(data_width-1):0] Q_RAM,
+    output  [(data_width-1):0] Q_W,
+    output ENABLE_W
+    
 );
 localparam SIZE = 32, ADDR_WIDTH = 10;
 
@@ -14,20 +21,20 @@ ALU #(.SIZE(SIZE)) pc_alu(
     .RESULT(next_consecutive_pc_wire),
 );
 
-wire [SIZE-1:0] instruction_wire;
+/*wire [SIZE-1:0] instruction_wire;
 ROM #(.data_width(SIZE),.addr_width(ADDR_WIDTH)) instruction_memory (
     .ADDR_R(PC),
     .Q_R(instruction_wire)
-);
+);*/
 
 wire Branch, MemRed, MemtoReg, ALUOp, MemWrite, ALUSrc, RegWrite;
 CONTROL control(
-    .INSTRUCTION_FORMAT(instruction_wire[6_0]),
+    .INSTRUCTION_FORMAT(Q_ROM[6_0]),
     .BRANCH(Branch),
     .MEM_READ(MemRed),
     .MEM_TO_REG(MemtoReg),
     .ALU_OP(ALUOp),
-    .MEM_WRITE(MemWrite),
+    .MEM_WRITE(ENABLE_W),
     .ALU_SRC(ALUSrc),
     .REG_WRITE(RegWrite)
 );
@@ -36,19 +43,19 @@ wire [SIE-1:0] data_1_wire, data_2_wire;
 BANCO_REGISTROS #(.SIZE(SIZE)) registros(
     .CLK(CLK),
     .RESET_N(RESET_N),
-    .reg1r(instruction_wire[19:15]),
-    .reg2r(instruction_wire[24:20]),
-    .regW(instruction_wire[11:7]),
+    .reg1r(Q_ROM[19:15]),
+    .reg2r(Q_ROM[24:20]),
+    .regW(Q_ROM[11:7]),
     .writeData(data_mux_result_wire),
     .RegWrite(RegWrite),
     .Data1(data_1_wire),
     .Data2(data_2_wire)
 );
-
+assign data_2_wire = Q_W;
 wire [SIZE-1:0] imm_wire;
 //Como hay que trocear la instruccion a mano, solo funciona para 32 bits
 IMMEDIATE_GENERATOR imm_gen(
-    .INSTRUCTION(instruction_wire),
+    .INSTRUCTION(Q_ROM),
     .IMMEDIATE(imm_wire)
 );
 
@@ -72,11 +79,11 @@ ALU #(.SIZE(SIZE)) address_alu(
     .A(data_1_wire),
     .B(second_operand_wire),
     .OPERATION(address_alu_operation_wire),
-    .RESULT(alu_address_wire),
+    .RESULT(ADDR_RAM),
     .ZERO(address_alu_zero)
 );
 
-wire [SIZE-1:0] read_data_wire;
+/*wire [SIZE-1:0] read_data_wire;
 RAM #(.data_width(SIZE), .addr_width(ADDR_WIDTH)) data_memory (
     .CLK(CLK),
     .ENABLE_W(MemWrite),
@@ -85,11 +92,11 @@ RAM #(.data_width(SIZE), .addr_width(ADDR_WIDTH)) data_memory (
     .Q_W(data_2_wire),
     .Q_R(read_data_wire)
 
-);
+);*/
 
 wire [SIZE-1:0] data_mux_result_wire;
 MUX #(.SIZE(SIZE), .INPUTS(2)) data_mux (
-    .all_inputs({alu_address_wire,read_data_wire})
+    .all_inputs({ADDR_RAM, Q_RAM})
     .sel(MemtoReg),
     .result(data_mux_result_wire)
 );
@@ -119,4 +126,5 @@ always @(posedge CLK or negedge RESET_N) begin
         PC <= next_pc_wire;
     end
 end
+assign PC = ADDR_ROM; 
 endmodule
