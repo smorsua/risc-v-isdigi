@@ -34,7 +34,10 @@ assign Data1 = banco_registros[reg1r];
 assign Data2 = banco_registros[reg2r];
 
 // problema a considerar: lectura y escritura del mismo registro 
-
+//asertions
+assert property (@(posedge CLK) disable iff (RegWrite and regW!='0) |-> (writeData == banco_registros[regW])) else $error("No realiza correctamente la escritura")
+//no sé si debería utilizar ##1 para así seleccionar diferentes ciclos, osea muestrear writeData 
+//del ciclo anterior con lo que me saca banco_registros[regW] en el ciclo actual
 endmodule 
 
 
