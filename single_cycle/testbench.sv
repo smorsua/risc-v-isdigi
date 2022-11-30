@@ -26,10 +26,13 @@ ROM rom(.ADDR_R(ADDR_ROM), .Q_R(Q_ROM));
 defparam rom.addr_width = addr_width;
 defparam rom.data_width = data_width;
 
-top top(CLK, RESET_N, ); //FALTAN SEÑALES POR METER PARA CONECTAR A LA RAM Y LA ROM
+top top(CLK, RESET_N, Q_ROM, ADDR_ROM, ADDR_RAM, Q_RAM, Q_W, ENABLE_W); //FALTAN SEÑALES POR METER PARA CONECTAR A LA RAM Y LA ROM
 defparam top.SIZE = addr_width;
 defparam top.ADDR_WIDTH = data_width;
 
+initial begin
+    
+end
 
 
 
