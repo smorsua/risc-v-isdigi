@@ -53,11 +53,10 @@ IMMEDIATE_GENERATOR imm_gen(
 );
 
 wire [SIZE-1:0] second_operand_wire;
-MUX #(.SIZE(SIZE)) alu_src_mux (
-    .A(data_2_wire),
-    .B(imm_wire),
-    .SEL(ALUSrc),
-    .RESULT(second_operand_wire)
+MUX #(.SIZE(SIZE), .INPUTS(2)) alu_src_mux (
+    .all_inputs({data_2_wire,imm_wire}),
+    .sel(ALUSrc),
+    .result(second_operand_wire)
 );
 
 wire [SIZE-1:0] address_alu_operation_wire;
@@ -89,11 +88,10 @@ RAM #(.data_width(SIZE), .addr_width(ADDR_WIDTH)) data_memory (
 );
 
 wire [SIZE-1:0] data_mux_result_wire;
-MUX #(.SIZE(SIZE)) data_mux (
-    .A(alu_address_wire),
-    .B(read_data_wire),
-    .SEL(MemtoReg),
-    .RESULT(data_mux_result_wire)
+MUX #(.SIZE(SIZE), .INPUTS(2)) data_mux (
+    .all_inputs({alu_address_wire,read_data_wire})
+    .sel(MemtoReg),
+    .result(data_mux_result_wire)
 );
 
 wire [SIZE-1:0] branch_target_wire;
@@ -107,11 +105,10 @@ ALU #(.SIZE(SIZE)) jump_alu(
 wire PCSrc;
 assign PCSrc = Branch & address_alu_zero;
 wire [SIZE-1:0] next_pc_wire;
-MUX #(.SIZE(SIZE)) pc_mux(
-    .A(next_consecutive_pc_wire),
-    .B(branch_target_wire),
-    .SEL(PCSrc),
-    .RESULT(next_pc_wire)
+MUX #(.SIZE(SIZE), .INPUTS(INPUTS)) pc_mux(
+    .all_inputs({next_consecutive_pc_wire,branch_target_wire})
+    .sel(PCSrc),
+    .result(next_pc_wire)
 );
 
 
