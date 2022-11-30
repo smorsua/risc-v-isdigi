@@ -6,18 +6,19 @@ module test_bancoReg();
 	localparam T = 10;
 	localparam SIZE = 32;
 
-    reg CLK;
-    reg [SIZE-1:0] reg1r, reg2r, regW; //seleccion de registro
-    reg  [SIZE-1:0]writeData;
-    reg RegWrite;
-    wire [SIZE-1:0] Data1, Data2;
+    logic CLK,RST_N;
+    logic [$clog2(SIZE)-1:0] reg1r, reg2r, regW; //seleccion de registro
+    logic  [SIZE-1:0]writeData;
+    logic RegWrite;
+    logic [SIZE-1:0] Data1, Data2;
 
     //instancias 
      
-    BANCO_REGISTROS DUV #(.SIZE(32))( 
+    banco_registros #(.SIZE(SIZE)) DUV ( 
+	 .RESET(RST_N),
     .CLK(CLK),
-    .reg1r(reg1), 
-    .reg2r(reg2), 
+    .reg1r(reg1r), 
+    .reg2r(reg2r), 
     .regW(regW), //seleccion de registro
     .writeData(writeData),
     .RegWrite(RegWrite),
@@ -25,7 +26,6 @@ module test_bancoReg();
     .Data2(Data2)
     );
 
-	 
 
 	initial
 	begin
@@ -33,18 +33,31 @@ module test_bancoReg();
 		forever  #(T/2) CLK=!CLK;
 	end 
 
-	initial begin
+
+	initial
+	begin
 		RST_N = 0;
 		#(T)
 		RST_N = 1;
 
+   		RegWrite =1'b1;
+	
+    		regW = 5'd10;
+    		writeData = 5'd21;
+			#(T*2)
+    		regW = 5'd14;
+    		writeData = 5'd13;
+			#(T*2)
+   		regW = 5'd7;
+   		writeData = 5'd1;
+    		writeData = 5'd6;
+			#(T*2)
 
-        //llenamos la memoria para que haya algun dato del que leer 
-        banco_registros = [5'd13][5'd10]; //aqui tendría que indicar direccion de mem y contenido 
+    
+    		reg1r = 5'd14; 
+    		reg2r = 5'd10;
+			#(T*2)
 
-        reg1 = 5'd14; //indico dos direcciones
-        reg2 = 5'd20;
-
+	$stop;
 	end
-
 endmodule
