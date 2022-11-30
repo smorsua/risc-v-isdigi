@@ -18,7 +18,9 @@ always_comb begin
         OR: RESULT = A | B;
         XNOR: RESULT = A ^ B;
         LEFT_SHIFT: RESULT = A << B;
+        SIGNED_LEFT_SHIFT: RESULT = A <<< B;
         RIGHT_SHIFT: RESULT = A >> B;
+        SIGNED_RIGHT_SHIFT: RESULT = A >>> B;
         default: RESULT = 0;
     endcase 
 end

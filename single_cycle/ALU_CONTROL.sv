@@ -15,11 +15,15 @@ module ALU_CONTROL(
             3'b010: ALUSelection = LESS_THAN;
             3'b011: ALUSelection = LESS_THAN;
             3'b100: ALUSelection = XOR;
-            3'b101: ALUSelection = bit30 == 0 ? RIGHT_SHIFT : RIGHT_SHIFT; //FIXME: LA SEGUNDA VERSION EXTIENDE EL SIGNO
+            3'b101: ALUSelection = bit30 == 0 ? RIGHT_SHIFT : SIGNED_RIGHT_SHIFT;
             3'b110: ALUSelection = OR;
             3'b111: ALUSelection = AND;
             endcase
         end
+        2'b01: ALUSelection = SUB;
+        2'b10: ALUSelection = ADD;
+    //FIXME: falta uno
+    
         endcase
     end
 
