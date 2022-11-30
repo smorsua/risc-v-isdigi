@@ -28,15 +28,17 @@ ROM #(.data_width(SIZE),.addr_width(ADDR_WIDTH)) instruction_memory (
 );*/
 
 wire Branch, MemRed, MemtoReg, ALUOp, MemWrite, ALUSrc, RegWrite;
+wire [1:0] AuipcLui_wire;
 CONTROL control(
-    .INSTRUCTION_FORMAT(Q_ROM[6_0]),
+    .INSTRUCTION_FORMAT(Q_ROM[6:0]),
     .BRANCH(Branch),
     .MEM_READ(MemRed),
     .MEM_TO_REG(MemtoReg),
     .ALU_OP(ALUOp),
     .MEM_WRITE(ENABLE_W),
     .ALU_SRC(ALUSrc),
-    .REG_WRITE(RegWrite)
+    .REG_WRITE(RegWrite),
+    .AuipcLui(AuipcLui_wire)
 );
 
 wire [SIE-1:0] data_1_wire, data_2_wire;
@@ -59,26 +61,34 @@ IMMEDIATE_GENERATOR imm_gen(
     .IMMEDIATE(imm_wire)
 );
 
+wire [SIZE-1:0] first_operand_wire;
+MUX #(.SIZE(32), .INPUTS(3)) alu_src_1_mux (
+    .all_inputs({PC, 32'b0, data_1_wire}),
+    .sel(AuipcLui_wire),
+    .result(first_operand_wire)
+);
+
 wire [SIZE-1:0] second_operand_wire;
 MUX #(.SIZE(SIZE), .INPUTS(2)) alu_src_mux (
-    .all_inputs({data_2_wire,imm_wire}),
+    .all_inputs({data_2_wire, imm_wire}),
     .sel(ALUSrc),
     .result(second_operand_wire)
 );
 
-wire [SIZE-1:0] address_alu_operation_wire;
+wire [3:0] ALUSelection_wire;
 ALU_CONTROL alu_control(
-    .(),
-    .ALU_OPERATION(ALUOp),
-    .ADDRESS_ALU_OPERATION(address_alu_operation_wire)
+    .funct3(Q_ROM[14:12]),
+    .bit30(Q_ROM[30]),
+    .ALUOp(ALUOp),
+    .ALUSelection(ALUSelection_wire)
 );
 
 wire [SIZE-1:0] alu_operation_wire;
 wire address_alu_zero;
 ALU #(.SIZE(SIZE)) address_alu(
-    .A(data_1_wire),
+    .A(first_operand_wire),
     .B(second_operand_wire),
-    .OPERATION(address_alu_operation_wire),
+    .OPERATION(ALUSelection_wire),
     .RESULT(ADDR_RAM),
     .ZERO(address_alu_zero)
 );

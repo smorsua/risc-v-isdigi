@@ -6,7 +6,8 @@ module CONTROL(
     output [1:0] ALU_OP,
     output MEM_WRITE,
     output ALU_SRC,
-    output REG_WRITE
+    output REG_WRITE,
+    output [1:0] AuipcLui
 );
 `include "instruction_type.sv"
 

@@ -2,7 +2,7 @@ module ALU_CONTROL(
     input [3:0] funct3,
     input bit30,
     input ALUOp,
-    output [3.0] ALUSelection
+    output [3:0] ALUSelection
 );
 
     `include "ALU/operation_type.sv"
