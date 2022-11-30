@@ -1,10 +1,9 @@
-module MUX #(parameter SIZE = 32) (
-    input [SIZE-1:0] A,
-    input [SIZE-1:0] B,
-    input SEL,
+module MUX #(parameter SIZE = 32, INPUTS = 4) (
+    input [SIZE - 1:0] all_inputs [INPUTS],
+    input [$clog2(INPUTS)-1:0] sel,
     output [SIZE-1:0] result
 );
 
-assign result = SEL == 0 ? A : B;
+assign result = all_inputs[sel];
 
-endmodule
+endmodule 
