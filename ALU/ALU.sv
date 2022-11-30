@@ -6,7 +6,7 @@ module ALU #(parameter SIZE = 32) (
     output ZERO
 );
 
-enum bit [3:0] { ADD, SUB, LESS_THAN, GREATER_OR_EQUAL_THAN, AND, OR, XNOR, LEFT_SHIFT, RIGHT_SHIFT } e_operations;
+`include "operation_type.sv"
 
 always_comb begin
     case(OPERATION)
