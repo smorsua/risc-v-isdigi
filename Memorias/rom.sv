@@ -10,11 +10,7 @@ module ROM
 	begin
 		$readmemh(file, rom);
 	end
-
-
+	
 	assign Q_R = rom[ADDR_R];
 	
-
-
-    
 endmodule
