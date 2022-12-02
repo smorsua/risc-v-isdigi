@@ -16,14 +16,14 @@ always_comb begin
         AND: RESULT = A & B;
         OR: RESULT = A | B;
         XOR: RESULT = A ^ B;
-        LUI: RESULT = [31:12] B;
-        AUIPC: RESULT = 
+        LUI: RESULT  =  {B,12'd0};
+        AUIPC: RESULT = {B,12'd0} + A;
         SUB: RESULT = A - B;
         BEQ: ZERO = (A == B) ? 1 : 0;
-        BNE: ZERO = (A != B) ? 0 : 1;  
+        BNE: ZERO = (A != B) ? 0 : 1;
 
         default: RESULT = 0;
-    endcase 
+    endcase
 end
 
 assign ZERO = RESULT == 0 ? 1'b1 : 1'b0;
