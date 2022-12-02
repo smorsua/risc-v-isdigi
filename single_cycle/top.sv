@@ -1,24 +1,26 @@
-module top(
+
+module top
+#(parameter SIZE = 32, parameter ADDR_WIDTH = 10)(
     input CLK, 
     input RESET_N,
-    input  [(data_width-1):0]Q_ROM,
-    output  [(addr_width-1):0] ADDR_ROM,
-    output  [(addr_width-1):0] ADDR_RAM,
-    input  [(data_width-1):0] Q_RAM,
-    output  [(data_width-1):0] Q_W,
+    input  [(SIZE-1):0]Q_ROM,
+    output  [(ADDR_WIDTH-1):0] ADDR_ROM,
+    output  [(ADDR_WIDTH-1):0] ADDR_RAM,
+    input  [(SIZE-1):0] Q_RAM,
+    output  [(SIZE-1):0] Q_W,
     output ENABLE_W
     
 );
-localparam SIZE = 32, ADDR_WIDTH = 10;
 
-bit [SIZE-1:0] PC;
-wire [SIZE1:0] next_consecutive_pc_wire;
+
+bit [ADDR_WIDTH-1:0] PC;
+wire [SIZE-1:0] next_consecutive_pc_wire;
 
 ALU #(.SIZE(SIZE)) pc_alu(
     .A(PC),
     .B('d4),
     .OPERATION(ADD),
-    .RESULT(next_consecutive_pc_wire),
+    .RESULT(next_consecutive_pc_wire)
 );
 
 /*wire [SIZE-1:0] instruction_wire;
@@ -41,7 +43,8 @@ CONTROL control(
     .AuipcLui(AuipcLui_wire)
 );
 
-wire [SIE-1:0] data_1_wire, data_2_wire;
+wire [SIZE-1:0] data_mux_result_wire;
+wire [SIZE-1:0] data_1_wire, data_2_wire;
 BANCO_REGISTROS #(.SIZE(SIZE)) registros(
     .CLK(CLK),
     .RESET_N(RESET_N),
@@ -104,9 +107,9 @@ RAM #(.data_width(SIZE), .addr_width(ADDR_WIDTH)) data_memory (
 
 );*/
 
-wire [SIZE-1:0] data_mux_result_wire;
+
 MUX #(.SIZE(SIZE), .INPUTS(2)) data_mux (
-    .all_inputs({ADDR_RAM, Q_RAM})
+    .all_inputs({ADDR_RAM, Q_RAM}),
     .sel(MemtoReg),
     .result(data_mux_result_wire)
 );
@@ -122,8 +125,8 @@ ALU #(.SIZE(SIZE)) jump_alu(
 wire PCSrc;
 assign PCSrc = Branch & address_alu_zero;
 wire [SIZE-1:0] next_pc_wire;
-MUX #(.SIZE(SIZE), .INPUTS(INPUTS)) pc_mux(
-    .all_inputs({next_consecutive_pc_wire,branch_target_wire})
+MUX #(.SIZE(SIZE), .INPUTS(2)) pc_mux(
+    .all_inputs({next_consecutive_pc_wire,branch_target_wire}),
     .sel(PCSrc),
     .result(next_pc_wire)
 );
@@ -136,5 +139,5 @@ always @(posedge CLK or negedge RESET_N) begin
         PC <= next_pc_wire;
     end
 end
-assign PC = ADDR_ROM; 
+assign ADDR_ROM = PC; 
 endmodule
