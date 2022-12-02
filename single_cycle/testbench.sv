@@ -30,12 +30,26 @@ top top(CLK, RESET_N, Q_ROM, ADDR_ROM, ADDR_RAM, Q_RAM, Q_W, ENABLE_W); //FALTAN
 defparam top.SIZE = addr_width;
 defparam top.ADDR_WIDTH = data_width;
 
-initial begin
- 
+initial 
+begin
+	CLK = 0;
+	forever  #(T/2) CLK=!CLK;
 end
+initial
+    begin
+        RST_N = 0;
+		    #(T)
+		RST_N = 1;
+    end
 
+
+
+
+task  read(input [addr_width-1:0] address_read, input [7:0] cicles = 1); 
+    ADDR_R = address_read; 
+endtask 
 task 
-
+    file = 'ADD_ADDI.txt'
 
 endtask 
 

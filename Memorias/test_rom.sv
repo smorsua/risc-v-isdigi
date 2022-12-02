@@ -18,7 +18,7 @@ defparam rom.data_width = data_width;
 
 initial 
 begin
-	
+    
     read(0);
     
     read(1);
