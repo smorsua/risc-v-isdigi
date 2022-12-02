@@ -1,10 +1,11 @@
 `ifndef INSTRUCTION_TYPE_GUARD
 `define INSTRUCTION_TYPE_GUARD
-enum { 
-    I_FORMAT = 'b0010011, 
-    S_FORMAT = 'b0100011, 
+enum {
+    R_FORMAT = 'b0110011,
+    I_FORMAT = 'b0010011,
+    S_FORMAT = 'b0100011,
     B_FORMAT = 'b1100011,
-    U_FORMAT = 'b0110111,
-    J_FORMAT = 'b1101111
+    U_FORMAT = 'b0110111
+    /*J_FORMAT = 'b1101111*/
 } instruction_type;
-`endif INSTRUCTION_TYPE_GUARD 
+`endif INSTRUCTION_TYPE_GUARD

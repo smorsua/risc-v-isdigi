@@ -1,7 +1,7 @@
 module ALU_CONTROL(
     input [3:0] funct3,
     input bit30,
-    input ALUOp,
+    input [1:0] ALUOp,
     output [3:0] ALUSelection
 );
 
@@ -10,7 +10,7 @@ module ALU_CONTROL(
         case(ALUOp)
         2'b00: begin
             case(funct3)
-            3'b000: ALUSelection = bit30 == 0 ? ADD : SUB; 
+            3'b000: ALUSelection = bit30 == 0 ? ADD : SUB;
             3'b001: ALUSelection = LEFT_SHIFT;
             3'b010: ALUSelection = LESS_THAN;
             3'b011: ALUSelection = LESS_THAN;
@@ -23,8 +23,8 @@ module ALU_CONTROL(
         2'b01: ALUSelection = SUB;
         2'b10: ALUSelection = ADD;
     //FIXME: falta uno
-    
+
         endcase
     end
 
-endmodule 
+endmodule

@@ -3,7 +3,7 @@ module CONTROL(
     output BRANCH,
     output MEM_READ,
     output MEM_TO_REG,
-    output [1:0] ALU_OP,
+    output [3:0] ALU_OP,
     output MEM_WRITE,
     output ALU_SRC,
     output REG_WRITE,
@@ -24,8 +24,8 @@ always_comb begin
         end
         I_FORMAT: begin
             BRANCH = 0;
-            MEM_READ = 1;
-            MEM_TO_REG = 1;
+            MEM_READ = 0;
+            MEM_TO_REG = 0;
             ALU_OP = 'b10;
             MEM_WRITE = 0;
             ALU_SRC = 1;
@@ -34,8 +34,8 @@ always_comb begin
         S_FORMAT:
         begin
             BRANCH = 0;
-            MEM_READ = 0; //X
-            MEM_TO_REG = 0;
+            MEM_READ = 1;
+            MEM_TO_REG = 0; //X
             ALU_OP = 'b10;
             MEM_WRITE = 1;
             ALU_SRC = 1;
@@ -61,17 +61,17 @@ always_comb begin
             ALU_SRC = 1;
             REG_WRITE = 1;
         end
-        /*J_FORMAT: 
+        /*J_FORMAT:
         begin
             BRANCH = 1; // check
-            MEM_READ = 0; //check 
+            MEM_READ = 0; //check
             MEM_TO_REG = 0;//check
             ALU_OP = 'b10;
             MEM_WRITE = 0;//check
             ALU_SRC = 1;//check
             REG_WRITE = 1;//check
         end*/
-        default: 
+        default:
     endcase
 end
 
