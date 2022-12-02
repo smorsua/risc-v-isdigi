@@ -8,6 +8,7 @@ module test_rom (
 
 );
 
+	logic CLK;
 	logic [(addr_width-1):0] ADDR_R;
 	logic [(data_width-1):0] Q_R;
 
@@ -17,14 +18,17 @@ defparam rom.data_width = data_width;
 
 initial 
 begin
-    
+	
     read(0);
+    
     read(1);
+    #(T/4)
     read(2);
+    #(T/2)
     $stop;
 	
 end
-task  read(input [addr_width-1:0] address_read); 
+task  read(input [addr_width-1:0] address_read, input [7:0] cicles = 1); 
     ADDR_R = address_read; 
 endtask 
 
