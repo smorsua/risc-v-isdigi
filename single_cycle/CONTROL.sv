@@ -61,7 +61,7 @@ always_comb begin
             ALU_SRC = 1;
             REG_WRITE = 1;
         end
-        J_FORMAT: 
+        /*J_FORMAT: 
         begin
             BRANCH = 1; // check
             MEM_READ = 0; //check 
@@ -70,7 +70,7 @@ always_comb begin
             MEM_WRITE = 0;//check
             ALU_SRC = 1;//check
             REG_WRITE = 1;//check
-        end
+        end*/
         default: 
     endcase
 end
