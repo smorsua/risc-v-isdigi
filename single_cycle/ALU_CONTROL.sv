@@ -1,3 +1,5 @@
+`include "../ALU/operation_type.sv"
+
 module ALU_CONTROL(
     input [3:0] funct3,
     input bit30,
@@ -5,7 +7,6 @@ module ALU_CONTROL(
     output [3:0] ALUSelection
 );
 
-    `include "ALU/operation_type.sv"
     always_comb begin
         case(ALUOp)
         2'b00: begin

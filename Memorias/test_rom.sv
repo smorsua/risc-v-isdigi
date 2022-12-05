@@ -1,12 +1,10 @@
 `timescale 1ns/1ps
-localparam  T = 20, addr_width = 10, data_width = 32;
-
-
-
 
 module test_rom (
 
 );
+
+localparam  T = 20, addr_width = 10, data_width = 32;
 
 	logic CLK;
 	logic [(addr_width-1):0] ADDR_R;

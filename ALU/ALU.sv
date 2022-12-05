@@ -1,3 +1,5 @@
+`include "operation_type.sv"
+
 module ALU #(parameter SIZE = 32) (
     input [SIZE-1:0] A,
     input [SIZE-1:0] B,
@@ -6,10 +8,12 @@ module ALU #(parameter SIZE = 32) (
     output ZERO
 );
 
-`include "operation_type.sv"
+e_operations operation;
+
+assign operation = OPERATION;
 
 always_comb begin
-    case(OPERATION)
+    case(operation)
         ADD: RESULT = A + B;
         SLT: RESULT = A >= B ? 0 : 1;
         SLTU: RESULT = $signed(A)>= $signed(B) ? 0 : 1;

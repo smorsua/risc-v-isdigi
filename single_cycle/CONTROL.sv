@@ -72,6 +72,15 @@ always_comb begin
             REG_WRITE = 1;//check
         end*/
         default:
+			begin
+				BRANCH = 0;
+            MEM_READ = 0;
+            MEM_TO_REG = 0;
+            ALU_OP = 'b10;
+            MEM_WRITE = 0;
+            ALU_SRC = 0;
+            REG_WRITE = 0;
+			end
     endcase
 end
 

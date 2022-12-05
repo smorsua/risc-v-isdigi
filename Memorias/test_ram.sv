@@ -1,17 +1,16 @@
 `timescale 1ns/1ps
-localparam  T = 20, addr_width = 10, data_width = 32;
-
-
 
 
 module test_ram (
 
 );
 
+localparam  T = 20, addr_width = 10, data_width = 32;
+
 	logic CLK;
 	logic  [(addr_width-1):0] ADDR_W;
 	logic ENABLE_W;
-    logic  [(data_width-1):0] Q_W;
+   logic  [(data_width-1):0] Q_W;
 	logic [(addr_width-1):0] ADDR_R;
 	logic [(data_width-1):0] Q_R;
 

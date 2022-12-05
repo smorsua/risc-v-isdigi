@@ -1,3 +1,4 @@
+`include "../ALU/operation_type.sv"
 
 module top
 #(parameter SIZE = 32, parameter ADDR_WIDTH = 10)(
