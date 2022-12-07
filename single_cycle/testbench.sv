@@ -20,7 +20,7 @@ defparam ram.data_width = data_width;
 ROM rom(.ADDR_R(ADDR_ROM), .Q_R(Q_ROM));
 defparam rom.addr_width = addr_width;
 defparam rom.data_width = data_width;
-defparam rom.file = "ADD_ADDI.txt" ;
+defparam rom.file = "instructions.txt" ;
 
 top top(CLK, RESET_N, Q_ROM, ADDR_ROM, ADDR_RAM, Q_RAM, Q_W, ENABLE_W); 
 defparam top.ADDR_WIDTH = addr_width;
@@ -37,7 +37,7 @@ initial
         RESET_N = 0;
 		    #(T)
 		RESET_N = 1;
-        load_program("ADD_ADDI.txt");
+        //load_program("instructions.txt");
         #(T*20);
         $stop;
 
@@ -51,7 +51,7 @@ endtask
 task load_program(input file);
 begin
 @(negedge CLK)
-file = "ADD_ADDI.txt" ; 
+file = "instructions.txt" ; 
 @(negedge CLK);
 end 
 endtask

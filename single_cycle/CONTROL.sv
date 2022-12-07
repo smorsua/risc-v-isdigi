@@ -21,6 +21,7 @@ always_comb begin
             MEM_WRITE = 0;
             ALU_SRC = 0;
             REG_WRITE = 1;
+            AuipcLui = 2;
         end
         I_FORMAT: begin
             BRANCH = 0;
@@ -30,6 +31,7 @@ always_comb begin
             MEM_WRITE = 0;
             ALU_SRC = 1;
             REG_WRITE = 1;
+            AuipcLui = 2;
         end
         S_FORMAT:
         begin
@@ -40,6 +42,7 @@ always_comb begin
             MEM_WRITE = 1;
             ALU_SRC = 1;
             REG_WRITE = 0;
+            AuipcLui = 2;
         end
         B_FORMAT:
         begin
@@ -50,8 +53,9 @@ always_comb begin
             MEM_WRITE = 0;
             ALU_SRC = 0;
             REG_WRITE = 0;
+            AuipcLui = 2;
         end
-        U_FORMAT: // creo que igual que I FORMAT
+        AUIPC: // creo que igual que I FORMAT
         begin
             BRANCH = 0;
             MEM_READ = 1;
@@ -60,6 +64,18 @@ always_comb begin
             MEM_WRITE = 0;
             ALU_SRC = 1;
             REG_WRITE = 1;
+            AuipcLui = 0;
+        end
+        LUI: // creo que igual que I FORMAT
+        begin
+            BRANCH = 0;
+            MEM_READ = 1;
+            MEM_TO_REG = 1;
+            ALU_OP = 'b10;
+            MEM_WRITE = 0;
+            ALU_SRC = 1;
+            REG_WRITE = 1;
+            AuipcLui = 1;
         end
         /*J_FORMAT:
         begin
@@ -73,13 +89,14 @@ always_comb begin
         end*/
         default:
 			begin
-				BRANCH = 0;
+			BRANCH = 0;
             MEM_READ = 0;
             MEM_TO_REG = 0;
             ALU_OP = 'b10;
             MEM_WRITE = 0;
             ALU_SRC = 0;
             REG_WRITE = 0;
+            AuipcLui = 0;
 			end
     endcase
 end
