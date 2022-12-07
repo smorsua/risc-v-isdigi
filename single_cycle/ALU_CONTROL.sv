@@ -4,7 +4,7 @@ module ALU_CONTROL(
     input [3:0] funct3,
     input bit30,
     input [1:0] ALUOp,
-    output [3:0] ALUSelection
+    output reg [3:0] ALUSelection
 );
 
     always_comb begin
