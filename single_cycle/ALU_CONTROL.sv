@@ -1,29 +1,62 @@
 `include "../ALU/operation_type.sv"
+`include "instruction_type.sv"
 
 module ALU_CONTROL(
+    input [6:0] OPCODE,
     input [3:0] funct3,
     input bit30,
-    input [1:0] ALUOp,
     output reg [3:0] ALUSelection
 );
 
     always_comb begin
-        case(ALUOp)
-        2'b00: begin
+        casex(OPCODE)
+        R_FORMAT: begin //tipo R
             case(funct3)
             3'b000: ALUSelection = bit30 == 0 ? ADD : SUB;
             3'b001: ALUSelection = LEFT_SHIFT;
             3'b010: ALUSelection = LESS_THAN;
             3'b011: ALUSelection = LESS_THAN;
             3'b100: ALUSelection = XOR;
-            3'b101: ALUSelection = bit30 == 0 ? RIGHT_SHIFT : SIGNED_RIGHT_SHIFT;
+            3'b101: ALUSelection = bit30 == 0 ? RIGHT_SHIFT : RIGHT_SHIFT_SIGNED;
             3'b110: ALUSelection = OR;
             3'b111: ALUSelection = AND;
-				default: ALUSelection = 0;
+			default: ALUSelection = 0;
             endcase
         end
-        2'b01: ALUSelection = SUB;
-        2'b10: ALUSelection = ADD;
+        I_FORMAT: begin
+            casex(OPCODE) 
+                7'b0000011: begin // instrucciones de carga
+                    ALUSelection = ADD;
+                end
+                7'b001x011: begin // operaciones con immediatos
+                    case(funct3)
+                        3'b000: ALUSelection = ADD;
+                        3'b001: ALUSelection = LEFT_SHIFT;
+                        3'b010: ALUSelection = LESS_THAN;
+                        3'b011: ALUSelection = LESS_THAN_UNSIGNED;
+                        3'b100: ALUSelection = XOR;
+                        3'b101: 
+                            case(bit30)
+                            1'b0: ALUSelection = RIGHT_SHIFT;
+                            1'b1: ALUSelection = RIGHT_SHIFT_SIGNED;
+                            //FIXME: usar case sin default
+                            default: ALUSelection = RIGHT_SHIFT;
+                            endcase
+                        3'b110: ALUSelection = OR;
+                        3'b111: ALUSelection = AND;
+								//usar case que no necesita default
+							default: ALUSelection = ADD;
+                    endcase
+                end
+					 //usar case que no necesita default
+				default: ALUSelection = ADD;
+            endcase
+        
+        end
+        // S_FORMAT: ALUSelection = ADD;
+        // B_FORMAT:
+        // U_FORMAT:
+        // J_FORMAT:
 		  default: ALUSelection = 0;
     //FIXME: falta uno
 

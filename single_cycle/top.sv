@@ -17,28 +17,22 @@ module top
 bit [ADDR_WIDTH-1:0] PC;
 wire [SIZE-1:0] next_consecutive_pc_wire;
 
-ALU #(.SIZE(SIZE)) pc_alu(
+ALU #(.SIZE(ADDR_WIDTH)) pc_alu(
     .A(PC),
-    .B('d4),
+    //FIXME: sumamos 1 o 4
+    .B('d1),
     .OPERATION(ADD),
     .RESULT(next_consecutive_pc_wire),
     .ZERO()
 );
 
-/*wire [SIZE-1:0] instruction_wire;
-ROM #(.data_width(SIZE),.addr_width(ADDR_WIDTH)) instruction_memory (
-    .ADDR_R(PC),
-    .Q_R(instruction_wire)
-);*/
-
-wire Branch, MemRed, MemtoReg, ALUOp, MemWrite, ALUSrc, RegWrite;
+wire Branch, MemRed, MemtoReg, MemWrite, ALUSrc, RegWrite;
 wire [1:0] AuipcLui_wire;
 CONTROL control(
-    .INSTRUCTION_FORMAT(Q_ROM[6:0]),
+    .OPCODE(Q_ROM[6:0]),
     .BRANCH(Branch),
     .MEM_READ(MemRed),
     .MEM_TO_REG(MemtoReg),
-    .ALU_OP(ALUOp),
     .MEM_WRITE(ENABLE_W),
     .ALU_SRC(ALUSrc),
     .REG_WRITE(RegWrite),
@@ -92,9 +86,9 @@ MUX #(.SIZE(SIZE), .INPUTS(2)) alu_src_2_mux (
 
 wire [3:0] ALUSelection_wire;
 ALU_CONTROL alu_control(
+    .OPCODE(Q_ROM[6:0]),
     .funct3(Q_ROM[14:12]),
     .bit30(Q_ROM[30]),
-    .ALUOp(ALUOp),
     .ALUSelection(ALUSelection_wire)
 );
 

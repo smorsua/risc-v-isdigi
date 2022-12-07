@@ -2,15 +2,16 @@
 `define OPERATION_TYPE_HEADER
 typedef enum bit [3:0] { 
 	ADD 					= 4'd0, 
-	SUB 					= 4'd1, 
-	LESS_THAN 				= 4'd2, 
-	GREATER_OR_EQUAL_THAN 	= 4'd3,  
-	AND 					= 4'd4,
-	OR 						= 4'd5, 
-	XOR 					= 4'd6, 
-	LEFT_SHIFT 				= 4'd7, 
-	SIGNED_LEFT_SHIFT 		= 4'd8, 
-	RIGHT_SHIFT 			= 4'd9, 
-	SIGNED_RIGHT_SHIFT		= 4'd10
+	SUB, 					
+	LESS_THAN, 				
+	LESS_THAN_UNSIGNED, 
+	GREATER_OR_EQUAL_THAN,  
+	AND, 					
+	OR, 						
+	XOR, 					
+	LEFT_SHIFT, 				
+	LEFT_SHIFT_SIGNED, 		
+	RIGHT_SHIFT,				
+	RIGHT_SHIFT_SIGNED	
 	} e_operations;
 `endif // OPERATION_TYPE_HEADER
