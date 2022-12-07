@@ -1,5 +1,3 @@
-`include "operation_type.sv"
-
 module ALU #(parameter SIZE = 32) (
     input [SIZE-1:0] A,
     input [SIZE-1:0] B,
@@ -8,29 +6,25 @@ module ALU #(parameter SIZE = 32) (
     output ZERO
 );
 
-e_operations operation;
-
-assign operation = OPERATION;
+`include "operation_type.sv"
 
 always_comb begin
-    case(operation)
+    case(OPERATION)
         ADD: RESULT = A + B;
-        SLT: RESULT = A >= B ? 0 : 1;
-        SLTU: RESULT = $signed(A)>= $signed(B) ? 0 : 1;
+        SUB: RESULT = A - B; 
+        LESS_THAN: RESULT = A < B;
+        GREATER_OR_EQUAL_THAN: RESULT = A >= B;
         AND: RESULT = A & B;
         OR: RESULT = A | B;
-        XOR: RESULT = A ^ B;
-        LUI: RESULT  =  {B,12'd0};
-        AUIPC: RESULT = {B,12'd0} + A;
-        SUB: RESULT = A - B;
-        BEQ: ZERO = (A == B) ? 1 : 0;
-        BNE: ZERO = (A != B) ? 0 : 1;
-
+        XNOR: RESULT = A ^ B;
+        LEFT_SHIFT: RESULT = A << B;
+        SIGNED_LEFT_SHIFT: RESULT = A <<< B;
+        RIGHT_SHIFT: RESULT = A >> B;
+        SIGNED_RIGHT_SHIFT: RESULT = A >>> B;
         default: RESULT = 0;
-    endcase
+    endcase 
 end
 
 assign ZERO = RESULT == 0 ? 1'b1 : 1'b0;
 
 endmodule
-
