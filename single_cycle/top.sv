@@ -49,9 +49,9 @@ wire [SIZE-1:0] data_1_wire, data_2_wire;
 BANCO_REGISTROS #(.SIZE(SIZE)) registros(
     .CLK(CLK),
     .RESET_N(RESET_N),
-    .reg1r(Q_ROM[19:15]),
-    .reg2r(Q_ROM[24:20]),
-    .regW(Q_ROM[11:7]),
+    .read_reg1(Q_ROM[19:15]),
+    .read_reg2(Q_ROM[24:20]),
+    .write_reg(Q_ROM[11:7]),
     .writeData(data_mux_result_wire),
     .RegWrite(RegWrite),
     .Data1(data_1_wire),
