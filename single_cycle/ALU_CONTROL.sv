@@ -3,7 +3,7 @@
 
 module ALU_CONTROL(
     input [6:0] OPCODE,
-    input [3:0] funct3,
+    input [2:0] funct3,
     input bit30,
     output reg [3:0] ALUSelection
 );
