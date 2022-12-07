@@ -21,7 +21,8 @@ ALU #(.SIZE(SIZE)) pc_alu(
     .A(PC),
     .B('d4),
     .OPERATION(ADD),
-    .RESULT(next_consecutive_pc_wire)
+    .RESULT(next_consecutive_pc_wire),
+    .ZERO()
 );
 
 /*wire [SIZE-1:0] instruction_wire;
