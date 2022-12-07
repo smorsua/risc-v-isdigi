@@ -25,7 +25,7 @@ defparam ram.data_width = data_width;
 ROM rom(.ADDR_R(ADDR_ROM), .Q_R(Q_ROM));
 defparam rom.addr_width = addr_width;
 defparam rom.data_width = data_width;
-defparam rom.file = ;
+defparam rom.file = "ADD_ADDI.txt" ;
 
 top top(CLK, RESET_N, Q_ROM, ADDR_ROM, ADDR_RAM, Q_RAM, Q_W, ENABLE_W); //FALTAN SEÑALES POR METER PARA CONECTAR A LA RAM Y LA ROM
 defparam top.SIZE = addr_width;
@@ -38,22 +38,24 @@ begin
 end
 initial
     begin
-        RST_N = 0;
+        RESET_N = 0;
 		    #(T)
-		RST_N = 1;
-        load_program("ADD_ADDI.txt")
+		RESET_N = 1;
+        load_program("ADD_ADDI.txt");
 
     end
 
 
 task  read(input [addr_width-1:0] address_read, input [7:0] cicles = 1); 
-    ADDR_R = address_read; 
+    ADDR_ROM = address_read; 
 endtask 
 
 task load_program(input file);
- @(negedge CLK)
-file = 'ADD_ADDI.txt'    
-@(negedge CLK); 
+begin
+@(negedge CLK)
+file = "ADD_ADDI.txt" ; 
+@(negedge CLK);
+end 
 endtask
 
 
