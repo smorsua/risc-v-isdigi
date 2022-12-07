@@ -14,7 +14,7 @@ module top
 );
 
 
-bit [ADDR_WIDTH-1:0] PC;
+bit [SIZE-1:0] PC;
 wire [SIZE-1:0] next_consecutive_pc_wire;
 
 ALU #(.SIZE(SIZE)) pc_alu(
@@ -60,21 +60,31 @@ BANCO_REGISTROS #(.SIZE(SIZE)) registros(
 assign data_2_wire = Q_W;
 wire [SIZE-1:0] imm_wire;
 //Como hay que trocear la instruccion a mano, solo funciona para 32 bits
+
 IMMEDIATE_GENERATOR imm_gen(
-    .INSTRUCTION(Q_ROM),
+    .inst(Q_ROM),
     .IMMEDIATE(imm_wire)
 );
 
 wire [SIZE-1:0] first_operand_wire;
+wire [SIZE-1:0] myInput_alu_src_1_mux [3];
+assign myInput_alu_src_1_mux[0] = PC;
+assign myInput_alu_src_1_mux[1] = 32'b0;
+assign myInput_alu_src_1_mux[2] = data_1_wire;
+
 MUX #(.SIZE(32), .INPUTS(3)) alu_src_1_mux (
-    .all_inputs({PC, 32'b0, data_1_wire}),
+    .all_inputs(myInput_alu_src_1_mux),
     .sel(AuipcLui_wire),
     .result(first_operand_wire)
 );
 
 wire [SIZE-1:0] second_operand_wire;
+wire [SIZE-1:0] myInput_alu_src_mux [2];
+assign myInput_alu_src_mux[0] = data_2_wire;
+assign myInput_alu_src_mux[1] = imm_wire;
+
 MUX #(.SIZE(SIZE), .INPUTS(2)) alu_src_mux (
-    .all_inputs({data_2_wire, imm_wire}),
+    .all_inputs(myInput_alu_src_mux),
     .sel(ALUSrc),
     .result(second_operand_wire)
 );
@@ -108,9 +118,12 @@ RAM #(.data_width(SIZE), .addr_width(ADDR_WIDTH)) data_memory (
 
 );*/
 
+wire [SIZE-1:0] myInput_data_mux [2];
+assign myInput_data_mux[0] = ADDR_RAM;
+assign myInput_data_mux[1] = Q_RAM;
 
 MUX #(.SIZE(SIZE), .INPUTS(2)) data_mux (
-    .all_inputs({ADDR_RAM, Q_RAM}),
+    .all_inputs(myInput_data_mux),
     .sel(MemtoReg),
     .result(data_mux_result_wire)
 );
@@ -126,8 +139,13 @@ ALU #(.SIZE(SIZE)) jump_alu(
 wire PCSrc;
 assign PCSrc = Branch & address_alu_zero;
 wire [SIZE-1:0] next_pc_wire;
+
+wire [SIZE-1:0] myInput_pc_mux [2];
+assign myInput_pc_mux[0] = next_consecutive_pc_wire;
+assign myInput_pc_mux[1] = branch_target_wire;
+
 MUX #(.SIZE(SIZE), .INPUTS(2)) pc_mux(
-    .all_inputs({next_consecutive_pc_wire,branch_target_wire}),
+    .all_inputs(myInput_pc_mux),
     .sel(PCSrc),
     .result(next_pc_wire)
 );

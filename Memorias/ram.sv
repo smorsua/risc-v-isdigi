@@ -15,8 +15,9 @@ module RAM
 	assign 	Q_R = ram[ADDR_R] ;
 	
 
-    always @(posedge CLK && ENABLE_W)
+    always @(posedge CLK)
     begin
+	 if(ENABLE_W)
 		ram[ADDR_W] <= Q_W ;
 	
 	end

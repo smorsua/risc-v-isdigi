@@ -1,6 +1,6 @@
-module banco_registros #(parameter SIZE = 32) (CLK,RESET_n,reg1r,reg2r,regW, writeData,RegWrite,Data1,Data2);
+module BANCO_REGISTROS #(parameter SIZE = 32) (CLK,RESET_N,reg1r,reg2r,regW, writeData,RegWrite,Data1,Data2);
   
-    input CLK,RESET;
+    input CLK, RESET_N;
     input logic [$clog2(SIZE)-1:0] reg1r, reg2r, regW; //seleccion de registro DIRECCIONES
     input logic [SIZE-1:0] writeData;
     input RegWrite;
@@ -14,9 +14,9 @@ module banco_registros #(parameter SIZE = 32) (CLK,RESET_n,reg1r,reg2r,regW, wri
 //caso escritura
 //cojo el valor de regW que es la direccion donde voy a escribir el dato que obtengo de la señal writeData 
 
-always @(posedge CLK or negedge RESET)
+always @(posedge CLK or negedge RESET_N)
 begin 
-    if(!RESET)
+    if(!RESET_N)
 	 banco_registros <= '0; 
        // for (int i = 0; i < SIZE-1; i = i+1)
 		// banco_registros[i] <= '0; 

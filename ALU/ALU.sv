@@ -1,3 +1,5 @@
+`include "operation_type.sv"
+
 module ALU #(parameter SIZE = 32) (
     input [SIZE-1:0] A,
     input [SIZE-1:0] B,
@@ -5,8 +7,6 @@ module ALU #(parameter SIZE = 32) (
     output reg [SIZE-1:0] RESULT,
     output ZERO
 );
-
-`include "operation_type.sv"
 
 always_comb begin
     case(OPERATION)
@@ -16,7 +16,7 @@ always_comb begin
         GREATER_OR_EQUAL_THAN: RESULT = A >= B;
         AND: RESULT = A & B;
         OR: RESULT = A | B;
-        XNOR: RESULT = A ^ B;
+        XOR: RESULT = A ^ B;
         LEFT_SHIFT: RESULT = A << B;
         SIGNED_LEFT_SHIFT: RESULT = A <<< B;
         RIGHT_SHIFT: RESULT = A >> B;

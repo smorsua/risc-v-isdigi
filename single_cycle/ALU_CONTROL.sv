@@ -19,10 +19,12 @@ module ALU_CONTROL(
             3'b101: ALUSelection = bit30 == 0 ? RIGHT_SHIFT : SIGNED_RIGHT_SHIFT;
             3'b110: ALUSelection = OR;
             3'b111: ALUSelection = AND;
+				default: ALUSelection = 0;
             endcase
         end
         2'b01: ALUSelection = SUB;
         2'b10: ALUSelection = ADD;
+		  default: ALUSelection = 0;
     //FIXME: falta uno
 
         endcase
