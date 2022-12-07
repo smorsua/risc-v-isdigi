@@ -14,7 +14,7 @@ module top
 );
 
 
-bit [SIZE-1:0] PC;
+bit [ADDR_WIDTH-1:0] PC;
 wire [SIZE-1:0] next_consecutive_pc_wire;
 
 ALU #(.SIZE(SIZE)) pc_alu(
@@ -138,7 +138,7 @@ ALU #(.SIZE(SIZE)) jump_alu(
 
 wire PCSrc;
 assign PCSrc = Branch & address_alu_zero;
-wire [SIZE-1:0] next_pc_wire;
+wire [ADDR_WIDTH-1:0] next_pc_wire;
 
 wire [SIZE-1:0] myInput_pc_mux [2];
 assign myInput_pc_mux[0] = next_consecutive_pc_wire;
