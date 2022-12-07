@@ -27,7 +27,7 @@ defparam rom.addr_width = addr_width;
 defparam rom.data_width = data_width;
 defparam rom.file = "ADD_ADDI.txt" ;
 
-top top(CLK, RESET_N, Q_ROM, ADDR_ROM, ADDR_RAM, Q_RAM, Q_W, ENABLE_W); //FALTAN SEÑALES POR METER PARA CONECTAR A LA RAM Y LA ROM
+top top(CLK, RESET_N, Q_ROM, ADDR_ROM, ADDR_RAM, Q_RAM, Q_W, ENABLE_W); 
 defparam top.SIZE = addr_width;
 defparam top.ADDR_WIDTH = data_width;
 
@@ -57,7 +57,5 @@ file = "ADD_ADDI.txt" ;
 @(negedge CLK);
 end 
 endtask
-
-
 
 endmodule 
