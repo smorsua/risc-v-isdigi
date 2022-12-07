@@ -1,6 +1,6 @@
 module IMMEDIATE_GENERATOR(
     input [31:0] inst,
-    output [31:0] IMMEDIATE
+    output reg [31:0] IMMEDIATE
 );
 `include "instruction_type.sv"
 

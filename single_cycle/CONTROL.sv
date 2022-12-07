@@ -1,13 +1,13 @@
 module CONTROL(
     input [6:0] INSTRUCTION_FORMAT,
-    output BRANCH,
-    output MEM_READ,
-    output MEM_TO_REG,
-    output [3:0] ALU_OP,
-    output MEM_WRITE,
-    output ALU_SRC,
-    output REG_WRITE,
-    output [1:0] AuipcLui
+    output reg BRANCH,
+    output reg MEM_READ,
+    output reg MEM_TO_REG,
+    output  reg [3:0] ALU_OP,
+    output reg  MEM_WRITE,
+    output reg ALU_SRC,
+    output reg REG_WRITE,
+    output reg [1:0] AuipcLui
 );
 `include "instruction_type.sv"
 
