@@ -4,7 +4,7 @@ module top
 #(parameter SIZE = 32, parameter ADDR_WIDTH = 10)(
     input CLK, 
     input RESET_N,
-    input  [(SIZE-1):0]Q_ROM,
+    input  [SIZE-1:0]Q_ROM,
     output  [(ADDR_WIDTH-1):0] ADDR_ROM,
     output  [(ADDR_WIDTH-1):0] ADDR_RAM,
     input  [(SIZE-1):0] Q_RAM,

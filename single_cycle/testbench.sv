@@ -13,11 +13,6 @@ logic  [(data_width-1):0] Q_RAM;
 logic [(addr_width-1):0] ADDR_ROM;
 logic  [(data_width-1):0] Q_ROM;
 
-initial begin
-    CLK = 0;
-    forever #(T/2) CLK = !CLK;
-end
-
 RAM ram(CLK, ADDR_W, ENABLE_W, Q_W, ADDR_RAM, Q_RAM);
 defparam ram.addr_width = addr_width;
 defparam ram.data_width = data_width;
@@ -28,20 +23,23 @@ defparam rom.data_width = data_width;
 defparam rom.file = "ADD_ADDI.txt" ;
 
 top top(CLK, RESET_N, Q_ROM, ADDR_ROM, ADDR_RAM, Q_RAM, Q_W, ENABLE_W); 
-defparam top.SIZE = addr_width;
-defparam top.ADDR_WIDTH = data_width;
+defparam top.ADDR_WIDTH = addr_width;
+defparam top.SIZE = data_width;
 
 initial 
 begin
 	CLK = 0;
-	forever  #(T/2) CLK=!CLK;
+	forever  #(T/2) CLK = ~CLK;
 end
+
 initial
     begin
         RESET_N = 0;
 		    #(T)
 		RESET_N = 1;
         load_program("ADD_ADDI.txt");
+        #(T*20);
+        $stop;
 
     end
 
