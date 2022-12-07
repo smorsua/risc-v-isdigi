@@ -57,7 +57,7 @@ BANCO_REGISTROS #(.SIZE(SIZE)) registros(
     .Data1(data_1_wire),
     .Data2(data_2_wire)
 );
-assign data_2_wire = Q_W;
+assign Q_W = data_2_wire;
 wire [SIZE-1:0] imm_wire;
 //Como hay que trocear la instruccion a mano, solo funciona para 32 bits
 
@@ -79,12 +79,12 @@ MUX #(.SIZE(32), .INPUTS(3)) alu_src_1_mux (
 );
 
 wire [SIZE-1:0] second_operand_wire;
-wire [SIZE-1:0] myInput_alu_src_mux [2];
-assign myInput_alu_src_mux[0] = data_2_wire;
-assign myInput_alu_src_mux[1] = imm_wire;
+wire [SIZE-1:0] myInput_alu_src_2_mux [2];
+assign myInput_alu_src_2_mux[0] = data_2_wire;
+assign myInput_alu_src_2_mux[1] = imm_wire;
 
-MUX #(.SIZE(SIZE), .INPUTS(2)) alu_src_mux (
-    .all_inputs(myInput_alu_src_mux),
+MUX #(.SIZE(SIZE), .INPUTS(2)) alu_src_2_mux (
+    .all_inputs(myInput_alu_src_2_mux),
     .sel(ALUSrc),
     .result(second_operand_wire)
 );
