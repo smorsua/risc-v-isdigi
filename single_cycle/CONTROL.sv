@@ -5,7 +5,7 @@ module CONTROL(
     output reg BRANCH,
     output reg MEM_READ,
     output reg MEM_TO_REG,
-    output reg  MEM_WRITE,
+    output reg MEM_WRITE,
     output reg ALU_SRC,
     output reg REG_WRITE,
     output reg [1:0] AuipcLui
