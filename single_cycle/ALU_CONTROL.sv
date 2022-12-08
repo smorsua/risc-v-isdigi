@@ -24,7 +24,7 @@ module ALU_CONTROL(
             endcase
         end
         I_FORMAT: begin
-            casex(OPCODE) 
+            casex(OPCODE)
                 7'b0000011: begin // instrucciones de carga
                     ALUSelection = ADD;
                 end
@@ -35,7 +35,7 @@ module ALU_CONTROL(
                         3'b010: ALUSelection = LESS_THAN;
                         3'b011: ALUSelection = LESS_THAN_UNSIGNED;
                         3'b100: ALUSelection = XOR;
-                        3'b101: 
+                        3'b101:
                             case(bit30)
                             1'b0: ALUSelection = RIGHT_SHIFT;
                             1'b1: ALUSelection = RIGHT_SHIFT_SIGNED;
@@ -51,11 +51,15 @@ module ALU_CONTROL(
 					 //usar case que no necesita default
 				default: ALUSelection = ADD;
             endcase
-        
+
         end
         // S_FORMAT: ALUSelection = ADD;
         // B_FORMAT:
-        // U_FORMAT:
+        U_FORMAT:begin
+            casex(funct3)
+                3'bxxx: ALUSelection = ADD;
+            endcase
+        end
         // J_FORMAT:
 		  default: ALUSelection = 0;
     //FIXME: falta uno

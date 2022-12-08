@@ -66,7 +66,7 @@ always_comb begin
             'b0110111: begin
                 BRANCH = 0;
                 MEM_READ = 1;
-                MEM_TO_REG = 1;
+                MEM_TO_REG = 0;
                 MEM_WRITE = 0;
                 ALU_SRC = 1;
                 REG_WRITE = 1;
@@ -83,7 +83,7 @@ always_comb begin
             AuipcLui = 0;
 			end
             endcase
-                
+
             end
         /*J_FORMAT:
         begin
