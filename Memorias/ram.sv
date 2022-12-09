@@ -10,16 +10,20 @@ module RAM
 );
 	reg [data_width-1:0] ram[2**addr_width-1:0];
 
-
-
-	assign 	Q_R = ram[ADDR_R] ;
-	
+	integer i;
+	initial begin
+		for(i=0; i < 2 ** addr_width; i++) begin
+			ram[i] = 'b0;
+		end
+	end
 
     always @(posedge CLK)
     begin
 	 if(ENABLE_W)
-		ram[ADDR_W] <= Q_W ;
-	
+		ram[ADDR_W] <= Q_W;
 	end
+
+	assign 	Q_R = ram[ADDR_R];
+
 	assert property (@(posedge CLK) ENABLE_W |=>  (ram[$past(ADDR_W, 1)] == $past(Q_W, 1))) else  $error ("No escribe");
 endmodule

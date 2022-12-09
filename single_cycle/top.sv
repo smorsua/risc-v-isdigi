@@ -92,15 +92,17 @@ ALU_CONTROL alu_control(
     .ALUSelection(ALUSelection_wire)
 );
 
-wire [SIZE-1:0] alu_operation_wire;
 wire address_alu_zero;
+wire [SIZE-1:0] address_alu_result;
 ALU #(.SIZE(SIZE)) address_alu(
     .A(first_operand_wire),
     .B(second_operand_wire),
     .OPERATION(ALUSelection_wire),
-    .RESULT(ADDR_RAM),
+    .RESULT(address_alu_result),
     .ZERO(address_alu_zero)
 );
+
+assign ADDR_RAM = address_alu_result;
 
 /*wire [SIZE-1:0] read_data_wire;
 RAM #(.data_width(SIZE), .addr_width(ADDR_WIDTH)) data_memory (
@@ -114,7 +116,7 @@ RAM #(.data_width(SIZE), .addr_width(ADDR_WIDTH)) data_memory (
 );*/
 
 wire [SIZE-1:0] myInput_data_mux [2];
-assign myInput_data_mux[0] = ADDR_RAM;
+assign myInput_data_mux[0] = address_alu_result;
 assign myInput_data_mux[1] = Q_RAM;
 
 MUX #(.SIZE(SIZE), .INPUTS(2)) data_mux (
