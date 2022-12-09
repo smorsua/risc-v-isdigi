@@ -13,11 +13,11 @@ module ALU_CONTROL(
         R_FORMAT: begin //tipo R
             case(funct3)
             3'b000: ALUSelection = bit30 == 0 ? ADD : SUB;
-            3'b001: ALUSelection = LEFT_SHIFT;
-            3'b010: ALUSelection = LESS_THAN;
-            3'b011: ALUSelection = LESS_THAN;
+            3'b001: ALUSelection = LEFT_SHIFT_UNSIGNED;
+            3'b010: ALUSelection = LESS_THAN_SIGNED;
+            3'b011: ALUSelection = LESS_THAN_UNSIGNED;
             3'b100: ALUSelection = XOR;
-            3'b101: ALUSelection = bit30 == 0 ? RIGHT_SHIFT : RIGHT_SHIFT_SIGNED;
+            3'b101: ALUSelection = bit30 == 0 ? RIGHT_SHIFT_UNSIGNED : RIGHT_SHIFT_SIGNED;
             3'b110: ALUSelection = OR;
             3'b111: ALUSelection = AND;
 			default: ALUSelection = 0;
@@ -31,16 +31,16 @@ module ALU_CONTROL(
                 7'b001x011: begin // operaciones con immediatos
                     case(funct3)
                         3'b000: ALUSelection = ADD;
-                        3'b001: ALUSelection = LEFT_SHIFT;
-                        3'b010: ALUSelection = LESS_THAN;
+                        3'b001: ALUSelection = LEFT_SHIFT_UNSIGNED;
+                        3'b010: ALUSelection = LESS_THAN_SIGNED;
                         3'b011: ALUSelection = LESS_THAN_UNSIGNED;
                         3'b100: ALUSelection = XOR;
                         3'b101:
                             case(bit30)
-                            1'b0: ALUSelection = RIGHT_SHIFT;
+                            1'b0: ALUSelection = RIGHT_SHIFT_UNSIGNED;
                             1'b1: ALUSelection = RIGHT_SHIFT_SIGNED;
                             //FIXME: usar case sin default
-                            default: ALUSelection = RIGHT_SHIFT;
+                            default: ALUSelection = RIGHT_SHIFT_UNSIGNED;
                             endcase
                         3'b110: ALUSelection = OR;
                         3'b111: ALUSelection = AND;

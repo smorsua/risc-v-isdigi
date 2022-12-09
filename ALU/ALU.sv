@@ -12,15 +12,17 @@ always_comb begin
     case(OPERATION)
         ADD: RESULT = A + B;
         SUB: RESULT = A - B; 
-        LESS_THAN: RESULT = A < B;
-        GREATER_OR_EQUAL_THAN: RESULT = A >= B;
+        LESS_THAN_SIGNED: RESULT = signed'(A) < signed'(B);
+        LESS_THAN_UNSIGNED: RESULT = A < B;
+        GREATER_OR_EQUAL_THAN_SIGNED: RESULT = signed'(A) >= signed'(B);
+        GREATER_OR_EQUAL_THAN_UNSIGNED: RESULT = A >= B;
         AND: RESULT = A & B;
         OR: RESULT = A | B;
         XOR: RESULT = A ^ B;
-        LEFT_SHIFT: RESULT = A << B;
         LEFT_SHIFT_SIGNED: RESULT = A <<< B;
-        RIGHT_SHIFT: RESULT = A >> B;
+        LEFT_SHIFT_UNSIGNED: RESULT = A << B;
         RIGHT_SHIFT_SIGNED: RESULT = A >>> B;
+        RIGHT_SHIFT_UNSIGNED: RESULT = A >> B;
         default: RESULT = 0;
     endcase 
 end
