@@ -1,3 +1,4 @@
+addi x3, x0, 14
 li x1 13
 li x2 777
 sw x1 0(x2)
