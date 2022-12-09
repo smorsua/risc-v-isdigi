@@ -39,16 +39,13 @@ module ALU_CONTROL(
                             case(bit30)
                             1'b0: ALUSelection = RIGHT_SHIFT_UNSIGNED;
                             1'b1: ALUSelection = RIGHT_SHIFT_SIGNED;
-                            //FIXME: usar case sin default
                             default: ALUSelection = RIGHT_SHIFT_UNSIGNED;
                             endcase
                         3'b110: ALUSelection = OR;
                         3'b111: ALUSelection = AND;
-								//usar case que no necesita default
 							default: ALUSelection = ADD;
                     endcase
                 end
-					 //usar case que no necesita default
 				default: ALUSelection = ADD;
             endcase
 

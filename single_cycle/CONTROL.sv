@@ -72,7 +72,6 @@ always_comb begin
                 REG_WRITE = 1;
                 AuipcLui = 1;
             end
-            // FIXME: usar case que no necesita default
             default: begin
 			BRANCH = 0;
             MEM_READ = 0;
@@ -85,16 +84,16 @@ always_comb begin
             endcase
 
             end
-        /*J_FORMAT:
-        begin
-            BRANCH = 1; // check
-            MEM_READ = 0; //check
-            MEM_TO_REG = 0;//check
+        J_FORMAT: begin
+            BRANCH = 1; 
+            MEM_READ = 0;
+            MEM_TO_REG = 0;
             ALU_OP = 'b10;
-            MEM_WRITE = 0;//check
-            ALU_SRC = 1;//check
-            REG_WRITE = 1;//check
-        end*/
+            MEM_WRITE = 0;
+            ALU_SRC = 1;
+            REG_WRITE = 1;
+            AuipcLui = 0;
+        end
         default:
 			begin
 			BRANCH = 0;
