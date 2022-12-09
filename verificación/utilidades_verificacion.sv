@@ -7,6 +7,10 @@ class RCSG_RISCV;
   constraint R_format    {valor[6:0] == 7'b0110011;}
   constraint R_format_a  {(valor[6:0] == 7'b0110011 && valor[14:12]!=3'b000 && valor[14:12]!=3'b101) -> valor[31:25]==7'b0000000 ;}
   constraint R_format_b  {(valor[6:0] == 7'b0110011 && (valor[14:12]==3'b000) || valor[14:12]==3'b101) -> valor[31:25]==7'b0000000 || valor[31:25]==7'b0100000 ;}
+  constraint I_format    {(valor[6:0] == 7'b0010011 && (valor[14:12]== ))}
+  constraint S_format    {(valor[6:0] == 7'b0100011 && (valor[14:12]== ))}
+  constraint B_format    {(valor[6:0] == 7'b1100011 && (valor[14:12]== ))}
+  
 endclass
 
 class covergroups_RISCV;
