@@ -1,7 +1,4 @@
-j Loop
-li x1 12
-nop
-nop
-nop
-Loop:
-li x1 99
+li x1 13
+li x2 777
+sw x1 0(x2)
+auipc x6, 3

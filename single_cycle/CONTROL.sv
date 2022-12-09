@@ -84,16 +84,16 @@ always_comb begin
             endcase
 
             end
-        J_FORMAT: begin
-            BRANCH = 1; 
+       /* J_FORMAT: begin
+            BRANCH = 1;
             MEM_READ = 0;
             MEM_TO_REG = 0;
-            ALU_OP = 'b10;
+            //ALU_OP = 'b10;
             MEM_WRITE = 0;
             ALU_SRC = 1;
             REG_WRITE = 1;
             AuipcLui = 0;
-        end
+        end*/
         default:
 			begin
 			BRANCH = 0;
