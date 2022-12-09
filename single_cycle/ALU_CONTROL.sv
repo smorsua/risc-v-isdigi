@@ -67,7 +67,12 @@ module ALU_CONTROL(
                 3'bxxx: ALUSelection = ADD;
             endcase
         end
-        // J_FORMAT:
+        J_FORMAT:begin
+            casex(funct3)
+                3'bxxx: ALUSelection = ADD;
+            endcase
+
+        end
 		  default: ALUSelection = 0;
     //FIXME: falta uno
 
