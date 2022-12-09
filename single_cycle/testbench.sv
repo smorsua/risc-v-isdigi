@@ -5,7 +5,6 @@ localparam  T = 20, addr_width = 10, data_width = 32;
 
 logic CLK;
 logic RESET_N;
-logic  [(addr_width-1):0] ADDR_W;
 logic ENABLE_W;
 logic  [(data_width-1):0] Q_W;
 logic [(addr_width-1):0] ADDR_RAM;
@@ -13,7 +12,7 @@ logic  [(data_width-1):0] Q_RAM;
 logic [(addr_width-1):0] ADDR_ROM;
 logic  [(data_width-1):0] Q_ROM;
 
-RAM ram(CLK, ADDR_W, ENABLE_W, Q_W, ADDR_RAM, Q_RAM);
+RAM ram(CLK, ADDR_RAM, ENABLE_W, Q_W, ADDR_RAM, Q_RAM);
 defparam ram.addr_width = addr_width;
 defparam ram.data_width = data_width;
 
