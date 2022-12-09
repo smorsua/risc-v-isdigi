@@ -4,7 +4,7 @@ module CONTROL(
     input [6:0] OPCODE,
     output reg BRANCH,
     output reg MEM_READ,
-    output reg MEM_TO_REG,
+    output reg [1:0] MEM_TO_REG,
     output reg MEM_WRITE,
     output reg ALU_SRC,
     output reg REG_WRITE,
@@ -87,7 +87,7 @@ always_comb begin
        J_FORMAT: begin
             BRANCH = 1;
             MEM_READ = 0;
-            MEM_TO_REG = 0;
+            MEM_TO_REG = 2;
             //ALU_OP = 'b10;
             MEM_WRITE = 0;
             ALU_SRC = 1;
