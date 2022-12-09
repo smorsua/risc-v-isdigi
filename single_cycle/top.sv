@@ -122,8 +122,8 @@ MUX #(.SIZE(SIZE), .INPUTS(2)) data_mux (
     .result(data_mux_result_wire)
 );
 
-wire [SIZE-1:0] branch_target_wire;
-ALU #(.SIZE(SIZE)) jump_alu(
+wire [ADDR_WIDTH-1:0] branch_target_wire;
+ALU #(.SIZE(ADDR_WIDTH)) jump_alu(
     .A(PC),
     .B(imm_wire),
     .OPERATION(ADD),
@@ -132,7 +132,7 @@ ALU #(.SIZE(SIZE)) jump_alu(
 );
 
 wire PCSrc;
-assign PCSrc = Branch & address_alu_zero;
+assign PCSrc = Branch & ((Q_ROM[14:12] == 001 && !address_alu_zero) || (Q_ROM[14:12] != 001 && address_alu_zero));
 wire [ADDR_WIDTH-1:0] next_pc_wire;
 
 wire [SIZE-1:0] myInput_pc_mux [2];

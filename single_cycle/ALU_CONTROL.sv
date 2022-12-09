@@ -54,7 +54,17 @@ module ALU_CONTROL(
 
         end
         // S_FORMAT: ALUSelection = ADD;
-        // B_FORMAT:
+        B_FORMAT: begin
+            case(funct3)
+            3'b000: ALUSelection = SUB;
+            3'b001: ALUSelection = SUB; // TODO: comprobar BNE
+            3'b100: ALUSelection = LESS_THAN_SIGNED;
+            3'b101: ALUSelection = GREATER_OR_EQUAL_THAN_SIGNED;
+            3'b110: ALUSelection = LESS_THAN_UNSIGNED;
+            3'b111: ALUSelection = GREATER_OR_EQUAL_THAN_UNSIGNED;
+            default: ALUSelection = ADD;
+            endcase
+        end
         U_FORMAT:begin
             casex(funct3)
                 3'bxxx: ALUSelection = ADD;
