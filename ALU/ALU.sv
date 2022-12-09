@@ -7,11 +7,11 @@ module ALU #(parameter SIZE = 32) (
     output reg [SIZE-1:0] RESULT,
     output ZERO
 );
-
+reg aux;
 always_comb begin
     case(OPERATION)
-        ADD: RESULT = A + B;
-        SUB: RESULT = A - B; 
+        ADD: RESULT = A + B, aux = 1;
+        SUB: RESULT = A - B;
         LESS_THAN_SIGNED: RESULT = !(signed'(A) < signed'(B));
         LESS_THAN_UNSIGNED: RESULT = !(A < B);
         GREATER_OR_EQUAL_THAN_SIGNED: RESULT = !(signed'(A) >= signed'(B));
@@ -24,9 +24,9 @@ always_comb begin
         RIGHT_SHIFT_SIGNED: RESULT = A >>> B;
         RIGHT_SHIFT_UNSIGNED: RESULT = A >> B;
         default: RESULT = 0;
-    endcase 
+    endcase
 end
 
-assign ZERO = RESULT == 0 ? 1'b1 : 1'b0;
+assign ZERO = (RESULT == 0 or aux == 1) ? 1'b1 : 1'b0;
 
 endmodule

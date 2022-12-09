@@ -94,16 +94,16 @@ always_comb begin
             REG_WRITE = 1;
             AuipcLui = 0;
         end
-        default:
+        /*default:
 			begin
-			BRANCH = 0;
+			BRANCH = 1;
             MEM_READ = 0;
             MEM_TO_REG = 0;
             MEM_WRITE = 0;
             ALU_SRC = 0;
             REG_WRITE = 0;
             AuipcLui = 0;
-			end
+			end*/
     endcase
 end
 
