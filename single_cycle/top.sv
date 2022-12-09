@@ -5,9 +5,9 @@ module top
     input CLK, 
     input RESET_N,
     input  [SIZE-1:0] Q_ROM,
+    input  [SIZE-1:0] Q_RAM,
     output  [ADDR_WIDTH-1:0] ADDR_ROM,
     output  [ADDR_WIDTH-1:0] ADDR_RAM,
-    input  [SIZE-1:0] Q_RAM,
     output  [SIZE-1:0] Q_W,
     output ENABLE_W
 );
