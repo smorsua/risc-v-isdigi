@@ -10,17 +10,14 @@ module top
     input  [SIZE-1:0] Q_RAM,
     output  [SIZE-1:0] Q_W,
     output ENABLE_W
-    
 );
-
 
 bit [ADDR_WIDTH-1:0] PC;
 wire [SIZE-1:0] next_consecutive_pc_wire;
 
 ALU #(.SIZE(ADDR_WIDTH)) pc_alu(
     .A(PC),
-    //FIXME: sumamos 1 o 4
-    .B('d1),
+    .B('d4),
     .OPERATION(ADD),
     .RESULT(next_consecutive_pc_wire),
     .ZERO()
@@ -156,5 +153,5 @@ always @(posedge CLK or negedge RESET_N) begin
         PC <= next_pc_wire;
     end
 end
-assign ADDR_ROM = PC; 
+assign ADDR_ROM = PC[11:2]; 
 endmodule
