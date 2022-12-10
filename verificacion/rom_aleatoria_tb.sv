@@ -1,5 +1,4 @@
 module rom_aleatoria_tb ();
-
   // Parameters
   localparam  d_width = 32;
   localparam  mem_depth = 1024;
