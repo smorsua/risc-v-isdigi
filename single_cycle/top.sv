@@ -2,7 +2,7 @@
 
 module top
 #(parameter SIZE = 32, parameter ADDR_WIDTH = 10)(
-    input CLK, 
+    input CLK,
     input RESET_N,
     input  [SIZE-1:0] Q_ROM,
     output  [ADDR_WIDTH-1:0] ADDR_ROM,
@@ -116,7 +116,7 @@ RAM #(.data_width(SIZE), .addr_width(ADDR_WIDTH)) data_memory (
 wire [SIZE-1:0] myInput_data_mux [3];
 assign myInput_data_mux[0] = address_alu_result;
 assign myInput_data_mux[1] = Q_RAM;
-assign myInput_data_mux[2] = {22'b0, next_consecutive_pc_wire}; //FIXME concat
+assign myInput_data_mux[2] = {{22'b0}, next_consecutive_pc_wire}; //FIXME concat
 
 MUX #(.SIZE(SIZE), .INPUTS(3)) data_mux (
     .all_inputs(myInput_data_mux),
