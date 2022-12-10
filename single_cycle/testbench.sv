@@ -37,7 +37,7 @@ initial
 		    #(T)
 		RESET_N = 1;
         //load_program("instructions.txt");
-        #(T*20);
+        #(T*1000);
         $stop;
 
     end

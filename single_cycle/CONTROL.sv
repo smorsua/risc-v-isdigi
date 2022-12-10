@@ -26,11 +26,16 @@ always_comb begin
         I_FORMAT: begin
             BRANCH = 0;
             MEM_READ = 0;
-            MEM_TO_REG = 0;
             MEM_WRITE = 0;
             ALU_SRC = 1;
             REG_WRITE = 1;
             AuipcLui = 2;
+            casex(OPCODE)
+            7'b0000011: MEM_TO_REG = 1; //Intrucciones de carga
+            7'b001x011: MEM_TO_REG = 0; //Operaciones aritmeticas
+            default: MEM_TO_REG = 0;
+            endcase
+            
              end
         S_FORMAT: begin
             BRANCH = 0;
