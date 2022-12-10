@@ -1,3 +1,5 @@
+
+
 module rom_aleatoria_tb ();
   // Parameters
   localparam  d_width = 32;
@@ -9,6 +11,7 @@ module rom_aleatoria_tb ();
   logic [d_width-1:0] dato;
 
 utilidades_verificacion::instruction_box m1=new();
+
 
 if_rom interfaz_rom ();
 

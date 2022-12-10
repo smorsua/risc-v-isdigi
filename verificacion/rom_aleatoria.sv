@@ -6,14 +6,14 @@ input [a_width-1:0] address;
 output logic [d_width-1:0] dout;
  
 logic [d_width-1:0] mem[mem_depth-1:0] ; 
+`define debug_aleatorio
+`ifndef debug_aleatorio 
  
-// `ifndef debug_aleatorio 
- 
-// initial
-//     $readmemh("contenido_fijo.dat", mem); 
-// assign dout = mem[address];
+initial
+    $readmemh("contenido_fijo.dat", mem); 
+assign dout = mem[address];
 
-// `else 
+`else 
 
 logic [31:0] tipos_paquete[logic [9:0] ]; // tipo de paquete es 16 bits
 
@@ -31,6 +31,6 @@ else
     dout=tipos_paquete[address];
    end
 
-// `endif
+`endif
 
 endmodule
