@@ -9,7 +9,7 @@ class RCSG_RISCV;
   constraint R_format_b  {(valor[6:0] == 7'b0110011 && (valor[14:12]==3'b000) || valor[14:12]==3'b101) -> valor[31:25]==7'b0000000 || valor[31:25]==7'b0100000 ;}
   
   constraint I_format      {valor[6:0] == 7'b0010011 || valor[6:0] == 7'b0000011;}
-  constraint I_format_a    {valor[6:0] == 7'b0010011 -> (valor[14:12] == 3'b000 || valor[14:12] == 3'b010 || valor[14:12] == 3'b011 || valor[14:12] == 3'b100 || valor[14:12] == 3'b110 || valor[14:12] == 3'b111);} //000, 010,011, 100, 110 111
+  constraint I_format_a    {valor[6:0] == 7'b0010011 -> (valor[14:12] != 3'b101 && valor[14:12]!=3'b001);} //000, 010,011, 100, 110 111 //001, 101
   constraint I_format_b    {valor[6:0] == 7'b0000011 -> valor[14:12] == 3'b010;}
 
   constraint S_format    {valor[6:0] == 7'b0100011 -> valor[14:12] == 3'b010;}
