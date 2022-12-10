@@ -13,12 +13,10 @@ logic [31:0] instruccion_random;
       # 50;
 
       $display("probando r_format" );
-      generar_instrucciones.R_format.constraint_mode(1);
-      generar_instrucciones.I_format.constraint_mode(0);
+      activate_constraints_RSBIU(5'b10000);
       prueba_random_r_format();
       $display("Fin R_format :: time is %0t",$time); 
-      generar_instrucciones.R_format.constraint_mode(0);
-      generar_instrucciones.I_format.constraint_mode(1);
+      activate_constraints_RSBIU(5'b00010);
       prueba_random_i_format();
       $stop;
       $writememh("salida_random.txt", rom_aleatoria_tb.rom_aleatoria_dut.duv.tipos_paquete);      
@@ -59,4 +57,70 @@ task prueba_random_i_format;
         end
   end
 endtask
+// sbu
+
+task prueba_random_s_format;
+  begin
+      assert (generar_instrucciones.randomize()) else    $fatal("randomization failed");   
+      rom_aleatoria_tb.m1.put(generar_instrucciones.valor);
+      testar_ports.address= testar_ports.address +1 ;
+      #0 monitorizar_instrucciones.instrucciones.sample();  
+      while ( monitorizar_instrucciones.instrucciones.sformat.get_coverage()<100)
+	begin
+	   # 100 ;
+	   assert (generar_instrucciones.randomize()) else    $fatal("randomization failed");     
+     	   rom_aleatoria_tb.m1.put(generar_instrucciones.valor);
+	   testar_ports.address= testar_ports.address +1;
+           #0 monitorizar_instrucciones.instrucciones.sample();
+        end
+  end
+endtask
+
+task prueba_random_b_format;
+  begin
+      assert (generar_instrucciones.randomize()) else    $fatal("randomization failed");   
+      rom_aleatoria_tb.m1.put(generar_instrucciones.valor);
+      testar_ports.address= testar_ports.address +1 ;
+      #0 monitorizar_instrucciones.instrucciones.sample();  
+      while ( monitorizar_instrucciones.instrucciones.bformat.get_coverage()<100)
+	begin
+	   # 100 ;
+	   assert (generar_instrucciones.randomize()) else    $fatal("randomization failed");     
+     	   rom_aleatoria_tb.m1.put(generar_instrucciones.valor);
+	   testar_ports.address= testar_ports.address +1;
+           #0 monitorizar_instrucciones.instrucciones.sample();
+        end
+  end
+
+endtask
+
+task prueba_random_u_format;
+  begin
+      assert (generar_instrucciones.randomize()) else    $fatal("randomization failed");   
+      rom_aleatoria_tb.m1.put(generar_instrucciones.valor);
+      testar_ports.address= testar_ports.address +1 ;
+      #0 monitorizar_instrucciones.instrucciones.sample();  
+      while ( monitorizar_instrucciones.instrucciones.uformat.get_coverage()<100)
+	begin
+	   # 100 ;
+	   assert (generar_instrucciones.randomize()) else    $fatal("randomization failed");     
+     	   rom_aleatoria_tb.m1.put(generar_instrucciones.valor);
+	   testar_ports.address= testar_ports.address +1;
+           #0 monitorizar_instrucciones.instrucciones.sample();
+        end
+  end
+endtask
+task activate_constraints_RSBIU(input [4:0] activate );
+// rsbiu
+generar_instrucciones.R_format.constraint_mode(activate[4]);
+generar_instrucciones.S_format.constraint_mode(activate[3]);
+generar_instrucciones.B_format.constraint_mode(activate[2]);
+generar_instrucciones.I_format.constraint_mode(activate[1]);
+generar_instrucciones.U_format.constraint_mode(activate[0]);
+
+
+
+
+endtask
+
 endprogram
