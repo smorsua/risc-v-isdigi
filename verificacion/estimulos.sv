@@ -31,7 +31,7 @@ logic [31:0] instruccion_random;
 
       activate_constraints_RISBU(5'b00001);
       prueba_random_u_format();
-      $display("Fin B_format :: time is %0t",$time); 
+      $display("Fin U_format :: time is %0t",$time); 
 
   
       $writememh("salida_random.txt", rom_aleatoria_tb.rom_aleatoria_dut.duv.tipos_paquete);      
