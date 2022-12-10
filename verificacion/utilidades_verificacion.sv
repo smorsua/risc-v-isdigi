@@ -8,9 +8,9 @@ class RCSG_RISCV;
   constraint R_format_a  {(valor[6:0] == 7'b0110011 && valor[14:12]!=3'b000 && valor[14:12]!=3'b101) -> valor[31:25]==7'b0000000 ;}
   constraint R_format_b  {(valor[6:0] == 7'b0110011 && (valor[14:12]==3'b000) || valor[14:12]==3'b101) -> valor[31:25]==7'b0000000 || valor[31:25]==7'b0100000 ;}
   
-  // constraint I_format      {valor[6:0] == 7'b0010011 || valor[6:0] == 7'b0000011;}
-  // constraint I_format_a    {valor[6:0] == 7'b0010011 -> valor[14:12]!=3'bx01;} 
-  // constraint I_format_b    {valor[6:0] == 7'b0000011 -> valor[14:12]==3'b010;}
+  constraint I_format      {valor[6:0] == 7'b0010011 || valor[6:0] == 7'b0000011;}
+  constraint I_format_a    {valor[6:0] == 7'b0010011 -> valor[14:12] != 3'b001 && valor[14:12] != 3'b101 ;} //000, 010,011, 100, 110 111
+  constraint I_format_b    {valor[6:0] == 7'b0000011 -> valor[14:12] == 3'b010;}
 
   // constraint S_format    {valor[6:0] == 7'b0100011;}
   // constraint B_format    {valor[6:0] == 7'b1100011;}
@@ -38,32 +38,18 @@ covergroup instrucciones ;
       illegal_bins imposibles_rformat = {9,10,11,12,14,15}; 
   } 
 
-//   iformat : coverpoint ({monitor_port.dato[4],monitor_port.dato[14:12]}) iff (monitor_port.dato[6:0]==7'b00x0011)
-//   {
-//       bins addi = {8};//1000  
-//       bins slti = {10};//1010
-//       bins xori = {12};//1100
-//       bins ori = {14};//1110
-//       bins andi = {15};//1111   
-//       bins lw  = {2}; //0010
-//       illegal_bins imposibles_iformat_a = {0,1,3,4,5,6,7,9,11,13}; 
-//   } 
+  iformat : coverpoint ({monitor_port.dato[4],monitor_port.dato[14:12]}) iff (monitor_port.dato[6:0]==7'b0000011 || monitor_port.dato[6:0]==7'b0010011)
+  {
+      bins addi = {8};//1000  
+      bins slti = {10};//1010
+      bins xori = {12};//1100
+      bins ori = {14};//1110
+      bins andi = {15};//1111   
+      bins lw  = {2}; //0010
+      illegal_bins imposibles_iformat_a = {0,1,3,4,5,6,7,9,11,13}; 
+  } 
 
-//   iformat_b : coverpoint ({monitor_port.dato[30],monitor_port.dato[14:12]}) iff (monitor_port.dato[6:0]==7'b0010011&&monitor_port.dato[31]==1'b0)
-//   {
-//       bins slli={1};
-//       bins slri={5};
-//       bins srai={13};
-//       illegal_bins imposibles_iformat_b = {0,2,3,4,6,7,8,9,10,11,12,14,15}; 
-//   }
 
-// iformat_loadInstr: coverpoint ({monitor_port.dato[14:12]}) iff (monitor_port.dato[6:0]==7'b0000011)
-//   {
-//       bins lb={0}; //000
-//       bins lh={1}; //001
-//       bins lw={2}; //010
-//       illegal_bins imposibles_iformat_load = {3,4,5,6,7}; 
-// //   }
 
 // sformat : coverpoint ({monitor_port.dato[14:12]})  iff (monitor_port.dato[6:0]==7'b0100011)
 //   {
