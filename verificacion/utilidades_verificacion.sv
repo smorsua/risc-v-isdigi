@@ -12,16 +12,9 @@ class RCSG_RISCV;
   constraint I_format_a    {valor[6:0] == 7'b0010011 -> valor[14:12] != 3'b001 && valor[14:12] != 3'b101 ;} //000, 010,011, 100, 110 111
   constraint I_format_b    {valor[6:0] == 7'b0000011 -> valor[14:12] == 3'b010;}
 
-<<<<<<< HEAD
   constraint S_format    {valor[6:0] == 7'b0100011 -> valor[14:12] == 3'b010;}
   constraint B_format    {valor[6:0] == 7'b1100011 -> valor[14:12] == 3'b000 || valor[14:12] == 3'b001;}
   constraint U_format    {valor[6:0] == 7'b0010111 || valor[6:0] ==7'b0110111;} 
-=======
-  // constraint S_format    {valor[6:0] == 7'b0100011;}
-  constraint B_format    {valor[6:0] == 7'b1100011;}
-  // constraint U_format    {valor[6:0] == 7'b0010111;} 
->>>>>>> c20bb8f99937cb35f4c4e4a9c72fa68833947c5c
-  // constraint J_format    {valor[6:0] == 7'b1101111;}
   
 endclass
 
@@ -81,12 +74,11 @@ uformat : coverpoint ({monitor_port.dato[5]}) iff (monitor_port.dato[6:0]==7'b00
    } 
 
 
-uformat : coverpoint ({monitor_port.dato[6:0]}) iff (monitor_port.dato[6:0]==7'b0x10111)
+uformat : coverpoint ({monitor_port.dato[5]}) iff (monitor_port.dato[6:0]==7'b0010111 || monitor_port.dato[6:0]==7'b0110111)
   {
-      bins lui ={0110111};
-      bins auipc ={0010111};
-      //illegal_bins imposibles_bformat={}; 
-  } 
+      bins lui ={1};
+      bins auipc ={0};
+  }
 
 endgroup
 
