@@ -52,8 +52,6 @@ covergroup instrucciones ;
 
 sformat : coverpoint ({monitor_port.dato[13]})  iff (monitor_port.dato[6:0]==7'b0100011)
   {
-     
-
       bins sw={1};  //010
       illegal_bins imposibles_sformat = {0}
   } 
@@ -64,14 +62,6 @@ bformat : coverpoint ({monitor_port.dato[12]})  iff (monitor_port.dato[6:0]==7'b
       bins beq ={0}; //000
       bins bne ={1};  //001 
   } 
-
-
-uformat : coverpoint ({monitor_port.dato[5]}) iff (monitor_port.dato[6:0]==7'b0010111 || monitor_port.dato[6:0]==7'b0110111)
-  {
-       bins beq ={0}; //000
-       bins bne ={1};  //001 
-   illegal_bins imposibles_bformat={2,3,4,5,6,7}; 
-   } 
 
 
 uformat : coverpoint ({monitor_port.dato[5]}) iff (monitor_port.dato[6:0]==7'b0010111 || monitor_port.dato[6:0]==7'b0110111)
