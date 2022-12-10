@@ -116,7 +116,8 @@ RAM #(.data_width(SIZE), .addr_width(ADDR_WIDTH)) data_memory (
 wire [SIZE-1:0] myInput_data_mux [3];
 assign myInput_data_mux[0] = address_alu_result;
 assign myInput_data_mux[1] = Q_RAM;
-assign myInput_data_mux[2] = {{22'b0}, next_consecutive_pc_wire}; //FIXME concat
+//TODO: make sure concatenation works
+assign myInput_data_mux[2] = {{22{1'b0}}, next_consecutive_pc_wire}; //FIXME concat
 
 MUX #(.SIZE(SIZE), .INPUTS(3)) data_mux (
     .all_inputs(myInput_data_mux),
