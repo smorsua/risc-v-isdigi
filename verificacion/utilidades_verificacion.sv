@@ -12,8 +12,8 @@ class RCSG_RISCV;
   constraint I_format_a    {valor[6:0] == 7'b0010011 -> valor[14:12] != 3'b001 && valor[14:12] != 3'b101 ;} //000, 010,011, 100, 110 111
   constraint I_format_b    {valor[6:0] == 7'b0000011 -> valor[14:12] == 3'b010;}
 
-  // constraint S_format    {valor[6:0] == 7'b0100011;}
-  // constraint B_format    {valor[6:0] == 7'b1100011;}
+  constraint S_format    {valor[6:0] == 7'b0100011 -> valor[14:12] == 3'b010;}
+  constraint B_format    {valor[6:0] == 7'b1100011 -> valor[14:12] == 3'b000 || valor[14:12] == 3'b001;}
   constraint U_format    {valor[6:0] == 7'b0010111 || valor[6:0] ==7'b0110111;} 
   // constraint J_format    {valor[6:0] == 7'b1101111;}
   
@@ -51,27 +51,20 @@ covergroup instrucciones ;
   } 
 
 
-sformat : coverpoint ({monitor_port.dato[14:12]})  iff (monitor_port.dato[6:0]==7'b0100011)
+sformat : coverpoint ({monitor_port.dato[13]})  iff (monitor_port.dato[6:0]==7'b0100011)
   {
-      //bins sb ={0}; //000
-      //bins sh={1};  //001 
+     
 
-      bins sw={2};  //010
-      illegal_bins imposibles_sformat={0,1,3,4,5,6,7}; 
+      bins sw={1};  //010
+      illegal_bins imposibles_sformat = {0}
   } 
 
 
-// bformat : coverpoint ({monitor_port.dato[14:12]})  iff (monitor_port.dato[6:0]==7'b1100011)
-//   {
-//       bins beq ={0}; //000
-//       bins bne ={1};  //001 
-      
-//       //bins blt ={4};  //010
-//       //bins bge ={5};  //010
-//       //bins bltu ={6};  //010
-
-//       illegal_bins imposibles_bformat={2,3,4,5,6,7}; 
-//   } 
+bformat : coverpoint ({monitor_port.dato[12]})  iff (monitor_port.dato[6:0]==7'b1100011)
+  {
+      bins beq ={0}; //000
+      bins bne ={1};  //001 
+  } 
 
 
 uformat : coverpoint ({monitor_port.dato[5]}) iff (monitor_port.dato[6:0]==7'b0010111 || monitor_port.dato[6:0]==7'b0110111)
