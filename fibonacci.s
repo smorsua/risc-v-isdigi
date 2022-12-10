@@ -1,7 +1,7 @@
-addi x10, x0, 100 # N = 100
-addi x11, x0, 0 # f1 = 0
-addi x12, x0, 1 # f2 = 1
-addi x13, x0, 1 # i = 1 porque voy a guardar el primer termino antes del bucle y para hacer 19 más iteraciones empiezo en 1 (<=)
+li x10, 100 # N = 100
+li x11, 0 # f1 = 0
+li x12, 1 # f2 = 1
+li x13, 1 # Counter. i = 1 porque voy a guardar el primer termino antes del bucle y para hacer 19 más iteraciones empiezo en 1 (<=)
 
 sw x12 0(sp) # Guardo el primer término
 addi sp, sp, -4
@@ -13,6 +13,6 @@ Loop:
 	sw x12 0(sp) # Guardo el n-ésimo término
 	addi sp, sp, -4
     addi x13, x13, 1
-    j Loop
-    
+    beq x0 x0 Loop
+
 Done:
