@@ -20,7 +20,7 @@ class covergroups_RISCV;
 virtual if_rom.monitorizar monitor_port;
 covergroup instrucciones ;
 
-  rformat : coverpoint ({monitor_port.dato[30],monitor_port.dato[14:12]})  iff (monitor_port.dato[6:0]==7'b0110011&&monitor_port.dato[31]==1'b0&&monitor_port.dato[29:25]==5'b0000)
+  rformat : coverpoint ({monitor_port.dato[30],monitor_port.dato[14:12]})  iff (monitor_port.dato[6:0]==7'b0110011 && monitor_port.dato[31]==1'b0 && monitor_port.dato[29:25]==5'b0000)
   {
       bins add ={0};
       bins sub={8};      
@@ -51,10 +51,44 @@ covergroup instrucciones ;
       bins slli={1};
       bins slri={5};
       bins srai={13};
-      illegal_bins imposibles_iformat_b={0,2,3,4,6,7,8,9,10,11,12,14,15}; 
+      illegal_bins imposibles_iformat_b = {0,2,3,4,6,7,8,9,10,11,12,14,15}; 
   }
 
+iformat_loadInstr: coverpoint ({monitor_port.dato[14:12]}) iff (monitor_port.dato[6:0]==7'b0000011)
+  {
+      bins lb={0}; //000
+      bins lh={1}; //001
+      bins lw={2}; //010
+      illegal_bins imposibles_iformat_load = {3,4,5,6,7}; 
+  }
+
+sformat : coverpoint ({monitor_port.dato[14:12]})  iff (monitor_port.dato[6:0]==7'b0100011)
+  {
+      bins sb ={0}; //000
+      bins sh={1};  //001 
+      bins sw={2};  //010
+      illegal_bins imposibles_sformat={3,4,5,6,7}; 
+  } 
+
+bformat : coverpoint ({monitor_port.dato[14:12]})  iff (monitor_port.dato[6:0]==7'b1100011)
+  {
+      bins beq ={0}; //000
+      bins bne ={1};  //001 
+      bins blt ={4};  //010
+      bins bge ={5};  //010
+      bins bltu ={6};  //010
+
+      illegal_bins imposibles_bformat={2,3,7}; 
+  } 
+
+uformat : coverpoint ({monitor_port.dato[6:0]}) iff (monitor_port.dato[6:0]==7'b0x10111)
+  {
+      bins lui ={0110111};
+      bins auipc ={0010111};
+      //illegal_bins imposibles_bformat={}; 
+  } 
 endgroup
+
 function new(virtual if_rom.monitorizar mpuertos);
 	monitor_port=mpuertos;
 	instrucciones=new;

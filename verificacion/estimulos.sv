@@ -23,14 +23,14 @@ logic [31:0] instruccion_random;
 
 task prueba_random_r_format;
   begin
-      generar_instrucciones.randomize();      
+      assert (generar_instrucciones.randomize()) else    $fatal("randomization failed");   
       rom_aleatoria_tb.m1.put(generar_instrucciones.valor);
       testar_ports.address='0; 
       #0 monitorizar_instrucciones.instrucciones.sample();  
       while ( monitorizar_instrucciones.instrucciones.rformat.get_coverage()<100)
 	begin
 	   # 100 ;
-	   generar_instrucciones.randomize();      
+	   assert (generar_instrucciones.randomize()) else    $fatal("randomization failed");     
      	   rom_aleatoria_tb.m1.put(generar_instrucciones.valor);
 	   testar_ports.address= testar_ports.address +1;
            #0 monitorizar_instrucciones.instrucciones.sample();
