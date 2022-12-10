@@ -14,7 +14,7 @@ class RCSG_RISCV;
 
   // constraint S_format    {valor[6:0] == 7'b0100011;}
   // constraint B_format    {valor[6:0] == 7'b1100011;}
-  // constraint U_format    {valor[6:0] == 7'b0010111;} 
+  constraint U_format    {valor[6:0] == 7'b0010111 || valor[6:0] ==7'b0110111;} 
   // constraint J_format    {valor[6:0] == 7'b1101111;}
   
 endclass
@@ -74,11 +74,10 @@ sformat : coverpoint ({monitor_port.dato[14:12]})  iff (monitor_port.dato[6:0]==
 //   } 
 
 
-uformat : coverpoint ({monitor_port.dato[6:0]}) iff (monitor_port.dato[6:0]==7'b0x10111)
+uformat : coverpoint ({monitor_port.dato[5]}) iff (monitor_port.dato[6:0]==7'b0010111 || monitor_port.dato[6:0]==7'b0110111)
   {
-      bins lui ={0110111};
-      bins auipc ={0010111};
-      //illegal_bins imposibles_bformat={}; 
+      bins lui ={1};
+      bins auipc ={0};
   } 
 
 endgroup
