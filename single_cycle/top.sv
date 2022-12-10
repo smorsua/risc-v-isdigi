@@ -100,7 +100,7 @@ ALU #(.SIZE(SIZE)) address_alu(
     .ZERO(address_alu_zero)
 );
 
-assign ADDR_RAM = address_alu_result;
+assign ADDR_RAM = {address_alu_result[31:2], 2'b0};
 
 /*wire [SIZE-1:0] read_data_wire;
 RAM #(.data_width(SIZE), .addr_width(ADDR_WIDTH)) data_memory (
@@ -116,8 +116,7 @@ RAM #(.data_width(SIZE), .addr_width(ADDR_WIDTH)) data_memory (
 wire [SIZE-1:0] myInput_data_mux [3];
 assign myInput_data_mux[0] = address_alu_result;
 assign myInput_data_mux[1] = Q_RAM;
-//TODO: make sure concatenation works
-assign myInput_data_mux[2] = {{22{1'b0}}, next_consecutive_pc_wire}; //FIXME concat
+assign myInput_data_mux[2] = {22'b0, next_consecutive_pc_wire[9:0]}; //FIXME concat
 
 MUX #(.SIZE(SIZE), .INPUTS(3)) data_mux (
     .all_inputs(myInput_data_mux),
