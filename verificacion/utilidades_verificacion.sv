@@ -42,40 +42,45 @@ covergroup instrucciones ;
   {
       bins addi = {8};//1000  
       bins slti = {10};//1010
+      bins sltiu = {11}; //1011
       bins xori = {12};//1100
       bins ori = {14};//1110
       bins andi = {15};//1111   
       bins lw  = {2}; //0010
-      illegal_bins imposibles_iformat_a = {0,1,3,4,5,6,7,9,11,13}; 
+      illegal_bins imposibles_iformat_a = {0,1,3,4,5,6,7,9,13}; 
   } 
 
 
+sformat : coverpoint ({monitor_port.dato[14:12]})  iff (monitor_port.dato[6:0]==7'b0100011)
+  {
+      //bins sb ={0}; //000
+      //bins sh={1};  //001 
 
-// sformat : coverpoint ({monitor_port.dato[14:12]})  iff (monitor_port.dato[6:0]==7'b0100011)
-//   {
-//       bins sb ={0}; //000
-//       bins sh={1};  //001 
-//       bins sw={2};  //010
-//       illegal_bins imposibles_sformat={3,4,5,6,7}; 
-//   } 
+      bins sw={2};  //010
+      illegal_bins imposibles_sformat={0,1,3,4,5,6,7}; 
+  } 
+
 
 // bformat : coverpoint ({monitor_port.dato[14:12]})  iff (monitor_port.dato[6:0]==7'b1100011)
 //   {
 //       bins beq ={0}; //000
 //       bins bne ={1};  //001 
-//       bins blt ={4};  //010
-//       bins bge ={5};  //010
-//       bins bltu ={6};  //010
+      
+//       //bins blt ={4};  //010
+//       //bins bge ={5};  //010
+//       //bins bltu ={6};  //010
 
-//       illegal_bins imposibles_bformat={2,3,7}; 
+//       illegal_bins imposibles_bformat={2,3,4,5,6,7}; 
 //   } 
 
-// uformat : coverpoint ({monitor_port.dato[6:0]}) iff (monitor_port.dato[6:0]==7'b0x10111)
-//   {
-//       bins lui ={0110111};
-//       bins auipc ={0010111};
-//       //illegal_bins imposibles_bformat={}; 
-//   } 
+
+uformat : coverpoint ({monitor_port.dato[6:0]}) iff (monitor_port.dato[6:0]==7'b0x10111)
+  {
+      bins lui ={0110111};
+      bins auipc ={0010111};
+      //illegal_bins imposibles_bformat={}; 
+  } 
+
 endgroup
 
 function new(virtual if_rom.monitorizar mpuertos);
