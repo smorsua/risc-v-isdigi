@@ -16,9 +16,24 @@ logic [31:0] instruccion_random;
       activate_constraints_RISBU(5'b10000);
       prueba_random_r_format();
       $display("Fin R_format :: time is %0t",$time); 
+
       activate_constraints_RISBU(5'b01000);
       prueba_random_i_format();
-      $stop;
+      $display("Fin I_format :: time is %0t",$time); 
+
+      activate_constraints_RISBU(5'b00100);
+      prueba_random_s_format();
+      $display("Fin S_format :: time is %0t",$time); 
+
+      activate_constraints_RISBU(5'b00010);
+      prueba_random_b_format();
+      $display("Fin B_format :: time is %0t",$time); 
+
+      activate_constraints_RISBU(5'b00001);
+      prueba_random_u_format();
+      $display("Fin B_format :: time is %0t",$time); 
+
+  
       $writememh("salida_random.txt", rom_aleatoria_tb.rom_aleatoria_dut.duv.tipos_paquete);      
       $finish;
 
