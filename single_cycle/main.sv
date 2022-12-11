@@ -1,6 +1,6 @@
 `include "../ALU/operation_type.sv"
 `include "instruction_type.sv"
-module top
+module main
 #(parameter SIZE = 32, parameter ADDR_WIDTH = 10)(
     input CLK,
     input RESET_N,

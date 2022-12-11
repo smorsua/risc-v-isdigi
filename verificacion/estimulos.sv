@@ -1,4 +1,4 @@
-program  estimulos (if_rom.testar testar_ports, if_rom.monitorizar monitorizar_ports);
+program estimulos (if_rom.testar testar_ports, if_rom.monitorizar monitorizar_ports);
 
  utilidades_verificacion::RCSG_RISCV generar_instrucciones;
  utilidades_verificacion::covergroups_RISCV monitorizar_instrucciones;
@@ -46,12 +46,12 @@ task prueba_random_r_format;
       testar_ports.address='0; 
       #0 monitorizar_instrucciones.instrucciones.sample();  
       while ( monitorizar_instrucciones.instrucciones.rformat.get_coverage()<100)
-	begin
-	   # 100 ;
-	   assert (generar_instrucciones.randomize()) else    $fatal("randomization failed");     
-     	   rom_aleatoria_tb.m1.put(generar_instrucciones.valor);
-	   testar_ports.address= testar_ports.address +1;
-           #0 monitorizar_instrucciones.instrucciones.sample();
+	      begin
+        # 100 ;
+        assert (generar_instrucciones.randomize()) else    $fatal("randomization failed");     
+            rom_aleatoria_tb.m1.put(generar_instrucciones.valor);
+        testar_ports.address= testar_ports.address +1;
+              #0 monitorizar_instrucciones.instrucciones.sample();
         end
   end
 endtask

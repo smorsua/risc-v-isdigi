@@ -1,3 +1,6 @@
+`ifndef IF_ROM_GUARD
+`define IF_ROM_GUARD
+
 interface if_rom;
 
 logic [9:0] address;
@@ -15,3 +18,4 @@ modport duv
 (input address,
 output dato);
 endinterface
+`endif //IF_ROM_GUARD
