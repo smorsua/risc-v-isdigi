@@ -116,7 +116,7 @@ RAM #(.data_width(SIZE), .addr_width(ADDR_WIDTH)) data_memory (
 wire [SIZE-1:0] myInput_data_mux [3];
 assign myInput_data_mux[0] = address_alu_result;
 assign myInput_data_mux[1] = Q_RAM;
-assign myInput_data_mux[2] = {22'b0, next_consecutive_pc_wire[9:0]}; //FIXME: concat
+assign myInput_data_mux[2] = {22'b0, next_consecutive_pc_wire[9:0]};
 
 MUX #(.SIZE(SIZE), .INPUTS(3)) data_mux (
     .all_inputs(myInput_data_mux),
@@ -199,31 +199,32 @@ always @(posedge CLK) begin
         default: $error("Incorrect funct3");
         endcase
     end
-    I_FORMAT: begin            
+    I_FORMAT: begin
         funct3 = Q_ROM[14:12];
         rs1 = Q_ROM[19:15];
         rd = Q_ROM[11:7];
         immediate = { {21{Q_ROM[31]}}, Q_ROM[30:20] };
-        
+
         case(opcode)
         7'b0000011: begin //memory operations
-            
+            /*LW*/ assert(data_mux_result_wire == Q_RAM) ;
+
         end
         7'b0010011: begin //arithmetic operations
             case(funct3)
             /*ADDI*/ 3'b000: assert(data_mux_result_wire == data_1_wire + immediate);
-            /*SLLI*/ 3'b001: assert(data_mux_result_wire == data_1_wire << immediate);                
-            /*SLTI*/ 3'b010: assert(data_mux_result_wire == !(signed'(data_1_wire) < signed'(immediate)));
-            /*SLTIU*/3'b011: assert(data_mux_result_wire == !(data_1_wire < immediate));                    
+            /*SLLI*/ 3'b001: assert(data_mux_result_wire == data_1_wire << immediate);
+            /*SLTIU*/3'b011: assert(data_mux_result_wire == !(data_1_wire < immediate));
             /*XORI*/ 3'b100: assert(data_mux_result_wire == data_1_wire ^ immediate);
+            /*SLTI*/ 3'b010: assert(data_mux_result_wire == !(signed'(data_1_wire) < signed'(immediate)));
             3'b101: begin
                 case(immediate[11:6])
                 /*SRLI*/ 7'b0000000: assert(data_mux_result_wire == data_1_wire >> immediate[5:0]);
                 /*SRAI*/ 7'b0100000: assert(data_mux_result_wire == data_1_wire >>> immediate[5:0]);
-                endcase                                        
+                endcase
             end
-            /*ORI*/ 3'b110: assert(data_mux_result_wire == data_1_wire | immediate);            
-            /*ANDI*/3'b111: assert(data_mux_result_wire == data_1_wire & immediate);               
+            /*ORI*/ 3'b110: assert(data_mux_result_wire == data_1_wire | immediate);
+            /*ANDI*/3'b111: assert(data_mux_result_wire == data_1_wire && immediate);
             default: $error("Invalid funct3");
             endcase
         end
@@ -240,7 +241,21 @@ always @(posedge CLK) begin
         endcase
     end
 
-    default: $error("Invalid instruction format");
+    S_FORMAT: begin
+        immediate = { {21{Q_ROM[31]}}, Q_ROM[30:25], Q_ROM[11:7]};
+        /*SW*/ assert(address_alu_result == data_1_wire + immediate);
+    end
+
+
+
+    B_FORMAT: begin
+        immediate = { {21{Q_ROM[31]}}, Q_ROM[7], Q_ROM[30:25], Q_ROM[11:8], 1'b0};
+        assert property ( address_alu_zero =='1 |-> (branch_target_wire != (immediate + PC)) ) else $fatal("No realiza correctamente el salto condicional");
+    end
+
+    //default: $error("Invalid instruction format");
     endcase
+
+
 end
 endmodule
