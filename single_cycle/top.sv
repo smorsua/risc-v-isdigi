@@ -1,5 +1,5 @@
 `include "../ALU/operation_type.sv"
-
+`include "instruction_type.sv"
 module top
 #(parameter SIZE = 32, parameter ADDR_WIDTH = 10)(
     input CLK,
@@ -156,4 +156,56 @@ always @(posedge CLK or negedge RESET_N) begin
     end
 end
 assign ADDR_ROM = PC[11:2];
+
+
+logic [6:0] opcode;
+logic [14:12] funct3;
+logic [19:15] rs1;
+logic [11:7] rd;
+logic [31:0] immediate;
+
+always @(posedge CLK) begin
+    opcode = Q_ROM[6:0];
+    casex(opcode)
+    I_FORMAT: begin            
+        funct3 = Q_ROM[14:12];
+        rs1 = Q_ROM[19:15];
+        rd = Q_ROM[11:7];
+        immediate = Q_ROM[31:20];
+        case(opcode)
+        7'b0000011: begin //memory operations
+            
+        end
+        7'b0010011: begin //arithmetic operations
+            case(funct3)
+            /*ADDI*/ 3'b000: assert(data_mux_result_wire == data_1_wire + immediate);
+            /*SLLI*/ 3'b001: assert(data_mux_result_wire == data_1_wire << immediate);                
+            /*SLTI*/ 3'b010: assert(data_mux_result_wire == !(signed'(data_1_wire) < signed'(immediate)));
+            /*SLTIU*/3'b011: assert(data_mux_result_wire == !(data_1_wire < immediate));                    
+            /*XORI*/ 3'b100: assert(data_mux_result_wire == data_1_wire ^ immediate);
+            3'b101: begin
+                case(immediate[11:6])
+                /*SRLI*/ 7'b0000000: assert(data_mux_result_wire == data_1_wire >> immediate[5:0]);
+                /*SRAI*/ 7'b0100000: assert(data_mux_result_wire == data_1_wire >>> immediate[5:0]);
+                endcase                                        
+            end
+            /*ORI*/ 3'b110: assert(data_mux_result_wire == data_1_wire | immediate);            
+            /*ANDI*/3'b111: assert(data_mux_result_wire == data_1_wire & immediate);               
+            default:
+                $error("Invalid funct3");
+            endcase
+        end
+        default:
+            $error("Invalid opcode");
+        endcase
+    end
+    U_FORMAT: begin
+        rd = Q_ROM[11:7];
+        immediate
+    end
+
+    default:
+        $error("Invalid instruction format");
+    endcase
+end
 endmodule
