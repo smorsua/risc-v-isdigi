@@ -1,11 +1,12 @@
-module ram_with_if(interface_ram.ram_module bus);
+`include "if_ram.sv"
+`include "if_rom.sv"
+`include "../single_cycle/main.sv"
+
+module ram_with_if(if_ram.ram_module bus);
   RAM ram(CLK, bus.address, bus.enable, bus.dato_entrada, bus.address, bus.dato_salida);
   defparam ram.addr_width = 10;
   defparam ram.data_width = 32;
 endmodule
-
-`include "if_ram.sv"
-`include "if_rom.sv"
 
 module rom_aleatoria_tb ();
   // Parameters
@@ -22,15 +23,15 @@ module rom_aleatoria_tb ();
   if_rom interface_rom();
   if_ram interface_ram();
 
-  top_duv rom_aleatoria_dut(.bus(interfaz_rom));
+  top_duv rom_aleatoria_dut(.bus(interface_rom.duv));
 
-  estimulos rom_aleatoria_estimulos(.testar_ports(interfaz_rom), .monitorizar_ports(interfaz_rom));
+  estimulos rom_aleatoria_estimulos(.testar_ports(interface_rom.testar), .monitorizar_ports(interface_rom.monitorizar));
 
   main main_circuit(
       .CLK(CLK),
       .RESET_N(RESET_N),
-      .Q_ROM(interfaz_rom.dato),
-      .ADDR_ROM(interfaz_rom.address),
+      .Q_ROM(interface_rom.main_circuit.dato),
+      .ADDR_ROM(interface_rom.main_circuit.address),
       .ADDR_RAM(interface_ram.main_circuit.address),
       .Q_RAM(interface_ram.main_circuit.dato_salida),
       .Q_W(interface_ram.main_circuit.dato_entrada),

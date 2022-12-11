@@ -1,3 +1,6 @@
+`ifndef MAIN_GUARD
+`define MAIN_GUARD
+
 `include "../ALU/operation_type.sv"
 `include "instruction_type.sv"
 module main
@@ -259,3 +262,5 @@ always @(posedge CLK) begin
 
 end
 endmodule
+
+`endif //MAIN_GUARD

@@ -11,13 +11,13 @@ logic enable;
 modport ram_module
 (input address,
 input enable,
-input dato_entrada
+input dato_entrada,
 output dato_salida);
 
 modport main_circuit
 (output address,
 output enable,
-input dato_salida
+input dato_salida,
 output dato_entrada);
 endinterface
 `endif //IF_RAM_GUARD

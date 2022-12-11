@@ -17,5 +17,9 @@ input dato);
 modport duv
 (input address,
 output dato);
+
+modport main_circuit
+(output address,
+input dato);
 endinterface
 `endif //IF_ROM_GUARD

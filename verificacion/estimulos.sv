@@ -118,8 +118,8 @@ task prueba_random_u_format;
 	begin
 	   # 100 ;
 	   assert (generar_instrucciones.randomize()) else    $fatal("randomization failed");     
-     	   rom_aleatoria_tb.m1.put(generar_instrucciones.valor);
-	   testar_ports.address= testar_ports.address +1;
+     	  rom_aleatoria_tb.m1.put(generar_instrucciones.valor);
+	      testar_ports.address= testar_ports.address +1;
            #0 monitorizar_instrucciones.instrucciones.sample();
         end
   end
