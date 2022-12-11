@@ -159,19 +159,52 @@ assign ADDR_ROM = PC[11:2];
 
 
 logic [6:0] opcode;
-logic [14:12] funct3;
-logic [19:15] rs1;
-logic [11:7] rd;
+logic [2:0] funct3;
+logic [6:0] funct7;
+logic [4:0] rs1;
+logic [4:0] rs2;
+logic [4:0] rd;
 logic [31:0] immediate;
 
 always @(posedge CLK) begin
     opcode = Q_ROM[6:0];
     casex(opcode)
+    R_FORMAT: begin
+        rd = Q_ROM[11:7];
+        funct3 = Q_ROM[14:12];
+        rs1 = Q_ROM[19:15];
+        rs2 = Q_ROM[24:20];
+        funct7 = Q_ROM[31:25];
+        casex(funct3)
+        3'b000: begin
+            case(funct7)
+            /*ADD*/ 7'b0000000: assert(data_mux_result_wire == data_1_wire + data_2_wire);
+            /*SUB*/ 7'b0100000: assert(data_mux_result_wire == data_1_wire - data_2_wire);
+            default: $error("Incorrect funct7");
+            endcase
+        end
+        /*SLL*/  3'b001: assert(data_mux_result_wire == data_1_wire << data_2_wire);
+        /*SLT*/  3'b010: assert(data_mux_result_wire == !(signed'(data_1_wire) < signed'(data_2_wire)));
+        /*SLTU*/ 3'b011: assert(data_mux_result_wire == !(data_1_wire < data_2_wire));
+        /*XOR*/  3'b100: assert(data_mux_result_wire == data_1_wire ^ data_2_wire);
+        3'b101: begin
+            case(funct7)
+            /*SRL*/ 7'b0000000: assert(data_mux_result_wire == data_1_wire >> data_2_wire);
+            /*SRA*/ 7'b0100000: assert(data_mux_result_wire == data_1_wire >>> data_2_wire);
+            default: $error("Incorrect funct 7");
+            endcase
+        end
+        /*OR*/ 3'b110: assert(data_mux_result_wire == data_1_wire | data_2_wire);
+        /*AND*/ 3'b111: assert(data_mux_result_wire == data_1_wire & data_2_wire);
+        default: $error("Incorrect funct3");
+        endcase
+    end
     I_FORMAT: begin            
         funct3 = Q_ROM[14:12];
         rs1 = Q_ROM[19:15];
         rd = Q_ROM[11:7];
-        immediate = Q_ROM[31:20];
+        immediate = { {21{Q_ROM[31]}}, Q_ROM[30:20] };
+        
         case(opcode)
         7'b0000011: begin //memory operations
             
@@ -191,21 +224,23 @@ always @(posedge CLK) begin
             end
             /*ORI*/ 3'b110: assert(data_mux_result_wire == data_1_wire | immediate);            
             /*ANDI*/3'b111: assert(data_mux_result_wire == data_1_wire & immediate);               
-            default:
-                $error("Invalid funct3");
+            default: $error("Invalid funct3");
             endcase
         end
-        default:
-            $error("Invalid opcode");
+        default: $error("Invalid opcode");
         endcase
     end
     U_FORMAT: begin
         rd = Q_ROM[11:7];
-        immediate
+        immediate = { Q_ROM[31:12], 12'b0 };
+        case(opcode)
+        /*AUIPC*/ 7'b0010111: assert(data_mux_result_wire == PC + immediate);
+        /*LUI*/ 7'b0110111: assert(data_mux_result_wire == immediate);
+        default: $error("invalid opcode");
+        endcase
     end
 
-    default:
-        $error("Invalid instruction format");
+    default: $error("Invalid instruction format");
     endcase
 end
 endmodule
