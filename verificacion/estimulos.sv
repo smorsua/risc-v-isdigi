@@ -129,9 +129,14 @@ endtask
 task activate_constraints_RISBU(input [4:0] activate );
   // rsbiu
   generar_instrucciones.R_format.constraint_mode(activate[4]);
-  generar_instrucciones.I_format.constraint_mode(activate[1]);
-  generar_instrucciones.S_format.constraint_mode(activate[3]);
-  generar_instrucciones.B_format.constraint_mode(activate[2]);
+  generar_instrucciones.R_format_a.constraint_mode(activate[4]);
+  generar_instrucciones.R_format_b.constraint_mode(activate[4]);
+
+  generar_instrucciones.I_format.constraint_mode(activate[3]);
+  generar_instrucciones.I_format_a.constraint_mode(activate[3]);
+
+  generar_instrucciones.S_format.constraint_mode(activate[2]);
+  generar_instrucciones.B_format.constraint_mode(activate[1]);
   generar_instrucciones.U_format.constraint_mode(activate[0]);
 endtask
 
