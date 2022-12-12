@@ -1,5 +1,5 @@
  `timescale 1ns/1ps
-module testbench();
+module testbench_fibonacci();
 localparam  T = 20, addr_width = 10, data_width = 32;
 
 
