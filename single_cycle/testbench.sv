@@ -21,9 +21,9 @@ defparam rom.addr_width = addr_width;
 defparam rom.data_width = data_width;
 defparam rom.file = "instructions.txt" ;
 
-top top(CLK, RESET_N, Q_ROM, ADDR_ROM, ADDR_RAM, Q_RAM, Q_W, ENABLE_W);
-defparam top.ADDR_WIDTH = addr_width;
-defparam top.SIZE = data_width;
+main main(CLK, RESET_N, Q_ROM, ADDR_ROM, ADDR_RAM, Q_RAM, Q_W, ENABLE_W);
+defparam main.ADDR_WIDTH = addr_width;
+defparam main.SIZE = data_width;
 
 initial
 begin
