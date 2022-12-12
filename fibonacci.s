@@ -1,4 +1,4 @@
-li x10, 100 # N = 5
+li x10, 100 # N = 100
 li x11, 0 # f1 = 0
 li x12, 1 # f2 = 1
 li x13, 1 # Counter. i = 1 porque voy a guardar el primer termino antes del bucle y para hacer 19 más iteraciones empiezo en 1 (<=)
