@@ -23,7 +23,7 @@ class covergroups_RISCV;
 virtual if_rom.monitorizar monitor_port;
 covergroup instrucciones ;
 
-  rformat : coverpoint ({monitor_port.dato[30],monitor_port.dato[14:12]})  iff (monitor_port.dato[6:0]==7'b0110011 && monitor_port.dato[31]==1'b0 && monitor_port.dato[29:25]==5'b0000)
+  rformat : coverpoint ({monitor_port.idata[30],monitor_port.idata[14:12]})  iff (monitor_port.idata[6:0]==7'b0110011 && monitor_port.idata[31]==1'b0 && monitor_port.idata[29:25]==5'b0000)
   {
       bins add = {0};
       bins sub = {8};      
@@ -38,7 +38,7 @@ covergroup instrucciones ;
       illegal_bins imposibles_rformat = {9,10,11,12,14,15}; 
   } 
 
-iformat : coverpoint ({monitor_port.dato[4],monitor_port.dato[14:12]}) iff (monitor_port.dato[6:0]==7'b0000011 || monitor_port.dato[6:0]==7'b0010011)
+iformat : coverpoint ({monitor_port.idata[4],monitor_port.idata[14:12]}) iff (monitor_port.idata[6:0]==7'b0000011 || monitor_port.idata[6:0]==7'b0010011)
   {
       bins addi = {8};//1000  
       bins slti = {10};//1010
@@ -51,21 +51,21 @@ iformat : coverpoint ({monitor_port.dato[4],monitor_port.dato[14:12]}) iff (moni
   }
 
 
-sformat : coverpoint ({monitor_port.dato[13]})  iff (monitor_port.dato[6:0]==7'b0100011)
+sformat : coverpoint ({monitor_port.idata[13]})  iff (monitor_port.idata[6:0]==7'b0100011)
   {
       bins sw={1};  //010
       illegal_bins imposibles_sformat = {0};
   } 
 
 
-bformat : coverpoint ({monitor_port.dato[12]})  iff (monitor_port.dato[6:0]==7'b1100011)
+bformat : coverpoint ({monitor_port.idata[12]})  iff (monitor_port.idata[6:0]==7'b1100011)
   {
       bins beq ={0}; //000
       bins bne ={1};  //001 
   } 
 
 
-uformat : coverpoint ({monitor_port.dato[5]}) iff (monitor_port.dato[6:0]==7'b0010111 || monitor_port.dato[6:0]==7'b0110111)
+uformat : coverpoint ({monitor_port.idata[5]}) iff (monitor_port.idata[6:0]==7'b0010111 || monitor_port.idata[6:0]==7'b0110111)
   {
       bins lui ={1};
       bins auipc ={0};

@@ -3,19 +3,19 @@
 
 interface if_rom;
 
-logic [9:0] address;
-logic [31:0] dato;
+logic [9:0] iaddr;
+logic [31:0] idata;
 
 modport monitorizar
-(input address,
-input dato);
+(input iaddr,
+input idata);
 
 modport duv
-(input address,
-output dato);
+(input iaddr,
+output idata);
 
 modport main_circuit
-(output address,
-input dato);
+(output iaddr,
+input idata);
 endinterface
 `endif //IF_ROM_GUARD

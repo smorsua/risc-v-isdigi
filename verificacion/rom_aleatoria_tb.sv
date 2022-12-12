@@ -2,7 +2,7 @@
 `include "if_rom.sv"
 `include "../single_cycle/main.sv"
 module ram_with_if(if_ram.ram_module bus);
-  RAM ram(CLK, bus.address, bus.enable, bus.dato_entrada, bus.address, bus.dato_salida);
+  RAM ram(CLK, bus.daddr, bus.d_rw, bus.ddata_w, bus.ddata_r);
   defparam ram.addr_width = 10;
   defparam ram.data_width = 32;
 endmodule
@@ -15,7 +15,7 @@ module rom_aleatoria_tb ();
 	localparam T = 10;
 
   // Ports
-  reg [a_width-1:0] address;
+  reg [a_width-1:0] daddr;
   reg clk;
   logic [d_width-1:0] dato;
 
@@ -49,12 +49,12 @@ module rom_aleatoria_tb ();
   main main_circuit(
       .CLK(CLK),
       .RESET_N(RESET_N),
-      .Q_ROM(interface_rom.main_circuit.dato),
-      .ADDR_ROM(interface_rom.main_circuit.address),
-      .ADDR_RAM(interface_ram.main_circuit.address),
-      .Q_RAM(interface_ram.main_circuit.dato_salida),
-      .Q_W(interface_ram.main_circuit.dato_entrada),
-      .ENABLE_W(interface_ram.main_circuit.enable)
+      .idata(interface_rom.main_circuit.idata),
+      .iaddr(interface_rom.main_circuit.iaddr),
+      .daddr(interface_ram.main_circuit.daddr),
+      .ddata_r(interface_ram.main_circuit.ddata_r),
+      .ddata_w(interface_ram.main_circuit.ddata_w),
+      .d_rw(interface_ram.main_circuit.d_rw)
   );
 
 ram_with_if ram_con_interfaz(interface_ram.ram_module);
