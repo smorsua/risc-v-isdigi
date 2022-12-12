@@ -14,6 +14,10 @@ modport duv
 (input iaddr,
 output idata);
 
+modport input_iaddr(
+    input iaddr
+);
+
 modport main_circuit
 (output iaddr,
 input idata);
