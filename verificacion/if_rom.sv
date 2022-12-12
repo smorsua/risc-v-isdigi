@@ -10,10 +10,6 @@ modport monitorizar
 (input address,
 input dato);
 
-modport testar
-(output address,
-input dato);
-
 modport duv
 (input address,
 output dato);

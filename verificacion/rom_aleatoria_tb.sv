@@ -1,7 +1,6 @@
 `include "if_ram.sv"
 `include "if_rom.sv"
 `include "../single_cycle/main.sv"
-
 module ram_with_if(if_ram.ram_module bus);
   RAM ram(CLK, bus.address, bus.enable, bus.dato_entrada, bus.address, bus.dato_salida);
   defparam ram.addr_width = 10;
@@ -13,10 +12,27 @@ module rom_aleatoria_tb ();
   localparam  d_width = 32;
   localparam  mem_depth = 1024;
   localparam a_width=$clog2(mem_depth);
+	localparam T = 10;
+
   // Ports
   reg [a_width-1:0] address;
   reg clk;
   logic [d_width-1:0] dato;
+
+  logic CLK;
+  logic RESET_N;
+
+  initial
+	begin
+		CLK = 0;
+		forever  #(T/2) CLK=!CLK;
+	end 
+
+	initial begin
+		RESET_N = 0;
+		#(T)
+		RESET_N = 1;
+	end
 
   utilidades_verificacion::instruction_box m1=new();
 
@@ -25,7 +41,10 @@ module rom_aleatoria_tb ();
 
   top_duv rom_aleatoria_dut(.bus(interface_rom.duv));
 
-  estimulos rom_aleatoria_estimulos(.testar_ports(interface_rom.testar), .monitorizar_ports(interface_rom.monitorizar));
+  estimulos rom_aleatoria_estimulos(.monitorizar_ports(interface_rom.monitorizar));
+
+
+
 
   main main_circuit(
       .CLK(CLK),

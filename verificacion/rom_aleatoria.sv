@@ -1,36 +1,29 @@
 module rom_aleatoria (address,dout);
 parameter d_width = 32;
-parameter mem_depth = 1024;
+parameter mem_depth = 1000;
 localparam a_width=$clog2(mem_depth);
 input [a_width-1:0] address;
 output logic [d_width-1:0] dout;
- 
-logic [d_width-1:0] mem[mem_depth-1:0] ; 
-`define debug_aleatorio
-`ifndef debug_aleatorio 
- 
-initial
-    $readmemh("contenido_fijo.dat", mem); 
-assign dout = mem[address];
 
-`else 
+logic [d_width-1:0] tipos_paquete[logic[a_width-1:0]]; // tipo de paquete es 16 bits
 
-logic [31:0] tipos_paquete[logic [9:0] ]; // tipo de paquete es 16 bits
+logic [d_width-1:0] temp;
+logic [a_width-1:0] temp_address;
 
-logic [31:0] temp;
-always @(address)
-if (!tipos_paquete.exists(address))
-  begin
-    rom_aleatoria_tb.m1.get(temp);
-    tipos_paquete[address]=temp;	
-    dout=tipos_paquete[address];
-  end
-else
-   begin
-    rom_aleatoria_tb.m1.get(temp);
-    dout=tipos_paquete[address];
+always @(address) begin
+  temp_address = address;
+  if (!tipos_paquete.exists(temp_address))
+    begin
+      rom_aleatoria_tb.m1.get(temp);
+      tipos_paquete[temp_address]=temp;	
+      dout=tipos_paquete[temp_address];
+    end
+  else
+    begin
+      rom_aleatoria_tb.m1.get(temp);
+      dout=tipos_paquete[temp_address];
    end
+end
 
-`endif
 
 endmodule
