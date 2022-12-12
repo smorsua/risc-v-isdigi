@@ -19,7 +19,7 @@ defparam ram.data_width = data_width;
 ROM rom(.ADDR_R(iaddr), .Q_R(idata));
 defparam rom.addr_width = addr_width;
 defparam rom.data_width = data_width;
-defparam rom.file = "instructions.txt" ;
+defparam rom.file = "bubble.txt" ;
 
 main main(CLK, RESET_N, idata, iaddr, daddr, ddata_r, ddata_w, d_rw);
 defparam main.ADDR_WIDTH = addr_width;
@@ -37,7 +37,7 @@ initial
 		    #(T)
 		RESET_N = 1;
         //load_program("instructions.txt");
-        #(T*700);
+        #(T*500);
         $stop;
 
     end
