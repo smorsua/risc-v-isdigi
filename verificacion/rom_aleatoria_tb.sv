@@ -14,11 +14,7 @@ module rom_aleatoria_tb ();
   localparam a_width=$clog2(mem_depth);
 	localparam T = 10;
 
-  // Ports
-  reg [a_width-1:0] daddr;
-  reg clk;
-  logic [d_width-1:0] dato;
-
+  
   logic CLK;
   logic RESET_N;
 
