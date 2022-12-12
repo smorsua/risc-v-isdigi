@@ -35,7 +35,7 @@ begin
     @(negedge CLK)
     fork
         begin
-        ADDR_R = 2;
+        daddr = 2;
         #(T);
         end
         begin 
@@ -50,7 +50,7 @@ begin
 end
 task  read(input [addr_width-1:0] address_read, input [7:0] cicles = 1); 
    
-    ADDR_R = address_read; 
+    daddr = address_read; 
     #(cicles*T);
 endtask 
 

@@ -27,7 +27,7 @@ begin
 	
 end
 task  read(input [addr_width-1:0] address_read, input [7:0] cicles = 1); 
-    ADDR_R = address_read; 
+    iaddr = address_read; 
 endtask 
 
 
