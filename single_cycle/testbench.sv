@@ -5,23 +5,23 @@ localparam  T = 20, addr_width = 10, data_width = 32;
 
 logic CLK;
 logic RESET_N;
-logic d_rw;
+logic mem0_ena_w;
 logic  [(data_width-1):0] ddata_w;
 logic [(addr_width-1):0] daddr;
 logic  [(data_width-1):0] ddata_r;
 logic [(addr_width-1):0] iaddr;
 logic  [(data_width-1):0] idata;
 
-RAM ram(CLK, daddr, d_rw,ddata_w, daddr, ddata_r);
+RAM ram(CLK, daddr, mem0_ena_w,ddata_w, ddata_r);
 defparam ram.addr_width = addr_width;
 defparam ram.data_width = data_width;
 
-ROM rom(.ADDR_R(iaddr), .Q_R(idata));
+ROM rom(.iaddr(iaddr), .idata(idata));
 defparam rom.addr_width = addr_width;
 defparam rom.data_width = data_width;
 defparam rom.file = "bubble.txt" ;
 
-main main(CLK, RESET_N, idata, iaddr, daddr, ddata_r, ddata_w, d_rw);
+main main(CLK, RESET_N, idata, iaddr, daddr, ddata_r, ddata_w, mem0_ena_w);
 defparam main.ADDR_WIDTH = addr_width;
 defparam main.SIZE = data_width;
 

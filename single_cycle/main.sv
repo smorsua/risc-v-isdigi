@@ -7,12 +7,12 @@ module main
 #(parameter SIZE = 32, parameter ADDR_WIDTH = 10)(
     input CLK,
     input RESET_N,
-    input  [SIZE-1:0] Q_ROM,
-    output  [ADDR_WIDTH-1:0] ADDR_ROM,
-    output  [ADDR_WIDTH-1:0] ADDR_RAM,
-    input  [SIZE-1:0] Q_RAM,
-    output  [SIZE-1:0] Q_W,
-    output ENABLE_W
+    input  [SIZE-1:0] idata,
+    output  [ADDR_WIDTH-1:0] iaddr,
+    output  [ADDR_WIDTH-1:0] daddr,
+    input  [SIZE-1:0] ddata_r,
+    output  [SIZE-1:0] ddata_w,
+    output mem0_ena_w
 );
 
 bit [ADDR_WIDTH-1:0] PC;
@@ -30,11 +30,11 @@ wire Branch, MemRed, MemWrite, ALUSrc, RegWrite;
 wire [1:0] MemtoReg;
 wire [1:0] AuipcLui_wire;
 CONTROL control(
-    .OPCODE(Q_ROM[6:0]),
+    .OPCODE(idata[6:0]),
     .BRANCH(Branch),
     .MEM_READ(MemRed),
     .MEM_TO_REG(MemtoReg),
-    .MEM_WRITE(ENABLE_W),
+    .MEM_WRITE(mem0_ena_w),
     .ALU_SRC(ALUSrc),
     .REG_WRITE(RegWrite),
     .AuipcLui(AuipcLui_wire)
@@ -45,20 +45,20 @@ wire [SIZE-1:0] data_1_wire, data_2_wire;
 BANCO_REGISTROS #(.SIZE(SIZE)) registros(
     .CLK(CLK),
     .RESET_N(RESET_N),
-    .read_reg1(Q_ROM[19:15]),
-    .read_reg2(Q_ROM[24:20]),
-    .write_reg(Q_ROM[11:7]),
+    .read_reg1(idata[19:15]),
+    .read_reg2(idata[24:20]),
+    .write_reg(idata[11:7]),
     .writeData(data_mux_result_wire),
     .RegWrite(RegWrite),
     .Data1(data_1_wire),
     .Data2(data_2_wire)
 );
-assign Q_W = data_2_wire;
+assign ddata_w = data_2_wire;
 wire [SIZE-1:0] imm_wire;
 //Como hay que trocear la instruccion a mano, solo funciona para 32 bits
 
 IMMEDIATE_GENERATOR imm_gen(
-    .inst(Q_ROM),
+    .inst(idata),
     .IMMEDIATE(imm_wire)
 );
 
@@ -87,9 +87,9 @@ MUX #(.SIZE(SIZE), .INPUTS(2)) alu_src_2_mux (
 
 wire [3:0] ALUSelection_wire;
 ALU_CONTROL alu_control(
-    .OPCODE(Q_ROM[6:0]),
-    .funct3(Q_ROM[14:12]),
-    .bit30(Q_ROM[30]),
+    .OPCODE(idata[6:0]),
+    .funct3(idata[14:12]),
+    .bit30(idata[30]),
     .ALUSelection(ALUSelection_wire)
 );
 
@@ -103,22 +103,22 @@ ALU #(.SIZE(SIZE)) address_alu(
     .ZERO(address_alu_zero)
 );
 
-assign ADDR_RAM = {2'b0, address_alu_result[31:2]};
+assign daddr = {2'b0, address_alu_result[31:2]};
 
 /*wire [SIZE-1:0] read_data_wire;
 RAM #(.data_width(SIZE), .addr_width(ADDR_WIDTH)) data_memory (
     .CLK(CLK),
-    .ENABLE_W(MemWrite),
+    .mem0_ena_w(MemWrite),
     .ADDR_R(alu_address_wire),
     .ADDR_W(alu_address_wire),
-    .Q_W(data_2_wire),
+    .ddata_w(data_2_wire),
     .Q_R(read_data_wire)
 
 );*/
 
 wire [SIZE-1:0] myInput_data_mux [3];
 assign myInput_data_mux[0] = address_alu_result;
-assign myInput_data_mux[1] = Q_RAM;
+assign myInput_data_mux[1] = ddata_r;
 assign myInput_data_mux[2] = {22'b0, next_consecutive_pc_wire[9:0]};
 
 MUX #(.SIZE(SIZE), .INPUTS(3)) data_mux (
@@ -137,7 +137,7 @@ ALU #(.SIZE(ADDR_WIDTH)) jump_alu(
 );
 
 wire PCSrc;
-assign PCSrc = Branch & ((Q_ROM[14:12] == 001 && !address_alu_zero) || (Q_ROM[14:12] != 001 && address_alu_zero));
+assign PCSrc = Branch & ((idata[14:12] == 001 && !address_alu_zero) || (idata[14:12] != 001 && address_alu_zero));
 wire [ADDR_WIDTH-1:0] next_pc_wire;
 
 wire [SIZE-1:0] myInput_pc_mux [2];
@@ -158,7 +158,7 @@ always @(posedge CLK or negedge RESET_N) begin
         PC <= next_pc_wire;
     end
 end
-assign ADDR_ROM = {2'b0, PC[9:2]};
+assign iaddr = {2'b0, PC[9:2]};
 
 
 logic [6:0] opcode;
@@ -170,14 +170,14 @@ logic [4:0] rd;
 logic [31:0] immediate;
 
 always @(posedge CLK) begin
-    opcode = Q_ROM[6:0];
+    opcode = idata[6:0];
     casex(opcode)
     R_FORMAT: begin
-        rd = Q_ROM[11:7];
-        funct3 = Q_ROM[14:12];
-        rs1 = Q_ROM[19:15];
-        rs2 = Q_ROM[24:20];
-        funct7 = Q_ROM[31:25];
+        rd = idata[11:7];
+        funct3 = idata[14:12];
+        rs1 = idata[19:15];
+        rs2 = idata[24:20];
+        funct7 = idata[31:25];
         casex(funct3)
         3'b000: begin
             case(funct7)
@@ -203,14 +203,14 @@ always @(posedge CLK) begin
         endcase
     end
     I_FORMAT: begin
-        funct3 = Q_ROM[14:12];
-        rs1 = Q_ROM[19:15];
-        rd = Q_ROM[11:7];
-        immediate = { {21{Q_ROM[31]}}, Q_ROM[30:20] };
+        funct3 = idata[14:12];
+        rs1 = idata[19:15];
+        rd = idata[11:7];
+        immediate = { {21{idata[31]}}, idata[30:20] };
 
         case(opcode)
         7'b0000011: begin //memory operations
-            /*LW*/ assert(data_mux_result_wire == Q_RAM) ;
+            /*LW*/ assert(data_mux_result_wire == ddata_r) ;
 
         end
         7'b0010011: begin //arithmetic operations
@@ -235,8 +235,8 @@ always @(posedge CLK) begin
         endcase
     end
     U_FORMAT: begin
-        rd = Q_ROM[11:7];
-        immediate = { Q_ROM[31:12], 12'b0 };
+        rd = idata[11:7];
+        immediate = { idata[31:12], 12'b0 };
         case(opcode)
         /*AUIPC*/ 7'b0010111: assert(data_mux_result_wire == PC + immediate);
         /*LUI*/ 7'b0110111: assert(data_mux_result_wire == immediate);
@@ -244,11 +244,11 @@ always @(posedge CLK) begin
         endcase
     end
     S_FORMAT: begin
-        immediate = { {21{Q_ROM[31]}}, Q_ROM[30:25], Q_ROM[11:7]};
+        immediate = { {21{idata[31]}}, idata[30:25], idata[11:7]};
         /*SW*/ assert(address_alu_result == data_1_wire + immediate);
     end
     B_FORMAT: begin
-        immediate = { {21{Q_ROM[31]}}, Q_ROM[7], Q_ROM[30:25], Q_ROM[11:8], 1'b0};
+        immediate = { {21{idata[31]}}, idata[7], idata[30:25], idata[11:8], 1'b0};
         
     end
 
@@ -256,7 +256,7 @@ always @(posedge CLK) begin
     endcase
 end
 
-// assert property (@(posedge CLK) address_alu_zero == '1 && Q_ROM[6:0] == 'b1100011 |-> (branch_target_wire == (immediate + PC)) ) else $fatal("No realiza correctamente el salto condicional");
+// assert property (@(posedge CLK) address_alu_zero == '1 && idata[6:0] == 'b1100011 |-> (branch_target_wire == (immediate + PC)) ) else $fatal("No realiza correctamente el salto condicional");
 
 endmodule
 

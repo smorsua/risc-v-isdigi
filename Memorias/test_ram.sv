@@ -8,13 +8,12 @@ module test_ram (
 localparam  T = 20, addr_width = 10, data_width = 32;
 
 	logic CLK;
-	logic  [(addr_width-1):0] ADDR_W;
-	logic ENABLE_W;
-   logic  [(data_width-1):0] Q_W;
-	logic [(addr_width-1):0] ADDR_R;
-	logic [(data_width-1):0] Q_R;
+	logic  [(addr_width-1):0] daddr;
+	logic mem0_ena_w;
+    logic  [(data_width-1):0] ddata_w;
+	logic [(data_width-1):0] ddata_r;
 
-RAM ram(CLK, ADDR_W, ENABLE_W, Q_W, ADDR_R, Q_R);
+RAM ram(CLK, daddr, mem0_ena_w, ddata_w, ddata_r);
 defparam ram.addr_width = addr_width;
 defparam ram.data_width = data_width;
 
@@ -57,10 +56,10 @@ endtask
 
 task  write(input [addr_width-1:0] address_write);
     @(negedge CLK)
-    ENABLE_W = 1; 
-    Q_W = $random();
-    ADDR_W = address_write;
+    mem0_ena_w = 1; 
+    ddata_w = $random();
+    daddr = address_write;
     @(negedge CLK); 
-    ENABLE_W = 0; 
+    mem0_ena_w = 0; 
 endtask
 endmodule
