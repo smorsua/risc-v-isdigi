@@ -16,11 +16,11 @@ module main
 );
 
 bit [ADDR_WIDTH-1:0] PC;
-wire [SIZE-1:0] next_consecutive_pc_wire;
+wire [ADDR_WIDTH-1:0] next_consecutive_pc_wire;
 
 ALU #(.SIZE(ADDR_WIDTH)) pc_alu(
     .A(PC),
-    .B('d4),
+    .B(10'd4),
     .OPERATION(ADD),
     .RESULT(next_consecutive_pc_wire),
     .ZERO()
@@ -140,11 +140,11 @@ wire PCSrc;
 assign PCSrc = Branch & ((idata[14:12] == 001 && !address_alu_zero) || (idata[14:12] != 001 && address_alu_zero));
 wire [ADDR_WIDTH-1:0] next_pc_wire;
 
-wire [SIZE-1:0] myInput_pc_mux [2];
+wire [ADDR_WIDTH-1:0] myInput_pc_mux [2];
 assign myInput_pc_mux[0] = next_consecutive_pc_wire;
 assign myInput_pc_mux[1] = branch_target_wire;
 
-MUX #(.SIZE(SIZE), .INPUTS(2)) pc_mux(
+MUX #(.SIZE(ADDR_WIDTH), .INPUTS(2)) pc_mux(
     .all_inputs(myInput_pc_mux),
     .sel(PCSrc),
     .result(next_pc_wire)
