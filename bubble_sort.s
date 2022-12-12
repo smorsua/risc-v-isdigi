@@ -7,7 +7,7 @@ li x10 1
 sw x10 0(sp)
 addi sp sp -4
 
-li x10 2
+li x10 22
 #Push to stack
 sw x10 0(sp)
 addi sp sp -4
@@ -17,7 +17,7 @@ li x10 3
 sw x10 0(sp)
 addi sp sp -4
 
-li x10 4
+li x10 42
 #Push to stack
 sw x10 0(sp)
 addi sp sp -4
@@ -27,7 +27,7 @@ li x10 5
 sw x10 0(sp)
 addi sp sp -4
 
-li x10 6
+li x10 62
 #Push to stack
 sw x10 0(sp)
 addi sp sp -4
