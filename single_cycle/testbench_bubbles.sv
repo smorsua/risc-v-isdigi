@@ -12,7 +12,7 @@ logic  [(data_width-1):0] ddata_r;
 logic [(addr_width-1):0] iaddr;
 logic  [(data_width-1):0] idata;
 
-RAM ram(CLK, daddr, mem0_ena_w,ddata_w, daddr, ddata_r);
+RAM ram(CLK, daddr, mem0_ena_w,ddata_w, ddata_r);
 defparam ram.addr_width = addr_width;
 defparam ram.data_width = data_width;
 
