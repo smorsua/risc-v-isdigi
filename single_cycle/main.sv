@@ -12,7 +12,7 @@ module main
     output  [ADDR_WIDTH-1:0] daddr,
     input  [SIZE-1:0] ddata_r,
     output  [SIZE-1:0] ddata_w,
-    output mem0_ena_w
+    output d_rw
 );
 
 bit [ADDR_WIDTH-1:0] PC;
@@ -34,7 +34,7 @@ CONTROL control(
     .BRANCH(Branch),
     .MEM_READ(MemRed),
     .MEM_TO_REG(MemtoReg),
-    .MEM_WRITE(mem0_ena_w),
+    .MEM_WRITE(d_rw),
     .ALU_SRC(ALUSrc),
     .REG_WRITE(RegWrite),
     .AuipcLui(AuipcLui_wire)
@@ -108,7 +108,7 @@ assign daddr = {2'b0, address_alu_result[31:2]};
 /*wire [SIZE-1:0] read_data_wire;
 RAM #(.data_width(SIZE), .addr_width(ADDR_WIDTH)) data_memory (
     .CLK(CLK),
-    .mem0_ena_w(MemWrite),
+    .d_rw(MemWrite),
     .ADDR_R(alu_address_wire),
     .ADDR_W(alu_address_wire),
     .ddata_w(data_2_wire),

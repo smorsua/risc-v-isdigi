@@ -9,11 +9,11 @@ localparam  T = 20, addr_width = 10, data_width = 32;
 
 	logic CLK;
 	logic  [(addr_width-1):0] daddr;
-	logic mem0_ena_w;
+	logic d_rw;
     logic  [(data_width-1):0] ddata_w;
 	logic [(data_width-1):0] ddata_r;
 
-RAM ram(CLK, daddr, mem0_ena_w, ddata_w, ddata_r);
+RAM ram(CLK, daddr, d_rw, ddata_w, ddata_r);
 defparam ram.addr_width = addr_width;
 defparam ram.data_width = data_width;
 
@@ -56,10 +56,10 @@ endtask
 
 task  write(input [addr_width-1:0] address_write);
     @(negedge CLK)
-    mem0_ena_w = 1; 
+    d_rw = 1; 
     ddata_w = $random();
     daddr = address_write;
     @(negedge CLK); 
-    mem0_ena_w = 0; 
+    d_rw = 0; 
 endtask
 endmodule

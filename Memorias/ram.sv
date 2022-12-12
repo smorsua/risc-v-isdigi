@@ -3,7 +3,7 @@ module RAM
 (
 	input CLK,
 	input  [(addr_width-1):0] daddr,
-	input mem0_ena_w, 
+	input d_rw, 
     input  [(data_width-1):0] ddata_w,
 	output reg [(data_width-1):0] ddata_r
 );
@@ -18,11 +18,11 @@ module RAM
 
     always @(posedge CLK)
     begin
-	 if(mem0_ena_w)
+	 if(d_rw)
 		ram[daddr] <= ddata_w;
 	end
 
 	assign 	ddata_r = ram[daddr];
 
-	assert property (@(posedge CLK) mem0_ena_w |=>  (ram[$past(daddr, 1)] == $past(ddata_w, 1))) else  $error ("No escribe");
+	assert property (@(posedge CLK) d_rw |=>  (ram[$past(daddr, 1)] == $past(ddata_w, 1))) else  $error ("No escribe");
 endmodule
