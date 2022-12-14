@@ -1,5 +1,5 @@
 module ROM
-#(parameter data_width=32, parameter addr_width=10, parameter file = "rom_init.txt")
+#(parameter data_width=32, parameter addr_width=10, parameter file = "bubble.txt")
 (
 	input CLK,
 	input [(addr_width-1):0] iaddr,
@@ -9,8 +9,9 @@ module ROM
 	initial // Read the memory contents in the file
 			 //dual_port_rom_init.txt. 
 	begin
-		$readmemh(file, rom);
+		$readmemh("bubble.txt", rom);
 	end
+
 	always @(posedge CLK)
 	begin
 	 	idata <= rom[iaddr];

@@ -14,20 +14,28 @@ ROM rom(.CLK(CLK), .iaddr(iaddr), .idata(idata));
 defparam rom.addr_width = addr_width;
 defparam rom.data_width = data_width;
 
+
+initial begin
+    CLK = 0;
+    forever #(T/2) CLK = !CLK;
+end
+
 initial 
 begin
 	
-    read(0);
-    
-    read(1);
-    #(T/4)
-    read(2);
-    #(T/2)
+    read(CLK, 0, 1);
+    read(CLK, 1, 1);
+    read(CLK, 2, 1);
+    read(CLK, 3, 1);
+
     $stop;
 	
 end
-task  read(input [addr_width-1:0] address_read, input [7:0] cicles = 1); 
-    iaddr = address_read; 
+task automatic read(ref CLK, input [addr_width-1:0] address_read, input [7:0] cicles = 1); 
+    @(negedge CLK) begin
+        iaddr <= address_read;
+        #cicles;
+    end
 endtask 
 
 
