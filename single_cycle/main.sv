@@ -15,6 +15,22 @@ module main
     output d_rw
 );
 
+bit [ADDR_WIDTH-1:0] PC_aux;
+always_ff @(posedge CLK or negedge RESET_N) begin
+    if(RESET_N == 0) begin
+        PC_aux <= 0;
+    end else begin
+        PC_aux <= next_pc_wire;
+    end
+end
+
+always_ff @( posedge CLK ) begin : 
+    PC <= PC_aux;    
+end
+
+assign iaddr = {2'b0, PC[9:2]};
+
+
 bit [ADDR_WIDTH-1:0] PC;
 wire [ADDR_WIDTH-1:0] next_consecutive_pc_wire;
 
@@ -26,18 +42,24 @@ ALU #(.SIZE(ADDR_WIDTH)) pc_alu(
     .ZERO()
 );
 
+
 wire Branch, MemRed, MemWrite, ALUSrc, RegWrite;
 wire [1:0] MemtoReg;
 wire [1:0] AuipcLui_wire;
 CONTROL control(
-    .OPCODE(idata[6:0]),
+
+    .WB(MemtoReg),
+    .M(d_rw),
+    .EX(ALUSrc), //SALEN alusCR aluoP
+
+   /* .OPCODE(idata[6:0]),
     .BRANCH(Branch),
     .MEM_READ(MemRed),
     .MEM_TO_REG(MemtoReg),
     .MEM_WRITE(d_rw),
     .ALU_SRC(ALUSrc),
     .REG_WRITE(RegWrite),
-    .AuipcLui(AuipcLui_wire)
+    .AuipcLui(AuipcLui_wire)*/
 );
 
 wire [SIZE-1:0] data_mux_result_wire;
@@ -141,14 +163,7 @@ MUX #(.SIZE(ADDR_WIDTH), .INPUTS(2)) pc_mux(
 );
 
 
-always @(posedge CLK or negedge RESET_N) begin
-    if(RESET_N == 0) begin
-        PC <= 0;
-    end else begin
-        PC <= next_pc_wire;
-    end
-end
-assign iaddr = {2'b0, PC[9:2]};
+
 
 
 logic [6:0] opcode;
