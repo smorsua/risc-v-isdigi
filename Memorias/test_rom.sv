@@ -20,6 +20,7 @@ initial begin
     forever #(T/2) CLK = !CLK;
 end
 
+
 initial 
 begin
 	

@@ -12,7 +12,7 @@ module ROM
 		$readmemh("bubble.txt", rom);
 	end
 
-	always @(posedge CLK)
+	always_ff @(posedge CLK)
 	begin
 	 	idata <= rom[iaddr];
 	end
