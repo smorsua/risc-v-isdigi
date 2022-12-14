@@ -16,7 +16,7 @@ RAM ram(CLK, daddr, d_rw,ddata_w, ddata_r);
 defparam ram.addr_width = addr_width;
 defparam ram.data_width = data_width;
 
-ROM rom(.iaddr(iaddr), .idata(idata));
+ROM rom(.CLK(CLK), .iaddr(iaddr), .idata(idata));
 defparam rom.addr_width = addr_width;
 defparam rom.data_width = data_width;
 defparam rom.file = "bubble.txt" ;

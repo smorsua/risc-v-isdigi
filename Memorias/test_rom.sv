@@ -10,7 +10,7 @@ localparam  T = 20, addr_width = 10, data_width = 32;
 	logic [(addr_width-1):0] iaddr;
 	logic [(data_width-1):0] idata;
 
-ROM rom(.iaddr(iaddr), .idata(idata));
+ROM rom(.CLK(CLK), .iaddr(iaddr), .idata(idata));
 defparam rom.addr_width = addr_width;
 defparam rom.data_width = data_width;
 

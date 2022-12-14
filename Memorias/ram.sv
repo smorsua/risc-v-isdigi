@@ -21,8 +21,13 @@ module RAM
 	 if(d_rw)
 		ram[daddr] <= ddata_w;
 	end
-
-	assign 	ddata_r = ram[daddr];
+	// lectura sincrona 
+	always @(posedge CLK)
+	begin
+		ddata_r <= ram[daddr];
+	end
+	 	
 
 	assert property (@(posedge CLK) d_rw |=>  (ram[$past(daddr, 1)] == $past(ddata_w, 1))) else  $error ("No escribe");
+	
 endmodule
