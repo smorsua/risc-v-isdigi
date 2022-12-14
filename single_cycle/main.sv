@@ -136,14 +136,26 @@ ALU #(.SIZE(ADDR_WIDTH)) jump_alu(
     .ZERO()
 );
 
-wire PCSrc;
-assign PCSrc = Branch & ((idata[14:12] == 001 && !address_alu_zero) || (idata[14:12] != 001 && address_alu_zero));
-wire [ADDR_WIDTH-1:0] next_pc_wire;
+reg PCSrc;
+
+always_comb begin
+    if(Branch) begin
+        if( /*BNE*/((idata[14:12] == 001 && !address_alu_zero) || 
+            /*Resto de comparaciones*/(idata[14:12] != 001 && address_alu_zero)) ||
+            /*JAL*/(idata[6:0] == 7'b1101111) ||
+            /*JALR*/(idata[6:0] == 7'b1100111))
+            PCSrc = 10'b1;
+    end else begin
+        PCSrc = 10'b0;
+    end
+    
+end
 
 wire [ADDR_WIDTH-1:0] myInput_pc_mux [2];
 assign myInput_pc_mux[0] = next_consecutive_pc_wire;
 assign myInput_pc_mux[1] = branch_target_wire;
 
+wire [ADDR_WIDTH-1:0] next_pc_wire;
 MUX #(.SIZE(ADDR_WIDTH), .INPUTS(2)) pc_mux(
     .all_inputs(myInput_pc_mux),
     .sel(PCSrc),

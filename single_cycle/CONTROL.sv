@@ -92,23 +92,22 @@ always_comb begin
        J_FORMAT: begin
             BRANCH = 1;
             MEM_READ = 0;
-            MEM_TO_REG = 2;
-            //ALU_OP = 'b10;
+            MEM_TO_REG = OPCODE == 7'b1100111 ? 0 : 7'b1101111 ? 2 : 0;
             MEM_WRITE = 0;
             ALU_SRC = 1;
             REG_WRITE = 1;
             AuipcLui = 0;
         end
-        /*default:
+        default:
 			begin
-			BRANCH = 1;
+			BRANCH = 0;
             MEM_READ = 0;
             MEM_TO_REG = 0;
             MEM_WRITE = 0;
             ALU_SRC = 0;
             REG_WRITE = 0;
             AuipcLui = 0;
-			end*/
+			end
     endcase
 end
 

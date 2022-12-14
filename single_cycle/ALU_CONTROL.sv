@@ -65,13 +65,14 @@ module ALU_CONTROL(
         U_FORMAT:begin
             casex(funct3)
                 3'bxxx: ALUSelection = ADD;
+                default: ALUSelection = ADD;
             endcase
         end
         J_FORMAT:begin
             casex(funct3)
                 3'bxxx: ALUSelection = ADD;
+                default: ALUSelection = ADD;
             endcase
-
         end
 		  default: ALUSelection = 0;
     //FIXME: falta uno
