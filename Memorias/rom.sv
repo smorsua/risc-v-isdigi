@@ -1,21 +1,16 @@
-module rom
-#(parameter data_width=32, parameter addr_width=10)
+module ROM
+#(parameter data_width=32, parameter addr_width=10, parameter file = "rom_init.txt")
 (
-	input CLK,
-	input [(addr_width-1):0] ADRR_R,
-	output reg [(data_width-1):0] Q_R
+	input [(addr_width-1):0] iaddr,
+	output reg [(data_width-1):0] idata
 );
 	reg [data_width-1:0] rom[2**addr_width-1:0];
 	initial // Read the memory contents in the file
 			 //dual_port_rom_init.txt. 
 	begin
-		$readmemb("rom_init.txt", rom);
+		$readmemh(file, rom);
 	end
-
-
-	assign Q_R = rom[ADRR_R];
 	
-
-
-    
+	assign idata = rom[iaddr];
+	
 endmodule

@@ -1,21 +1,19 @@
 `timescale 1ns/1ps
-localparam  T = 20, addr_width = 10, data_width = 32;
-
-
 
 
 module test_ram (
 
 );
 
-	logic CLK,
-	logic  [(addr_width-1):0] ADRR_W,
-	logic ENABLE_W,
-    logic  [(data_width-1):0] Q_W,
-	logic [(addr_width-1):0] ADRR_R,
-	logic reg [(data_width-1):0] Q_R
+localparam  T = 20, addr_width = 10, data_width = 32;
 
-ram ram(CLK, ADRR_W, ENABLE_W, Q_W, ADRR_R, Q_R);
+	logic CLK;
+	logic  [(addr_width-1):0] daddr;
+	logic d_rw;
+    logic  [(data_width-1):0] ddata_w;
+	logic [(data_width-1):0] ddata_r;
+
+RAM ram(CLK, daddr, d_rw, ddata_w, ddata_r);
 defparam ram.addr_width = addr_width;
 defparam ram.data_width = data_width;
 
@@ -24,7 +22,7 @@ initial begin
     forever #(T/2) CLK = !CLK;
 end
 
-/*initial 
+initial 
 begin
 	write(0);
     read(0);
@@ -37,34 +35,31 @@ begin
     @(negedge CLK)
     fork
         begin
-        ADRR_R = 2;
+        daddr = 2;
         #(T);
         end
         begin 
-        ADRR_W = 2;
-        Q_W = $random();
-        ENABLE_W = 1;
-        #(2*T);
-        ENABLE_W = 0; 
+        write(2);
+        write(2);
         end
     
     join
     #(T*2)
     $stop;
 	
-end*/
+end
 task  read(input [addr_width-1:0] address_read, input [7:0] cicles = 1); 
    
-    ADRR_R = address_read; 
-    #(cicles*T)
+    daddr = address_read; 
+    #(cicles*T);
 endtask 
 
 task  write(input [addr_width-1:0] address_write);
     @(negedge CLK)
-    ENABLE_W = 1; 
-    Q_W = $random();
-    ADRR_W = address_write;
+    d_rw = 1; 
+    ddata_w = $random();
+    daddr = address_write;
     @(negedge CLK); 
-    ENABLE_W = 0; 
+    d_rw = 0; 
 endtask
 endmodule
