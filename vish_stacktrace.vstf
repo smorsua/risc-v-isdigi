@@ -1,0 +1,32 @@
+# Current time Fri Dec 09 12:47:56 2022
+# QuestaSim Stack Trace
+# Program = vish
+# Id = "10.4"
+# Version = "2014.12"
+# Date = "Dec  3 2014"
+# Platform = win64
+
+Exception c0000005 has occurred at address 1008e550. Traceback:
+# 0    0x1008e550: 'TclGetNamespaceFromObj + 0x160'
+# 1    0x1008e40e: 'TclGetNamespaceFromObj + 0x1e'
+# 2    0x1005aa7a: 'Tcl_ExprObj + 0x330a'
+# 3    0x100a62b4: 'TclObjInterpProcCore + 0x74'
+# 4    0x10011461: 'Tcl_ListMathFuncs + 0x591'
+# 5    0x1005931a: 'Tcl_ExprObj + 0x1baa'
+# 6    0x10057f0a: 'Tcl_ExprObj + 0x79a'
+# 7    0x100130b0: 'TclEvalObjEx + 0x3e0'
+# 8    0x10078627: 'TclChannelEventScriptInvoker + 0x57'
+# 9    0x10077e9d: 'Tcl_NotifyChannel + 0x15d'
+# 10   0x100daa3c: 'TclGetAndDetachPids + 0x78c'
+# 11   0x10095092: 'Tcl_ServiceEvent + 0xd2'
+# 12   0x100954b2: 'Tcl_DoOneEvent + 0x172'
+# 13   0x102e21a5: 'Tk_MainLoop + 0x25'
+# 14   0x102ae12b: 'Tk_MainEx + 0x91b'
+# 15   0x400e051b: 'Mtirpc_Init + 0x22aeb'
+# 16   0x400e2292: 'Mtirpc_Init + 0x24862'
+# 17   0x405a75f2: 'Sqlite_Unload + 0xb3492'
+# 18   0xa87574b4: 'BaseThreadInitThunk + 0x14'
+# 19   0xaa2c26a1: 'RtlUserThreadStart + 0x21'
+StackWalk failed 0
+# End of Stack Trace
+
