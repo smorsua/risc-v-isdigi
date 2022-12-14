@@ -6,7 +6,14 @@ module IMMEDIATE_GENERATOR(
 
 always_comb begin
     casex(inst[6:0])
-    I_FORMAT: IMMEDIATE = { {21{inst[31]}}, inst[30:20] };
+    I_FORMAT:begin
+        case(inst[14:12])
+        /*SLLI*/3'b001: IMMEDIATE = {7'b0, inst[24:20] };
+        /*SRLI*/3'b101: IMMEDIATE = {7'b0, inst[24:20] };
+
+    default: IMMEDIATE = { {21{inst[31]}}, inst[30:20] };
+        endcase
+    end
     S_FORMAT: IMMEDIATE = { {21{inst[31]}}, inst[30:25], inst[11:7] };
     B_FORMAT: IMMEDIATE = { {20{inst[31]}}, inst[7], inst[30:25], inst[11:8], 1'b0};
     U_FORMAT: IMMEDIATE = { inst[31:12], 12'b0 };
