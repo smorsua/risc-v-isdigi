@@ -3,7 +3,7 @@ module RAM
 (
 	input CLK,
 	input  [(addr_width-1):0] daddr,
-	input d_rw, 
+	input MemWrite, MemRead;
     input  [(data_width-1):0] ddata_w,
 	output reg [(data_width-1):0] ddata_r
 );
@@ -18,16 +18,17 @@ module RAM
 
     always @(posedge CLK)
     begin
-	 if(d_rw)
+	 if(MemWrite)
 		ram[daddr] <= ddata_w;
 	end
 	// lectura sincrona 
 	always @(posedge CLK)
 	begin
+		if(MemRead)
 		ddata_r <= ram[daddr];
 	end
 	 	
 
-	assert property (@(posedge CLK) d_rw |=>  (ram[$past(daddr, 1)] == $past(ddata_w, 1))) else  $error ("No escribe");
+	assert property (@(posedge CLK) MemWrite |=>  (ram[$past(daddr, 1)] == $past(ddata_w, 1))) else  $error ("No escribe");
 	
 endmodule
