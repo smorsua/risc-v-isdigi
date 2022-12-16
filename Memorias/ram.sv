@@ -2,11 +2,10 @@ module RAM
 #(parameter data_width=32, parameter addr_width=10)
 (
 	input CLK,
-	input  [(addr_width-1):0] ADDR_W,
-	input ENABLE_W, 
-    input  [(data_width-1):0] Q_W,
-	input [(addr_width-1):0] ADDR_R,
-	output reg [(data_width-1):0] Q_R
+	input  [(addr_width-1):0] daddr,
+	input d_rw, 
+    input  [(data_width-1):0] ddata_w,
+	output reg [(data_width-1):0] ddata_r
 );
 	reg [data_width-1:0] ram[2**addr_width-1:0];
 
@@ -19,11 +18,11 @@ module RAM
 
     always @(posedge CLK)
     begin
-	 if(ENABLE_W)
-		ram[ADDR_W] <= Q_W;
+	 if(d_rw)
+		ram[daddr] <= ddata_w;
 	end
 
-	assign 	Q_R = ram[ADDR_R];
+	assign 	ddata_r = ram[daddr];
 
-	assert property (@(posedge CLK) ENABLE_W |=>  (ram[$past(ADDR_W, 1)] == $past(Q_W, 1))) else  $error ("No escribe");
+	assert property (@(posedge CLK) d_rw |=>  (ram[$past(daddr, 1)] == $past(ddata_w, 1))) else  $error ("No escribe");
 endmodule
