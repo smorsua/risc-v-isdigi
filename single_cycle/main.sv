@@ -15,6 +15,7 @@ module main
     output d_rw
 );
 
+
 bit [ADDR_WIDTH-1:0] PC_aux;
 always_ff @(posedge CLK or negedge RESET_N) begin
     if(RESET_N == 0) begin
@@ -27,6 +28,7 @@ end
 always_ff @( posedge CLK ) begin : 
     PC <= PC_aux;    
 end
+
 assign iaddr = {2'b0, PC[9:2]};
 
 
@@ -71,29 +73,48 @@ BANCO_REGISTROS #(.SIZE(SIZE)) registros(
 );
 assign ddata_w = data_2_wire;
 
-reg iaddr_IF_ID, idata_IF_ID, wb_control_ID_EX,m_control_ID_EX,ex_control_ID_EX;
-reg iaddr_ID_EX, data_1_wire_ID_EX, data_2_wire_ID_EX, idata_ID_EX, writeReg_ID_EX;
-    addr_MEM_WB <= daddr;
-reg wb_EX_MEM,m_EX_MEM,Sum_EX_MEM,Zero_EX_MEM, writeReg_EX_MEM,wb_MEM_WB,writeReg_MEM_WB ;
+// reg iaddr_IF_ID, idata_IF_ID, wb_control_ID_EX,m_control_ID_EX,ex_control_ID_EX;
+// reg iaddr_ID_EX, data_1_wire_ID_EX, data_2_wire_ID_EX, idata_ID_EX, writeReg_ID_EX;
+//     addr_MEM_WB <= daddr;
+// reg wb_EX_MEM, m_EX_MEM, Sum_EX_MEM, Zero_EX_MEM, writeReg_EX_MEM, wb_MEM_WB, writeReg_MEM_WB ;
+
+// ETAPA ID_EX
+reg [3:0] idata_ID_EX_30_12;
+reg [4:0] idata_ID_EX_11_7;
+reg [6:0] idata_ID_EX_6_0;
+reg [ADDR_WIDTH-1:0] PC_ID_EX;
+reg [ADDR_WIDTH:0] reg_imm_ID_EX;
+reg Branch_ID_EX, MemWrite_ID_EX, MEM_READ_ID_EX, ALUSrc_ID_EX;
+
 
 //REGISTROS PRIMERA FASE IF/ID
-always_ff @( posedge CLK ) begin : 
-iaddr_IF_ID <= iaddr;
-idata_IF_ID <= idata;
-end
+// always_ff @( posedge CLK ) begin : 
+// iaddr_IF_ID <= iaddr;
+// idata_IF_ID <= idata;
+// end
 
 //REGISTROS SEGUNDA FASE ID/EX
 always_ff @( posedge CLK ) begin : 
-    wb_control_ID_EX <= {RegWrite,MemtoReg}
-    m_control_ID_EX <= {Branch,MemRead,MemWrite}
-    ex_control_ID_EX <= {aluoP,ALUSrc} //no se el nombre correcto de estas dos señales
+    // EX_PART
+    ALUSrc_ID_EX <= ALUSrc;
     
-    iaddr_ID_EX <= iaddr_IF_ID;
-    data_1_wire_ID_EX <= data_1_wire;
-    data_2_wire_ID_EX <= data_2_wire;
-    reg_imm <= imm_wire; //lo que sale del generador de imm
-    idata_ID_EX<= {idata_IF_ID[30],idata_IF_ID[14:12]}; //idata[{30,14:12}];    
-    writeReg_ID_EX <= idata_IF_ID[11:7];    
+    // M_PART
+    Branch_ID_EX <= Branch;
+    MemWrite_ID_EX <= MemWrite;
+    MEM_READ_ID_EX <= MemRed;
+
+    
+    PC_ID_EX <= PC;
+
+    idata_ID_EX_6_0 <= idata[6:0];
+    
+    
+    // REGISTRO DE PARTE DEL INMEDIATO
+    reg_imm_ID_EX <= imm_wire; //lo que sale del generador de imm
+    idata_ID_EX_30_12 <= {idata[30],idata[14:12]}; //idata[{30,14:12}];    
+    idata_ID_EX_11_7  <= idata[11:7];    
+    // data_1_wire_ID_EX <= data_1_wire; YA ESTÁ REGISTRADO EN BANCO DE REGISTROS
+    // data_2_wire_ID_EX <= data_2_wire;
 end   
 
 //REGISTROS FASE EX/MEM
@@ -155,9 +176,9 @@ MUX #(.SIZE(SIZE), .INPUTS(2)) alu_src_2_mux (
 
 wire [3:0] ALUSelection_wire;
 ALU_CONTROL alu_control(
-    .OPCODE(idata[6:0]),
-    .funct3(idata[14:12]),
-    .bit30(idata[30]),
+    .OPCODE(idata_ID_EX_6_0),
+    .funct3(idata_ID_EX_30_12[2:0]),
+    .bit30(idata_ID_EX_30_12[3]),
     .ALUSelection(ALUSelection_wire)
 );
 
