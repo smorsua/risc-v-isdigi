@@ -111,6 +111,7 @@ always_ff @( posedge CLK ) begin :
 
     PC_ID_EX <= PC;
 
+
     idata_ID_EX_6_0 <= idata[6:0];
     
     
@@ -163,15 +164,27 @@ always_ff @( posedge CLK ) begin :
     // writeReg_EX_MEM <= writeReg_ID_EX;
 
 end
+assign iaddr = address_alu_result_EX_MEM;
+assign idata = data_2_wire_EX_MEM;
 
 //REGISTROS FASE MEM/WB
+reg RegWrite_MEM_WB;
+reg [2:0] MemtoReg_MEM_WB;
+reg [ADDR_WIDTH-1:0] address_alu_result_MEM_WB;
+
 always_ff @( posedge CLK ) begin : 
- 
-    wb_MEM_WB <= wb_EX_MEM;
-    entrada1_mux <= ddata_r;
-    addr_MEM_WB <= daddr;
-    //creo Read_data de la RAM ya está es registrada y no hay que registrarla otra vez
-    writeReg_MEM_WB <=  writeReg_EX_MEM;
+    
+    //WB_PART
+    RegWrite_MEM_WB <= RegWrite_EX_MEM;
+    MemtoReg_MEM_WB <= MemToReg_EX_MEM;
+
+    address_alu_result_MEM_WB <= address_alu_result_EX_MEM;
+
+    // wb_MEM_WB <= wb_EX_MEM;
+    // entrada1_mux <= ddata_r;
+    // addr_MEM_WB <= daddr;
+    // //creo Read_data de la RAM ya está es registrada y no hay que registrarla otra vez
+    // writeReg_MEM_WB <=  writeReg_EX_MEM;
 
 end
 
@@ -230,7 +243,7 @@ assign daddr = {2'b0, address_alu_result[31:2]};
 
 
 wire [SIZE-1:0] myInput_data_mux [3];
-assign myInput_data_mux[0] = address_alu_result;
+assign myInput_data_mux[0] = address_alu_result_MEM_WB;
 assign myInput_data_mux[1] = ddata_r;
 assign myInput_data_mux[2] = {22'b0, next_consecutive_pc_wire[9:0]};
 
