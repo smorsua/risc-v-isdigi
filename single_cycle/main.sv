@@ -12,7 +12,7 @@ module main
     output  [ADDR_WIDTH-1:0] daddr,
     input  [SIZE-1:0] ddata_r,
     output  [SIZE-1:0] ddata_w,
-    output d_rw
+    output MemWrite, MemRead;
 );
 
 
@@ -36,22 +36,22 @@ bit [ADDR_WIDTH-1:0] PC;
 wire [ADDR_WIDTH-1:0] next_consecutive_pc_wire;
 
 ALU #(.SIZE(ADDR_WIDTH)) pc_alu(
-    .A(PC),
+    .A(PC_aux),
     .B(10'd4),
     .OPERATION(ADD),
-    .RESULT(next_consecutive_pc_wire),
+    .RESULT(next_consecutive_pc_wire),  
     .ZERO()
 );
 
-wire Branch, MemRed, MemWrite, ALUSrc, RegWrite;
+wire Branch, MemRead, MemWrite, ALUSrc, RegWrite;
 wire [1:0] MemtoReg;
 wire [1:0] AuipcLui_wire;
 CONTROL control(
     .OPCODE(idata[6:0]), 
     .BRANCH(Branch),
-    .MEM_READ(MemRed),
+    .MEM_READ(MemRead),
     .MEM_TO_REG(MemtoReg),
-    .MEM_WRITE(d_rw),
+    .MEM_WRITE(MemWrite),
     .ALU_SRC(ALUSrc),
     .REG_WRITE(RegWrite),
     .AuipcLui(AuipcLui_wire)
@@ -84,7 +84,9 @@ reg [4:0] idata_ID_EX_11_7;
 reg [6:0] idata_ID_EX_6_0;
 reg [ADDR_WIDTH-1:0] PC_ID_EX;
 reg [ADDR_WIDTH:0] reg_imm_ID_EX;
-reg Branch_ID_EX, MemWrite_ID_EX, MEM_READ_ID_EX, ALUSrc_ID_EX;
+reg Branch_ID_EX, MemWrite_ID_EX, MemRead_ID_EX, ALUSrc_ID_EX;
+reg RegWrite_ID_EX;
+reg [1:0] MemToReg_ID_EX;
 
 
 //REGISTROS PRIMERA FASE IF/ID
@@ -101,9 +103,12 @@ always_ff @( posedge CLK ) begin :
     // M_PART
     Branch_ID_EX <= Branch;
     MemWrite_ID_EX <= MemWrite;
-    MEM_READ_ID_EX <= MemRed;
+    MemRead_ID_EX <= MemRed;
 
-    
+    //WB_PART
+    RegWrite_ID_EX <= RegWrite;
+    MemToReg_ID_EX <= MEM_TO_REG;
+
     PC_ID_EX <= PC;
 
     idata_ID_EX_6_0 <= idata[6:0];
@@ -118,16 +123,44 @@ always_ff @( posedge CLK ) begin :
 end   
 
 //REGISTROS FASE EX/MEM
+reg RegWrite_EX_MEM, Branch_EX_MEM, MemWrite_EX_MEM, MemRead_EX_MEM;
+reg [1:0]MemToReg_EX_MEM;
+reg [ADDR_WIDTH-1:0] branch_target_wire_EX_MEM;
+reg [SIZE-1:0] address_alu_result_EX_MEM;
+reg address_alu_zero_EX_MEM;
+reg [SIZE-1:0] data_2_wire_EX_MEM;
+reg [5:0] idata_EX_MEM_11_7;
+reg [14:12] idata_EX_MEM_14_12;
 
 always_ff @( posedge CLK ) begin : 
-    wb_EX_MEM <= wb_control_ID_EX;
-    m_EX_MEM <= m_control_ID_EX;
-    Sum_EX_MEM <= //entradas que le entran al sumador: reg_imm e idata_ID_EX
-    Zero_EX_MEM <=Zero;
 
-    daddr <= address_alu_result;
-    ddata_w <= data_2_wire_ID_EX;
-    writeReg_EX_MEM <= writeReg_ID_EX;
+    //WB_PART
+    RegWrite_EX_MEM <= RegWrite_ID_EX;
+    MemToReg_EX_MEM <= MemToReg_ID_EX;
+
+    //M_PART
+    Branch_EX_MEM <= Branch_ID_EX;
+    MemWrite_EX_MEM <= MemWrite_ID_EX;
+    MemRead_EX_MEM <= MemRead_ID_EX;
+
+    branch_target_wire_EX_MEM <= branch_target_wire;
+
+    address_alu_result_EX_MEM <= address_alu_result;
+    address_alu_zero_EX_MEM <= address_alu_zero;
+
+    data_2_wire_EX_MEM <= data_2_wire;
+    idata_EX_MEM_11_7 <= idata_ID_EX_11_7;
+    idata_EX_MEM_14_12 <= idata_ID_EX_30_12[2:0];
+
+
+    // wb_EX_MEM <= wb_control_ID_EX;
+    // m_EX_MEM <= m_control_ID_EX;
+    // Sum_EX_MEM <= //entradas que le entran al sumador: reg_imm e idata_ID_EX
+    // Zero_EX_MEM <=Zero;
+
+    // daddr <= address_alu_result;
+    // ddata_w <= data_2_wire_ID_EX;
+    // writeReg_EX_MEM <= writeReg_ID_EX;
 
 end
 
@@ -151,22 +184,22 @@ IMMEDIATE_GENERATOR imm_gen(
     .IMMEDIATE(imm_wire)
 );
 
-wire [SIZE-1:0] first_operand_wire;
-wire [SIZE-1:0] myInput_alu_src_1_mux [3];
-assign myInput_alu_src_1_mux[0] = PC;
-assign myInput_alu_src_1_mux[1] = 32'b0;
-assign myInput_alu_src_1_mux[2] = data_1_wire;
+// wire [SIZE-1:0] first_operand_wire;
+// wire [SIZE-1:0] myInput_alu_src_1_mux [3];
+// assign myInput_alu_src_1_mux[0] = PC;
+// assign myInput_alu_src_1_mux[1] = 32'b0;
+// assign myInput_alu_src_1_mux[2] = data_1_wire;
 
-MUX #(.SIZE(32), .INPUTS(3)) alu_src_1_mux (
-    .all_inputs(myInput_alu_src_1_mux),
-    .sel(AuipcLui_wire),
-    .result(first_operand_wire)
-);
+// MUX #(.SIZE(32), .INPUTS(3)) alu_src_1_mux (
+//     .all_inputs(myInput_alu_src_1_mux),
+//     .sel(AuipcLui_wire),
+//     .result(first_operand_wire)
+// );
 
 wire [SIZE-1:0] second_operand_wire;
 wire [SIZE-1:0] myInput_alu_src_2_mux [2];
 assign myInput_alu_src_2_mux[0] = data_2_wire;
-assign myInput_alu_src_2_mux[1] = imm_wire;
+assign myInput_alu_src_2_mux[1] = reg_imm_ID_EX;//
 
 MUX #(.SIZE(SIZE), .INPUTS(2)) alu_src_2_mux (
     .all_inputs(myInput_alu_src_2_mux),
@@ -186,7 +219,7 @@ wire address_alu_zero;
 wire [SIZE-1:0] address_alu_result;
 
 ALU #(.SIZE(SIZE)) address_alu(
-    .A(first_operand_wire),
+    .A(data_1_wire),
     .B(second_operand_wire),
     .OPERATION(ALUSelection_wire),
     .RESULT(address_alu_result),
@@ -209,15 +242,15 @@ MUX #(.SIZE(SIZE), .INPUTS(3)) data_mux (
 
 wire [ADDR_WIDTH-1:0] branch_target_wire;
 ALU #(.SIZE(ADDR_WIDTH)) jump_alu(
-    .A(PC),
-    .B(imm_wire),
+    .A(PC_ID_EX),
+    .B(reg_imm_ID_EX),
     .OPERATION(ADD),
     .RESULT(branch_target_wire),
     .ZERO()
 );
 
 wire PCSrc;
-assign PCSrc = Branch & ((idata[14:12] == 001 && !address_alu_zero) || (idata[14:12] != 001 && address_alu_zero));
+assign PCSrc = branch_EX_MEM & ((idata_EX_MEM_14_12[14:12] == 001 && !address_alu_zero_EX_MEM) || (idata_EX_MEM_14_12[14:12] != 001 && address_alu_zero_EX_MEM));
 wire [ADDR_WIDTH-1:0] next_pc_wire;
 
 wire [ADDR_WIDTH-1:0] myInput_pc_mux [2];
