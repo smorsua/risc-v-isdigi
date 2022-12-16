@@ -27,7 +27,6 @@ end
 always_ff @( posedge CLK ) begin : 
     PC <= PC_aux;    
 end
-
 assign iaddr = {2'b0, PC[9:2]};
 
 
@@ -42,28 +41,23 @@ ALU #(.SIZE(ADDR_WIDTH)) pc_alu(
     .ZERO()
 );
 
-
 wire Branch, MemRed, MemWrite, ALUSrc, RegWrite;
 wire [1:0] MemtoReg;
 wire [1:0] AuipcLui_wire;
 CONTROL control(
-
-    .WB(MemtoReg),
-    .M(d_rw),
-    .EX(ALUSrc), //SALEN alusCR aluoP
-
-   /*.OPCODE(idata[6:0]),
+    .OPCODE(idata[6:0]), 
     .BRANCH(Branch),
     .MEM_READ(MemRed),
     .MEM_TO_REG(MemtoReg),
     .MEM_WRITE(d_rw),
     .ALU_SRC(ALUSrc),
     .REG_WRITE(RegWrite),
-    .AuipcLui(AuipcLui_wire)*/
+    .AuipcLui(AuipcLui_wire)
 );
 
 wire [SIZE-1:0] data_mux_result_wire;
 wire [SIZE-1:0] data_1_wire, data_2_wire;
+
 BANCO_REGISTROS #(.SIZE(SIZE)) registros(
     .CLK(CLK),
     .RESET_N(RESET_N),
@@ -76,6 +70,58 @@ BANCO_REGISTROS #(.SIZE(SIZE)) registros(
     .Data2(data_2_wire)
 );
 assign ddata_w = data_2_wire;
+
+reg iaddr_IF_ID, idata_IF_ID, wb_control_ID_EX,m_control_ID_EX,ex_control_ID_EX;
+reg iaddr_ID_EX, data_1_wire_ID_EX, data_2_wire_ID_EX, idata_ID_EX, writeReg_ID_EX;
+    addr_MEM_WB <= daddr;
+reg wb_EX_MEM,m_EX_MEM,Sum_EX_MEM,Zero_EX_MEM, writeReg_EX_MEM,wb_MEM_WB,writeReg_MEM_WB ;
+
+//REGISTROS PRIMERA FASE IF/ID
+always_ff @( posedge CLK ) begin : 
+iaddr_IF_ID <= iaddr;
+idata_IF_ID <= idata;
+end
+
+//REGISTROS SEGUNDA FASE ID/EX
+always_ff @( posedge CLK ) begin : 
+    wb_control_ID_EX <= {RegWrite,MemtoReg}
+    m_control_ID_EX <= {Branch,MemRead,MemWrite}
+    ex_control_ID_EX <= {aluoP,ALUSrc} //no se el nombre correcto de estas dos señales
+    
+    iaddr_ID_EX <= iaddr_IF_ID;
+    data_1_wire_ID_EX <= data_1_wire;
+    data_2_wire_ID_EX <= data_2_wire;
+    reg_imm <= imm_wire; //lo que sale del generador de imm
+    idata_ID_EX<= {idata_IF_ID[30],idata_IF_ID[14:12]}; //idata[{30,14:12}];    
+    writeReg_ID_EX <= idata_IF_ID[11:7];    
+end   
+
+//REGISTROS FASE EX/MEM
+
+always_ff @( posedge CLK ) begin : 
+    wb_EX_MEM <= wb_control_ID_EX;
+    m_EX_MEM <= m_control_ID_EX;
+    Sum_EX_MEM <= //entradas que le entran al sumador: reg_imm e idata_ID_EX
+    Zero_EX_MEM <=Zero;
+
+    daddr <= address_alu_result;
+    ddata_w <= data_2_wire_ID_EX;
+    writeReg_EX_MEM <= writeReg_ID_EX;
+
+end
+
+//REGISTROS FASE MEM/WB
+always_ff @( posedge CLK ) begin : 
+ 
+    wb_MEM_WB <= wb_EX_MEM;
+    entrada1_mux <= ddata_r;
+    addr_MEM_WB <= daddr;
+    //creo Read_data de la RAM ya está es registrada y no hay que registrarla otra vez
+    writeReg_MEM_WB <=  writeReg_EX_MEM;
+
+end
+
+
 wire [SIZE-1:0] imm_wire;
 //Como hay que trocear la instruccion a mano, solo funciona para 32 bits
 
@@ -117,6 +163,7 @@ ALU_CONTROL alu_control(
 
 wire address_alu_zero;
 wire [SIZE-1:0] address_alu_result;
+
 ALU #(.SIZE(SIZE)) address_alu(
     .A(first_operand_wire),
     .B(second_operand_wire),
@@ -161,9 +208,6 @@ MUX #(.SIZE(ADDR_WIDTH), .INPUTS(2)) pc_mux(
     .sel(PCSrc),
     .result(next_pc_wire)
 );
-
-
-
 
 
 logic [6:0] opcode;
@@ -266,3 +310,10 @@ end
 endmodule
 
 `endif //MAIN_GUARD
+
+
+//Inst_IF (32bits) conectada a la rom
+//1 ciclo después cuando llegue el flancod e reloj Inst_ID pasa a la siguienten fase
+
+always @(posedge CLK)
+Inst_ID <= Inst_IF //los 32 bits de la fase IF pasan a la fase ID para ser decodificada
