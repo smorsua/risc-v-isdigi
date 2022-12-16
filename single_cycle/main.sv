@@ -52,7 +52,7 @@ CONTROL control(
     .M(d_rw),
     .EX(ALUSrc), //SALEN alusCR aluoP
 
-   /* .OPCODE(idata[6:0]),
+   /*.OPCODE(idata[6:0]),
     .BRANCH(Branch),
     .MEM_READ(MemRed),
     .MEM_TO_REG(MemtoReg),
