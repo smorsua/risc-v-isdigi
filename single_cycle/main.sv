@@ -73,10 +73,6 @@ BANCO_REGISTROS #(.SIZE(SIZE)) registros(
 );
 assign ddata_w = data_2_wire;
 
-// reg iaddr_IF_ID, idata_IF_ID, wb_control_ID_EX,m_control_ID_EX,ex_control_ID_EX;
-// reg iaddr_ID_EX, data_1_wire_ID_EX, data_2_wire_ID_EX, idata_ID_EX, writeReg_ID_EX;
-//     addr_MEM_WB <= daddr;
-// reg wb_EX_MEM, m_EX_MEM, Sum_EX_MEM, Zero_EX_MEM, writeReg_EX_MEM, wb_MEM_WB, writeReg_MEM_WB ;
 
 // ETAPA ID_EX
 reg [3:0] idata_ID_EX_30_12;
@@ -89,32 +85,27 @@ reg RegWrite_ID_EX;
 reg [1:0] MemToReg_ID_EX;
 
 
-//REGISTROS PRIMERA FASE IF/ID
-// always_ff @( posedge CLK ) begin : 
-// iaddr_IF_ID <= iaddr;
-// idata_IF_ID <= idata;
-// end
+//REGISTROS PRIMERA FASE IF/ID  no hace falta registrarlos porque ya tenemos la rom  y el pc registrados
 
 //REGISTROS SEGUNDA FASE ID/EX
 always_ff @( posedge CLK ) begin : 
-    // EX_PART
-    ALUSrc_ID_EX <= ALUSrc;
-    
-    // M_PART
+
+    idata_ID_EX_6_0 <= idata[6:0];
+
+     //WB_PART
+    RegWrite_ID_EX <= RegWrite;
+    MemToReg_ID_EX <= MEM_TO_REG;
+
+        // M_PART
     Branch_ID_EX <= Branch;
     MemWrite_ID_EX <= MemWrite;
     MemRead_ID_EX <= MemRed;
 
-    //WB_PART
-    RegWrite_ID_EX <= RegWrite;
-    MemToReg_ID_EX <= MEM_TO_REG;
-
+    // EX_PART
+    ALUSrc_ID_EX <= ALUSrc;
+    
     PC_ID_EX <= PC;
 
-
-    idata_ID_EX_6_0 <= idata[6:0];
-    
-    
     // REGISTRO DE PARTE DEL INMEDIATO
     reg_imm_ID_EX <= imm_wire; //lo que sale del generador de imm
     idata_ID_EX_30_12 <= {idata[30],idata[14:12]}; //idata[{30,14:12}];    
@@ -146,24 +137,14 @@ always_ff @( posedge CLK ) begin :
 
     branch_target_wire_EX_MEM <= branch_target_wire;
 
-    address_alu_result_EX_MEM <= address_alu_result;
+    address_alu_result_EX_MEM <= address_alu_result; // entrada del Address en la RAM daddr
     address_alu_zero_EX_MEM <= address_alu_zero;
 
-    data_2_wire_EX_MEM <= data_2_wire;
-    idata_EX_MEM_11_7 <= idata_ID_EX_11_7;
+    data_2_wire_EX_MEM <= data_2_wire; //entrada Write data (ddata_w) de la RAM
+    idata_EX_MEM_11_7 <= idata_ID_EX_11_7; //Write Register que el entra al banco de registros
     idata_EX_MEM_14_12 <= idata_ID_EX_30_12[2:0];
-
-
-    // wb_EX_MEM <= wb_control_ID_EX;
-    // m_EX_MEM <= m_control_ID_EX;
-    // Sum_EX_MEM <= //entradas que le entran al sumador: reg_imm e idata_ID_EX
-    // Zero_EX_MEM <=Zero;
-
-    // daddr <= address_alu_result;
-    // ddata_w <= data_2_wire_ID_EX;
-    // writeReg_EX_MEM <= writeReg_ID_EX;
-
 end
+
 assign iaddr = address_alu_result_EX_MEM;
 assign idata = data_2_wire_EX_MEM;
 
@@ -172,20 +153,12 @@ reg RegWrite_MEM_WB;
 reg [2:0] MemtoReg_MEM_WB;
 reg [ADDR_WIDTH-1:0] address_alu_result_MEM_WB;
 
-always_ff @( posedge CLK ) begin : 
-    
+always_ff @( posedge CLK ) begin :
     //WB_PART
     RegWrite_MEM_WB <= RegWrite_EX_MEM;
     MemtoReg_MEM_WB <= MemToReg_EX_MEM;
 
     address_alu_result_MEM_WB <= address_alu_result_EX_MEM;
-
-    // wb_MEM_WB <= wb_EX_MEM;
-    // entrada1_mux <= ddata_r;
-    // addr_MEM_WB <= daddr;
-    // //creo Read_data de la RAM ya está es registrada y no hay que registrarla otra vez
-    // writeReg_MEM_WB <=  writeReg_EX_MEM;
-
 end
 
 
@@ -216,7 +189,7 @@ assign myInput_alu_src_2_mux[1] = reg_imm_ID_EX;//
 
 MUX #(.SIZE(SIZE), .INPUTS(2)) alu_src_2_mux (
     .all_inputs(myInput_alu_src_2_mux),
-    .sel(ALUSrc),
+    .sel(ALUSrc_ID_EX),
     .result(second_operand_wire)
 );
 
@@ -240,7 +213,6 @@ ALU #(.SIZE(SIZE)) address_alu(
 );
 
 assign daddr = {2'b0, address_alu_result[31:2]};
-
 
 wire [SIZE-1:0] myInput_data_mux [3];
 assign myInput_data_mux[0] = address_alu_result_MEM_WB;
@@ -382,5 +354,5 @@ endmodule
 //Inst_IF (32bits) conectada a la rom
 //1 ciclo después cuando llegue el flancod e reloj Inst_ID pasa a la siguienten fase
 
-always @(posedge CLK)
-Inst_ID <= Inst_IF //los 32 bits de la fase IF pasan a la fase ID para ser decodificada
+//always @(posedge CLK)
+//Inst_ID <= Inst_IF //los 32 bits de la fase IF pasan a la fase ID para ser decodificada
