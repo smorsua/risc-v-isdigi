@@ -1,3 +1,5 @@
+`ifndef ALU_GUARD
+`define ALU_GUARD
 `include "operation_type.sv"
 
 module ALU #(parameter SIZE = 32) (
@@ -29,3 +31,4 @@ end
 assign ZERO = RESULT == 0 ? 1'b1 : 1'b0;
 
 endmodule
+`endif // ALU_GUARD

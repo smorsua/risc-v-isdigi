@@ -1,30 +1,32 @@
 `ifndef MAIN_GUARD
 `define MAIN_GUARD
 
+`include "../MUX.sv"
+
 `include "../ALU/operation_type.sv"
 `include "instruction_type.sv"
 
-`include "pipeline_registers/IF_ID_REG.sv";
-`include "pipeline_registers/ID_EX_REG.sv";
-`include "pipeline_registers/EX_MEM_REG.sv";
-`include "pipeline_registers/MEM_WB_REG.sv";
+`include "pipeline_registers/IF_ID_REG.sv"
+`include "pipeline_registers/ID_EX_REG.sv"
+`include "pipeline_registers/EX_MEM_REG.sv"
+`include "pipeline_registers/MEM_WB_REG.sv"
 
 module main
-#(parameter SIZE = 32, parameter ADDR_WIDTH = 10)(
+#(parameter DATA_SIZE = 32, parameter ADDR_SIZE = 10)(
     input                   CLK,
     input                   RESET_N,
-    input  [SIZE-1:0]       idata,
-    output [ADDR_WIDTH-1:0] iaddr,
-    output [ADDR_WIDTH-1:0] daddr,
-    input  [SIZE-1:0]       ddata_r,
-    output [SIZE-1:0]       ddata_w,
-    output mem_write, mem_read;
+    input  [DATA_SIZE-1:0]  idata,
+    output [ADDR_SIZE-1:0]  iaddr,
+    output [ADDR_SIZE-1:0]  daddr,
+    input  [DATA_SIZE-1:0]  ddata_r,
+    output [DATA_SIZE-1:0]  ddata_w,
+    output mem_write, mem_read
 );
 
-wire [ADDR_WIDTH-1:0] next_pc_wire;
+wire [ADDR_SIZE-1:0] next_pc_wire;
 
-bit [ADDR_WIDTH-1:0] PC_aux;
-bit [ADDR_WIDTH-1:0] PC; 
+bit [ADDR_SIZE-1:0] PC_aux;
+bit [ADDR_SIZE-1:0] PC; 
 
 always_ff @(posedge CLK or negedge RESET_N) begin
     if(RESET_N == 0) begin
@@ -34,7 +36,8 @@ always_ff @(posedge CLK or negedge RESET_N) begin
     end
 end
 
-ALU #(.SIZE(ADDR_WIDTH)) pc_alu(
+wire [ADDR_SIZE-1:0] next_consecutive_pc_wire;
+ALU #(.SIZE(ADDR_SIZE)) pc_alu(
     .A(PC),
     .B(10'd4),
     .OPERATION(ADD),
@@ -46,7 +49,7 @@ assign iaddr = {2'b0, PC[9:2]};
 
 wire [ADDR_SIZE-1:0] pc_id;
 wire [DATA_SIZE-1:0] inst_id;
-IF_ID_REG #(.DATA_SIZE(SIZE), .ADDR_SIZE(ADDR_SIZE)) if_id_reg(
+IF_ID_REG #(.DATA_SIZE(DATA_SIZE), .ADDR_SIZE(ADDR_SIZE)) if_id_reg(
     .clk(CLK),
     .pc_if(PC),
     .inst_if(idata),
@@ -68,8 +71,8 @@ CONTROL control(
     .AuipcLui(AuipcLui_id)
 );
 
-wire [SIZE-1:0] read_data_1_id, read_data_2_id;
-banco_registros #(.SIZE(SIZE)) registros(
+wire [DATA_SIZE-1:0] read_data_1_id, read_data_2_id;
+banco_registros #(.SIZE(DATA_SIZE)) registros(
     .CLK(CLK),
     .RESET_N(RESET_N),
     .read_reg1(inst_id[19:15]),
@@ -81,7 +84,7 @@ banco_registros #(.SIZE(SIZE)) registros(
     .Data2(read_data_2_id)
 );
 
-wire [SIZE-1:0] immediate_id;
+wire [DATA_SIZE-1:0] immediate_id;
 IMMEDIATE_GENERATOR imm_gen(
     .inst(inst_id),
     .IMMEDIATE(immediate_id)
@@ -109,7 +112,7 @@ ID_EX_REG id_ex_reg(
     .immediate_id(immediate_id),
     .inst_30_and_14_to_12_id({inst_id[30], inst_id[14:12]}),
     .inst_11_to_7_id(inst_id[11:7]),
-    .inst_6_to_0_ex(inst_id[6:0]),
+    .inst_6_to_0_id(inst_id[6:0]),
 
     .branch_ex(branch_ex),
     .reg_write_ex(reg_write_ex),
@@ -127,13 +130,13 @@ ID_EX_REG id_ex_reg(
     .inst_6_to_0_ex(inst_6_to_0_ex)
 );
 
-wire [SIZE-1:0] second_operand_wire;
-wire [SIZE-1:0] myInput_alu_src_2_mux [2];
+wire [DATA_SIZE-1:0] second_operand_wire;
+wire [DATA_SIZE-1:0] myInput_alu_src_2_mux[2];
 assign myInput_alu_src_2_mux[0] = read_data_2_ex;
 assign myInput_alu_src_2_mux[1] = immediate_ex;
-MUX #(.SIZE(SIZE), .INPUTS(2)) alu_src_2_mux (
+MUX #(.SIZE(DATA_SIZE), .INPUTS(2)) alu_src_2_mux (
     .all_inputs(myInput_alu_src_2_mux),
-    .sel(ALUSrc_ID_EX),
+    .sel(alu_src_ex),
     .result(second_operand_wire)
 );
 
@@ -145,18 +148,18 @@ ALU_CONTROL alu_control(
     .ALUSelection(ALUSelection_wire)
 );
 
-wire [SIZE-1:0] address_alu_result_ex;
+wire [DATA_SIZE-1:0] address_alu_result_ex;
 wire address_alu_zero_ex;
-ALU #(.SIZE(SIZE)) address_alu(
-    .A(data_1_wire),
+ALU #(.SIZE(DATA_SIZE)) address_alu(
+    .A(read_data_1_ex),
     .B(second_operand_wire),
     .OPERATION(ALUSelection_wire),
     .RESULT(address_alu_result_ex),
     .ZERO(address_alu_zero_ex)
 );
 
-wire [ADDR_WIDTH-1:0] jump_alu_result_ex;
-ALU #(.SIZE(ADDR_WIDTH)) jump_alu(
+wire [ADDR_SIZE-1:0] jump_alu_result_ex;
+ALU #(.SIZE(ADDR_SIZE)) jump_alu(
     .A(pc_ex),
     .B(immediate_ex),
     .OPERATION(ADD),
@@ -170,8 +173,8 @@ wire [DATA_SIZE-1:0] read_data_2_mem;
 wire [4:0] inst_11_to_7_mem;
 wire [ADDR_SIZE-1:0] jump_alu_result_mem;
 wire [DATA_SIZE-1:0] address_alu_result_mem;
+wire [2:0] inst_14_to_12_mem;
 wire address_alu_zero_mem;
-wire [DATA_SIZE-1:0] read_data_2_mem;
 EX_MEM_REG #(.DATA_SIZE(32), .ADDR_SIZE(10)) ex_mem_reg  (
     .clk(CLK),
     .branch_ex(branch_ex),
@@ -185,6 +188,7 @@ EX_MEM_REG #(.DATA_SIZE(32), .ADDR_SIZE(10)) ex_mem_reg  (
     .address_alu_result_ex(address_alu_result_ex),
     .address_alu_zero_ex(address_alu_zero_ex),
     .read_data_2_ex(read_data_2_ex),
+    .inst_14_to_12_ex(inst_30_and_14_to_12_ex[2:0]),
 
     .branch_mem(branch_mem),
     .reg_write_mem(reg_write_mem),
@@ -197,15 +201,16 @@ EX_MEM_REG #(.DATA_SIZE(32), .ADDR_SIZE(10)) ex_mem_reg  (
     .address_alu_result_mem(address_alu_result_mem),
     .address_alu_zero_mem(address_alu_zero_mem),
     .read_data_2_mem(read_data_2_mem),
+    .inst_14_to_12_mem(inst_14_to_12_mem)
 );
 
 assign ddata_w = read_data_2_mem;
-assign daddr = {2'b0, address_alu_result_mem[31:2]};
+assign daddr = {2'b0, address_alu_result_mem[9:2]};
 assign mem_write = mem_write_mem;
 assign mem_read = mem_read_mem;
 
 wire PCSrc;
-assign PCSrc = Branch_EX_MEM & ((idata_EX_MEM_14_12[14:12] == 001 && !address_alu_zero_EX_MEM) || (idata_EX_MEM_14_12[14:12] != 001 && address_alu_zero_EX_MEM));
+assign PCSrc = branch_mem & ((inst_14_to_12_mem == 'b001 && !address_alu_zero_mem) || (inst_14_to_12_mem != 001 && address_alu_zero_mem));
 
 wire [1:0] mem_to_reg_wb;
 wire reg_write_wb;
@@ -215,7 +220,7 @@ MEM_WB_REG mem_wb_reg(
     .clk(CLK),
     .mem_to_reg_mem(mem_to_reg_mem),
     .reg_write_mem(reg_write_mem),
-    .ddata_r_mem(ddata_r_mem),
+    .ddata_r_mem(ddata_r),
     .address_alu_result_mem(address_alu_result_mem),
     .inst_11_to_7_mem(inst_11_to_7_mem),
 
@@ -223,123 +228,123 @@ MEM_WB_REG mem_wb_reg(
     .reg_write_wb(reg_write_wb),
     .ddata_r_wb(ddata_r_wb),
     .address_alu_result_wb(address_alu_result_wb),
-    .inst_11_to_7_wb(inst_11_to_7_wb),
+    .inst_11_to_7_wb(inst_11_to_7_wb)
 );
 
-wire [SIZE-1:0] myInput_data_mux [3];
+wire [DATA_SIZE-1:0] myInput_data_mux [3];
 assign myInput_data_mux[0] = address_alu_result_wb; 
 assign myInput_data_mux[1] = ddata_r_wb;
 assign myInput_data_mux[2] = {22'b0, next_consecutive_pc_wire[9:0]};
-wire [SIZE-1:0] data_mux_result_wire;
-MUX #(.SIZE(SIZE), .INPUTS(3)) data_mux (
+wire [DATA_SIZE-1:0] data_mux_result_wire;
+MUX #(.SIZE(DATA_SIZE), .INPUTS(3)) data_mux (
     .all_inputs(myInput_data_mux),
-    .sel(MemtoReg),
+    .sel(mem_to_reg_wb),
     .result(data_mux_result_wire)
 );
 
-wire [ADDR_WIDTH-1:0] myInput_pc_mux [2];
+wire [ADDR_SIZE-1:0] myInput_pc_mux [2];
 assign myInput_pc_mux[0] = next_consecutive_pc_wire;
 assign myInput_pc_mux[1] = jump_alu_result_mem;
-MUX #(.SIZE(ADDR_WIDTH), .INPUTS(2)) pc_mux(
+MUX #(.SIZE(ADDR_SIZE), .INPUTS(2)) pc_mux(
     .all_inputs(myInput_pc_mux),
     .sel(PCSrc),
     .result(next_pc_wire)
 );
 
-logic [6:0] opcode;
-logic [2:0] funct3;
-logic [6:0] funct7;
-logic [4:0] rs1;
-logic [4:0] rs2;
-logic [4:0] rd;
-logic [31:0] immediate;
+// logic [6:0] opcode;
+// logic [2:0] funct3;
+// logic [6:0] funct7;
+// logic [4:0] rs1;
+// logic [4:0] rs2;
+// logic [4:0] rd;
+// logic [31:0] immediate;
 
-always @(posedge CLK) begin
-    opcode = idata[6:0];
-    casex(opcode)
-    R_FORMAT: begin
-        rd = idata[11:7];
-        funct3 = idata[14:12];
-        rs1 = idata[19:15];
-        rs2 = idata[24:20];
-        funct7 = idata[31:25];
-        casex(funct3)
-        3'b000: begin
-            case(funct7)
-            /*ADD*/ 7'b0000000: assert(data_mux_result_wire == data_1_wire + data_2_wire);
-            /*SUB*/ 7'b0100000: assert(data_mux_result_wire == data_1_wire - data_2_wire);
-            default: $error("Incorrect funct7");
-            endcase
-        end
-        /*SLL*/  3'b001: assert(data_mux_result_wire == (data_1_wire << data_2_wire));
-        /*SLT*/  3'b010: assert(data_mux_result_wire == (!(signed'(data_1_wire) < signed'(data_2_wire))));
-        /*SLTU*/ 3'b011: assert(data_mux_result_wire == (!(data_1_wire < data_2_wire)));
-        /*XOR*/  3'b100: assert(data_mux_result_wire == (data_1_wire ^ data_2_wire));
-        3'b101: begin
-            case(funct7)
-            /*SRL*/ 7'b0000000: assert(data_mux_result_wire == (data_1_wire >> data_2_wire));
-            /*SRA*/ 7'b0100000: assert(data_mux_result_wire == (data_1_wire >>> data_2_wire));
-            default: $error("Incorrect funct 7");
-            endcase
-        end
-        /*OR*/ 3'b110: assert(data_mux_result_wire == (data_1_wire | data_2_wire));
-        /*AND*/ 3'b111: assert(data_mux_result_wire == (data_1_wire & data_2_wire));
-        default: $error("Incorrect funct3");
-        endcase
-    end
-    I_FORMAT: begin
-        funct3 = idata[14:12];
-        rs1 = idata[19:15];
-        rd = idata[11:7];
-        immediate = { {21{idata[31]}}, idata[30:20] };
+// always @(posedge CLK) begin
+//     opcode = idata[6:0];
+//     casex(opcode)
+//     R_FORMAT: begin
+//         rd = idata[11:7];
+//         funct3 = idata[14:12];
+//         rs1 = idata[19:15];
+//         rs2 = idata[24:20];
+//         funct7 = idata[31:25];
+//         casex(funct3)
+//         3'b000: begin
+//             case(funct7)
+//             /*ADD*/ 7'b0000000: assert(data_mux_result_wire == data_1_wire + data_2_wire);
+//             /*SUB*/ 7'b0100000: assert(data_mux_result_wire == data_1_wire - data_2_wire);
+//             default: $error("Incorrect funct7");
+//             endcase
+//         end
+//         /*SLL*/  3'b001: assert(data_mux_result_wire == (data_1_wire << data_2_wire));
+//         /*SLT*/  3'b010: assert(data_mux_result_wire == (!(signed'(data_1_wire) < signed'(data_2_wire))));
+//         /*SLTU*/ 3'b011: assert(data_mux_result_wire == (!(data_1_wire < data_2_wire)));
+//         /*XOR*/  3'b100: assert(data_mux_result_wire == (data_1_wire ^ data_2_wire));
+//         3'b101: begin
+//             case(funct7)
+//             /*SRL*/ 7'b0000000: assert(data_mux_result_wire == (data_1_wire >> data_2_wire));
+//             /*SRA*/ 7'b0100000: assert(data_mux_result_wire == (data_1_wire >>> data_2_wire));
+//             default: $error("Incorrect funct 7");
+//             endcase
+//         end
+//         /*OR*/ 3'b110: assert(data_mux_result_wire == (data_1_wire | data_2_wire));
+//         /*AND*/ 3'b111: assert(data_mux_result_wire == (data_1_wire & data_2_wire));
+//         default: $error("Incorrect funct3");
+//         endcase
+//     end
+//     I_FORMAT: begin
+//         funct3 = idata[14:12];
+//         rs1 = idata[19:15];
+//         rd = idata[11:7];
+//         immediate = { {21{idata[31]}}, idata[30:20] };
 
-        case(opcode)
-        7'b0000011: begin //memory operations
-            /*LW*/ assert(data_mux_result_wire == ddata_r) ;
+//         case(opcode)
+//         7'b0000011: begin //memory operations
+//             /*LW*/ assert(data_mux_result_wire == ddata_r) ;
 
-        end
-        7'b0010011: begin //arithmetic operations
-            case(funct3)
-            /*ADDI*/ 3'b000: assert(data_mux_result_wire == (data_1_wire + immediate));
-            /*SLLI*/ 3'b001: assert(data_mux_result_wire == (data_1_wire << immediate));
-            /*SLTIU*/3'b011: assert(data_mux_result_wire == (!(data_1_wire < immediate)));
-            /*XORI*/ 3'b100: assert(data_mux_result_wire == (data_1_wire ^ immediate));
-            /*SLTI*/ 3'b010: assert(data_mux_result_wire == (!(signed'(data_1_wire) < signed'(immediate))));
-            3'b101: begin
-                case(immediate[11:6])
-                /*SRLI*/ 7'b0000000: assert(data_mux_result_wire == (data_1_wire >> immediate[5:0]));
-                /*SRAI*/ 7'b0100000: assert(data_mux_result_wire == (data_1_wire >>> immediate[5:0]));
-                endcase
-            end
-            /*ORI*/ 3'b110: assert(data_mux_result_wire == (data_1_wire | immediate));
-            /*ANDI*/3'b111: assert(data_mux_result_wire == (data_1_wire & immediate));
-            default: $error("Invalid funct3");
-            endcase
-        end
-        default: $error("Invalid opcode");
-        endcase
-    end
-    U_FORMAT: begin
-        rd = idata[11:7];
-        immediate = { idata[31:12], 12'b0 };
-        case(opcode)
-        /*AUIPC*/ 7'b0010111: assert(data_mux_result_wire == PC + immediate);
-        /*LUI*/ 7'b0110111: assert(data_mux_result_wire == immediate);
-        default: $error("invalid opcode");
-        endcase
-    end
-    S_FORMAT: begin
-        immediate = { {21{idata[31]}}, idata[30:25], idata[11:7]};
-        /*SW*/ assert(address_alu_result == data_1_wire + immediate);
-    end
-    B_FORMAT: begin
-        immediate = { {21{idata[31]}}, idata[7], idata[30:25], idata[11:8], 1'b0};
+//         end
+//         7'b0010011: begin //arithmetic operations
+//             case(funct3)
+//             /*ADDI*/ 3'b000: assert(data_mux_result_wire == (data_1_wire + immediate));
+//             /*SLLI*/ 3'b001: assert(data_mux_result_wire == (data_1_wire << immediate));
+//             /*SLTIU*/3'b011: assert(data_mux_result_wire == (!(data_1_wire < immediate)));
+//             /*XORI*/ 3'b100: assert(data_mux_result_wire == (data_1_wire ^ immediate));
+//             /*SLTI*/ 3'b010: assert(data_mux_result_wire == (!(signed'(data_1_wire) < signed'(immediate))));
+//             3'b101: begin
+//                 case(immediate[11:6])
+//                 /*SRLI*/ 7'b0000000: assert(data_mux_result_wire == (data_1_wire >> immediate[5:0]));
+//                 /*SRAI*/ 7'b0100000: assert(data_mux_result_wire == (data_1_wire >>> immediate[5:0]));
+//                 endcase
+//             end
+//             /*ORI*/ 3'b110: assert(data_mux_result_wire == (data_1_wire | immediate));
+//             /*ANDI*/3'b111: assert(data_mux_result_wire == (data_1_wire & immediate));
+//             default: $error("Invalid funct3");
+//             endcase
+//         end
+//         default: $error("Invalid opcode");
+//         endcase
+//     end
+//     U_FORMAT: begin
+//         rd = idata[11:7];
+//         immediate = { idata[31:12], 12'b0 };
+//         case(opcode)
+//         /*AUIPC*/ 7'b0010111: assert(data_mux_result_wire == PC + immediate);
+//         /*LUI*/ 7'b0110111: assert(data_mux_result_wire == immediate);
+//         default: $error("invalid opcode");
+//         endcase
+//     end
+//     S_FORMAT: begin
+//         immediate = { {21{idata[31]}}, idata[30:25], idata[11:7]};
+//         /*SW*/ assert(address_alu_result == data_1_wire + immediate);
+//     end
+//     B_FORMAT: begin
+//         immediate = { {21{idata[31]}}, idata[7], idata[30:25], idata[11:8], 1'b0};
         
-    end
+//     end
 
-    default: $error("Invalid instruction format");
-    endcase
-end
+//     default: $error("Invalid instruction format");
+//     endcase
+// end
 
 // assert property (@(posedge CLK) address_alu_zero == '1 && idata[6:0] == 'b1100011 |-> (branch_target_wire == (immediate + PC)) ) else $fatal("No realiza correctamente el salto condicional");
 

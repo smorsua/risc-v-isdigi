@@ -1,5 +1,5 @@
-`ifndef OPERATION_TYPE_HEADER
-`define OPERATION_TYPE_HEADER
+`ifndef OPERATION_TYPE_GUARD
+`define OPERATION_TYPE_GUARD
 typedef enum bit [3:0] { 
 	ADD 					= 4'd0, 
 	SUB, 					
@@ -15,4 +15,4 @@ typedef enum bit [3:0] {
 	RIGHT_SHIFT_SIGNED,
 	RIGHT_SHIFT_UNSIGNED			
 	} e_operations;
-`endif // OPERATION_TYPE_HEADER
+`endif // OPERATION_TYPE_GUARD
