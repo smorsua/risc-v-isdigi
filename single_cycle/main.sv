@@ -69,7 +69,6 @@ CONTROL control(
 );
 
 wire [SIZE-1:0] read_data_1_id, read_data_2_id;
-
 banco_registros #(.SIZE(SIZE)) registros(
     .CLK(CLK),
     .RESET_N(RESET_N),
@@ -95,7 +94,6 @@ wire [DATA_SIZE-1:0] read_data_1_ex, read_data_2_ex, immediate_ex;
 wire [3:0] inst_30_and_14_to_12_ex;
 wire [4:0] inst_11_to_7_ex;
 wire [6:0] inst_6_to_0_ex;
-
 ID_EX_REG id_ex_reg(
     .clk(CLK),
     .branch_id(branch_id),
@@ -133,7 +131,6 @@ wire [SIZE-1:0] second_operand_wire;
 wire [SIZE-1:0] myInput_alu_src_2_mux [2];
 assign myInput_alu_src_2_mux[0] = read_data_2_ex;
 assign myInput_alu_src_2_mux[1] = immediate_ex;
-
 MUX #(.SIZE(SIZE), .INPUTS(2)) alu_src_2_mux (
     .all_inputs(myInput_alu_src_2_mux),
     .sel(ALUSrc_ID_EX),
@@ -175,7 +172,6 @@ wire [ADDR_SIZE-1:0] jump_alu_result_mem;
 wire [DATA_SIZE-1:0] address_alu_result_mem;
 wire address_alu_zero_mem;
 wire [DATA_SIZE-1:0] read_data_2_mem;
-
 EX_MEM_REG #(.DATA_SIZE(32), .ADDR_SIZE(10)) ex_mem_reg  (
     .clk(CLK),
     .branch_ex(branch_ex),
@@ -233,7 +229,7 @@ MEM_WB_REG mem_wb_reg(
 wire [SIZE-1:0] myInput_data_mux [3];
 assign myInput_data_mux[0] = address_alu_result_wb; 
 assign myInput_data_mux[1] = ddata_r_wb;
-assign myInput_data_mux[2] = {22'b0, next_consecutive_pc_wire_MEM_WB[9:0]};
+assign myInput_data_mux[2] = {22'b0, next_consecutive_pc_wire[9:0]};
 wire [SIZE-1:0] data_mux_result_wire;
 MUX #(.SIZE(SIZE), .INPUTS(3)) data_mux (
     .all_inputs(myInput_data_mux),
@@ -241,17 +237,14 @@ MUX #(.SIZE(SIZE), .INPUTS(3)) data_mux (
     .result(data_mux_result_wire)
 );
 
-
 wire [ADDR_WIDTH-1:0] myInput_pc_mux [2];
 assign myInput_pc_mux[0] = next_consecutive_pc_wire;
 assign myInput_pc_mux[1] = jump_alu_result_mem;
-
 MUX #(.SIZE(ADDR_WIDTH), .INPUTS(2)) pc_mux(
     .all_inputs(myInput_pc_mux),
     .sel(PCSrc),
     .result(next_pc_wire)
 );
-
 
 logic [6:0] opcode;
 logic [2:0] funct3;
