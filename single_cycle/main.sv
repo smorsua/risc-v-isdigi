@@ -3,6 +3,7 @@
 
 `include "../ALU/operation_type.sv"
 `include "instruction_type.sv"
+
 module main
 #(parameter SIZE = 32, parameter ADDR_WIDTH = 10)(
     input CLK,
@@ -14,7 +15,6 @@ module main
     output  [SIZE-1:0] ddata_w,
     output MemWrite, MemRead
 );
-
 
 wire [ADDR_WIDTH-1:0] next_pc_wire;
 
@@ -30,7 +30,6 @@ end
 always_ff @( posedge CLK ) begin : 
     PC <= PC_aux;    
 end
-
 assign iaddr = {2'b0, PC[9:2]};
 
 
@@ -75,8 +74,9 @@ BANCO_REGISTROS #(.SIZE(SIZE)) registros(
 );
 assign ddata_w = data_2_wire;
 
+//REGISTROS PRIMERA FASE IF/ID  no hace falta registrarlos porque ya tenemos la rom  y el pc registrados
 
-// ETAPA ID_EX
+//REGISTROS SEGUNDA FASE ID/EX
 reg [3:0] idata_ID_EX_30_12;
 reg [4:0] idata_ID_EX_11_7;
 reg [6:0] idata_ID_EX_6_0;
@@ -88,9 +88,6 @@ reg [1:0] MemToReg_ID_EX;
 
 wire [SIZE-1:0] imm_wire;
 
-//REGISTROS PRIMERA FASE IF/ID  no hace falta registrarlos porque ya tenemos la rom  y el pc registrados
-
-//REGISTROS SEGUNDA FASE ID/EX
 always_ff @( posedge CLK ) begin : 
 
     idata_ID_EX_6_0 <= idata[6:0];
