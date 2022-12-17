@@ -12,9 +12,11 @@ module main
     output  [ADDR_WIDTH-1:0] daddr,
     input  [SIZE-1:0] ddata_r,
     output  [SIZE-1:0] ddata_w,
-    output MemWrite, MemRead;
+    output MemWrite, MemRead
 );
 
+
+wire [ADDR_WIDTH-1:0] next_pc_wire;
 
 bit [ADDR_WIDTH-1:0] PC_aux;
 always_ff @(posedge CLK or negedge RESET_N) begin
@@ -84,6 +86,7 @@ reg Branch_ID_EX, MemWrite_ID_EX, MemRead_ID_EX, ALUSrc_ID_EX;
 reg RegWrite_ID_EX;
 reg [1:0] MemToReg_ID_EX;
 
+wire [SIZE-1:0] imm_wire;
 
 //REGISTROS PRIMERA FASE IF/ID  no hace falta registrarlos porque ya tenemos la rom  y el pc registrados
 
@@ -94,12 +97,12 @@ always_ff @( posedge CLK ) begin :
 
      //WB_PART
     RegWrite_ID_EX <= RegWrite;
-    MemToReg_ID_EX <= MEM_TO_REG;
+    MemToReg_ID_EX <= MemtoReg;
 
         // M_PART
     Branch_ID_EX <= Branch;
     MemWrite_ID_EX <= MemWrite;
-    MemRead_ID_EX <= MemRed;
+    MemRead_ID_EX <= MemRead;
 
     // EX_PART
     ALUSrc_ID_EX <= ALUSrc;
@@ -123,6 +126,10 @@ reg address_alu_zero_EX_MEM;
 reg [SIZE-1:0] data_2_wire_EX_MEM;
 reg [5:0] idata_EX_MEM_11_7;
 reg [14:12] idata_EX_MEM_14_12;
+
+wire [ADDR_WIDTH-1:0] branch_target_wire;
+wire address_alu_zero;
+wire [SIZE-1:0] address_alu_result;
 
 always_ff @( posedge CLK ) begin : 
 
@@ -162,7 +169,7 @@ always_ff @( posedge CLK ) begin :
 end
 
 
-wire [SIZE-1:0] imm_wire;
+
 //Como hay que trocear la instruccion a mano, solo funciona para 32 bits
 
 IMMEDIATE_GENERATOR imm_gen(
@@ -201,8 +208,7 @@ ALU_CONTROL alu_control(
     .ALUSelection(ALUSelection_wire)
 );
 
-wire address_alu_zero;
-wire [SIZE-1:0] address_alu_result;
+
 
 ALU #(.SIZE(SIZE)) address_alu(
     .A(data_1_wire),
@@ -225,7 +231,7 @@ MUX #(.SIZE(SIZE), .INPUTS(3)) data_mux (
     .result(data_mux_result_wire)
 );
 
-wire [ADDR_WIDTH-1:0] branch_target_wire;
+
 ALU #(.SIZE(ADDR_WIDTH)) jump_alu(
     .A(PC_ID_EX),
     .B(reg_imm_ID_EX),
@@ -235,8 +241,7 @@ ALU #(.SIZE(ADDR_WIDTH)) jump_alu(
 );
 
 wire PCSrc;
-assign PCSrc = branch_EX_MEM & ((idata_EX_MEM_14_12[14:12] == 001 && !address_alu_zero_EX_MEM) || (idata_EX_MEM_14_12[14:12] != 001 && address_alu_zero_EX_MEM));
-wire [ADDR_WIDTH-1:0] next_pc_wire;
+assign PCSrc = Branch_EX_MEM & ((idata_EX_MEM_14_12[14:12] == 001 && !address_alu_zero_EX_MEM) || (idata_EX_MEM_14_12[14:12] != 001 && address_alu_zero_EX_MEM));
 
 wire [ADDR_WIDTH-1:0] myInput_pc_mux [2];
 assign myInput_pc_mux[0] = next_consecutive_pc_wire;

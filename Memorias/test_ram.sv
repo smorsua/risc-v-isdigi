@@ -50,7 +50,7 @@ begin
 end
 task  read(input [addr_width-1:0] address_read); 
     @(negedge CLK)
-    MeamRead = 1;
+    MemRead = 1;
     daddr = address_read; 
     @(negedge CLK)
     MemRead = 0;
