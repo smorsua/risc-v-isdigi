@@ -19,6 +19,8 @@ module main
 wire [ADDR_WIDTH-1:0] next_pc_wire;
 
 bit [ADDR_WIDTH-1:0] PC_aux;
+bit [ADDR_WIDTH-1:0] PC; 
+
 always_ff @(posedge CLK or negedge RESET_N) begin
     if(RESET_N == 0) begin
         PC_aux <= 0;
@@ -27,13 +29,12 @@ always_ff @(posedge CLK or negedge RESET_N) begin
     end
 end
 
-always_ff @( posedge CLK ) begin : 
+always_ff @( posedge CLK ) begin 
     PC <= PC_aux;    
 end
 assign iaddr = {2'b0, PC[9:2]};
 
 
-bit [ADDR_WIDTH-1:0] PC;
 wire [ADDR_WIDTH-1:0] next_consecutive_pc_wire;
 
 ALU #(.SIZE(ADDR_WIDTH)) pc_alu(
