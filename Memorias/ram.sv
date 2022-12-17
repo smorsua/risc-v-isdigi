@@ -3,7 +3,7 @@ module RAM
 (
 	input CLK,
 	input  [(addr_width-1):0] daddr,
-	input MemWrite, MemRead;
+	input MemWrite, MemRead,
     input  [(data_width-1):0] ddata_w,
 	output reg [(data_width-1):0] ddata_r
 );
