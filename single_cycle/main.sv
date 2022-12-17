@@ -45,7 +45,7 @@ ALU #(.SIZE(ADDR_WIDTH)) pc_alu(
     .ZERO()
 );
 
-wire Branch, MemRead, MemWrite, ALUSrc, RegWrite;
+wire Branch, ALUSrc, RegWrite;
 wire [1:0] MemtoReg;
 wire [1:0] AuipcLui_wire;
 CONTROL control(
