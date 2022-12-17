@@ -36,6 +36,11 @@ assign iaddr = {2'b0, PC[9:2]};
 
 
 wire [ADDR_WIDTH-1:0] next_consecutive_pc_wire;
+reg [ADDR_WIDTH-1:0] next_consecutive_pc_wire_IF_ID; 
+
+always_ff @(posedge CLK)begin
+next_consecutive_pc_wire_IF_ID <= next_consecutive_pc_wire;
+end
 
 ALU #(.SIZE(ADDR_WIDTH)) pc_alu(
     .A(PC_aux),
@@ -86,11 +91,13 @@ reg [ADDR_WIDTH:0] reg_imm_ID_EX;
 reg Branch_ID_EX, MemWrite_ID_EX, MemRead_ID_EX, ALUSrc_ID_EX;
 reg RegWrite_ID_EX;
 reg [1:0] MemToReg_ID_EX;
+reg [ADDR_WIDTH-1:0] next_consecutive_pc_wire_ID_EX; 
 
 wire [SIZE-1:0] imm_wire;
 
 always_ff @( posedge CLK ) begin 
 
+    next_consecutive_pc_wire_ID_EX <= next_consecutive_pc_wire_IF_ID;
     idata_ID_EX_6_0 <= idata[6:0];
 
      //WB_PART
@@ -124,12 +131,18 @@ reg address_alu_zero_EX_MEM;
 reg [SIZE-1:0] data_2_wire_EX_MEM;
 reg [5:0] idata_EX_MEM_11_7;
 reg [14:12] idata_EX_MEM_14_12;
+reg [ADDR_WIDTH-1:0] next_consecutive_pc_wire_EX_MEM; 
+
 
 wire [ADDR_WIDTH-1:0] branch_target_wire;
 wire address_alu_zero;
 wire [SIZE-1:0] address_alu_result;
 
+
+
 always_ff @( posedge CLK ) begin 
+
+    next_consecutive_pc_wire_EX_MEM <= next_consecutive_pc_wire_ID_EX;
 
     //WB_PART
     RegWrite_EX_MEM <= RegWrite_ID_EX;
@@ -157,16 +170,16 @@ assign idata = data_2_wire_EX_MEM;
 reg RegWrite_MEM_WB;
 reg [2:0] MemtoReg_MEM_WB;
 reg [ADDR_WIDTH-1:0] address_alu_result_MEM_WB;
+reg [ADDR_WIDTH-1:0] next_consecutive_pc_wire_MEM_WB; 
 
 always_ff @( posedge CLK ) begin
+    next_consecutive_pc_wire_MEM_WB <= next_consecutive_pc_wire_EX_MEM;
     //WB_PART
     RegWrite_MEM_WB <= RegWrite_EX_MEM;
     MemtoReg_MEM_WB <= MemToReg_EX_MEM;
 
     address_alu_result_MEM_WB <= address_alu_result_EX_MEM;
 end
-
-
 
 //Como hay que trocear la instruccion a mano, solo funciona para 32 bits
 
@@ -219,9 +232,9 @@ ALU #(.SIZE(SIZE)) address_alu(
 assign daddr = {2'b0, address_alu_result[31:2]};
 
 wire [SIZE-1:0] myInput_data_mux [3];
-assign myInput_data_mux[0] = address_alu_result_MEM_WB;
+assign myInput_data_mux[0] = address_alu_result_MEM_WB; 
 assign myInput_data_mux[1] = ddata_r;
-assign myInput_data_mux[2] = {22'b0, next_consecutive_pc_wire[9:0]};
+assign myInput_data_mux[2] = {22'b0, next_consecutive_pc_wire_MEM_WB[9:0]};
 
 MUX #(.SIZE(SIZE), .INPUTS(3)) data_mux (
     .all_inputs(myInput_data_mux),
