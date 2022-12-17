@@ -89,7 +89,7 @@ reg [1:0] MemToReg_ID_EX;
 
 wire [SIZE-1:0] imm_wire;
 
-always_ff @( posedge CLK ) begin : 
+always_ff @( posedge CLK ) begin 
 
     idata_ID_EX_6_0 <= idata[6:0];
 
@@ -129,7 +129,7 @@ wire [ADDR_WIDTH-1:0] branch_target_wire;
 wire address_alu_zero;
 wire [SIZE-1:0] address_alu_result;
 
-always_ff @( posedge CLK ) begin : 
+always_ff @( posedge CLK ) begin 
 
     //WB_PART
     RegWrite_EX_MEM <= RegWrite_ID_EX;
@@ -158,7 +158,7 @@ reg RegWrite_MEM_WB;
 reg [2:0] MemtoReg_MEM_WB;
 reg [ADDR_WIDTH-1:0] address_alu_result_MEM_WB;
 
-always_ff @( posedge CLK ) begin :
+always_ff @( posedge CLK ) begin
     //WB_PART
     RegWrite_MEM_WB <= RegWrite_EX_MEM;
     MemtoReg_MEM_WB <= MemToReg_EX_MEM;
