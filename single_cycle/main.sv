@@ -67,7 +67,7 @@ CONTROL control(
 wire [SIZE-1:0] data_mux_result_wire;
 wire [SIZE-1:0] data_1_wire, data_2_wire;
 
-BANCO_REGISTROS #(.SIZE(SIZE)) registros(
+banco_registros #(.SIZE(SIZE)) registros(
     .CLK(CLK),
     .RESET_N(RESET_N),
     .read_reg1(idata[19:15]),
@@ -163,8 +163,8 @@ always_ff @( posedge CLK ) begin
     idata_EX_MEM_14_12 <= idata_ID_EX_30_12[2:0];
 end
 
-assign iaddr = address_alu_result_EX_MEM;
-assign idata = data_2_wire_EX_MEM;
+assign ddata_r = address_alu_result_EX_MEM;
+assign ddata_w = data_2_wire_EX_MEM;
 
 //REGISTROS FASE MEM/WB
 reg RegWrite_MEM_WB;

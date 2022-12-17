@@ -6,25 +6,15 @@ module test_bancoReg();
 	localparam T = 10;
 	localparam SIZE = 32;
 
-    logic CLK,RST_N;
-    logic [$clog2(SIZE)-1:0] reg1r, reg2r, regW; //seleccion de registro
-    logic  [SIZE-1:0]writeData;
-    logic RegWrite;
-    logic [SIZE-1:0] Data1, Data2;
+    logic CLK,RESET_N;
+    logic [$clog2(SIZE)-1:0] read_reg1, read_reg2, write_reg; //seleccion de registro DIRECCIONES
+    logic [SIZE-1:0] writeData;
+	logic RegWrite;
+    logic [SIZE-1:0] Data1, Data2; //dentro de cada registro, X0,X1 etc selecciono los datos de 32bits de cada registro
 
     //instancias 
      
-    banco_registros #(.SIZE(SIZE)) DUV ( 
-	 .RESET(RST_N),
-    .CLK(CLK),
-    .reg1r(reg1r), 
-    .reg2r(reg2r), 
-    .regW(regW), //seleccion de registro
-    .writeData(writeData),
-    .RegWrite(RegWrite),
-    .Data1(Data1), 
-    .Data2(Data2)
-    );
+    banco_registros #(.SIZE(SIZE)) DUV (CLK, RESET_N, read_reg1, read_reg2, write_reg, writeData, RegWrite, Data1, Data2);
 
 
 	initial
@@ -36,26 +26,26 @@ module test_bancoReg();
 
 	initial
 	begin
-		RST_N = 0;
+		RESET_N = 0;
 		#(T)
-		RST_N = 1;
+		RESET_N = 1;
 
    		RegWrite =1'b1;
 	
-    		regW = 5'd10;
+    		write_reg = 5'd10;
     		writeData = 5'd21;
 			#(T*2)
-    		regW = 5'd14;
+    		write_reg = 5'd14;
     		writeData = 5'd13;
 			#(T*2)
-   		regW = 5'd7;
+   		write_reg = 5'd7;
    		writeData = 5'd1;
     		writeData = 5'd6;
 			#(T*2)
 
     
-    		reg1r = 5'd14; 
-    		reg2r = 5'd10;
+    		read_reg1 = 5'd14; 
+    		read_reg2 = 5'd10;
 			#(T*2)
 
 	$stop;

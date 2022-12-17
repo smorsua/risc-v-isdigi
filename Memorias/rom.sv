@@ -9,7 +9,7 @@ module ROM
 	initial // Read the memory contents in the file
 			 //dual_port_rom_init.txt. 
 	begin
-		$readmemh("bubble.txt", rom);
+		$readmemh(file, rom);
 	end
 
 	always_ff @(posedge CLK)
