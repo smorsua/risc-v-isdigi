@@ -74,6 +74,8 @@ CONTROL control(
 wire [DATA_SIZE-1:0] read_data_1_id, read_data_2_id;
 wire [DATA_SIZE-1:0] data_mux_result_wire;
 wire reg_write_wb;
+wire [4:0] inst_11_to_7_wb;
+
 banco_registros #(.SIZE(DATA_SIZE)) registros(
     .CLK(CLK),
     .RESET_N(RESET_N),
@@ -216,7 +218,6 @@ assign PCSrc = branch_mem & ((inst_14_to_12_mem == 'b001 && !address_alu_zero_me
 
 wire [1:0] mem_to_reg_wb;
 wire [DATA_SIZE-1:0] ddata_r_wb, address_alu_result_wb;
-wire [4:0] inst_11_to_7_wb;
 MEM_WB_REG mem_wb_reg(
     .clk(CLK),
     .mem_to_reg_mem(mem_to_reg_mem),
