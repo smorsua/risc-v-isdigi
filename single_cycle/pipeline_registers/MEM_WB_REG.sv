@@ -11,7 +11,7 @@ module MEM_WB_REG #(parameter DATA_SIZE = 32) (
 
     output reg [1:0] mem_to_reg_wb,
     output reg reg_write_wb,
-    output reg [DATA_SIZE-1:0] ddata_r_wb,
+    output [DATA_SIZE-1:0] ddata_r_wb,
     output reg [DATA_SIZE-1:0] address_alu_result_wb,
     output reg [4:0] inst_11_to_7_wb
 );
@@ -19,10 +19,11 @@ module MEM_WB_REG #(parameter DATA_SIZE = 32) (
 always_ff @(posedge clk) begin
     mem_to_reg_wb <= mem_to_reg_mem;
     reg_write_wb <= reg_write_mem;
-    ddata_r_wb <= ddata_r_mem;
     address_alu_result_wb <= address_alu_result_mem;
     inst_11_to_7_wb <= inst_11_to_7_mem;
 end
+
+assign ddata_r_wb = ddata_r_mem;
 
 endmodule
 `endif

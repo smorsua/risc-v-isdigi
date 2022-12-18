@@ -16,7 +16,7 @@ begin
     if(!RESET_N)
 	 banco_registros <= '0;  
 
-    else if(RegWrite && write_reg!='0)
+    else if(RegWrite && write_reg !== '0)
         banco_registros[write_reg] <= writeData;
 
 end     

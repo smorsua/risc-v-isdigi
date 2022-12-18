@@ -79,7 +79,7 @@ banco_registros #(.SIZE(DATA_SIZE)) registros(
     .RESET_N(RESET_N),
     .read_reg1(inst_id[19:15]),
     .read_reg2(inst_id[24:20]),
-    .write_reg(inst_id[11:7]),
+    .write_reg(inst_11_to_7_wb),
     .writeData(data_mux_result_wire),
     .RegWrite(reg_write_wb),
     .Data1(read_data_1_id),

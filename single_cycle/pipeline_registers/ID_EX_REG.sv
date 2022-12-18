@@ -26,8 +26,8 @@ module ID_EX_REG #(parameter DATA_SIZE = 32, parameter ADDR_SIZE = 10) (
     output reg [1:0] mem_to_reg_ex,
     output reg [1:0] AuipcLui_ex,
     output reg [ADDR_SIZE-1:0] pc_ex,
-    output reg [DATA_SIZE-1:0] read_data_1_ex,
-    output reg [DATA_SIZE-1:0] read_data_2_ex,
+    output [DATA_SIZE-1:0] read_data_1_ex,
+    output [DATA_SIZE-1:0] read_data_2_ex,
     output reg [DATA_SIZE-1:0] immediate_ex,
     output reg [3:0] inst_30_and_14_to_12_ex,
     output reg [4:0] inst_11_to_7_ex,
@@ -43,13 +43,14 @@ always_ff @(posedge clk) begin
     reg_write_ex <= reg_write_id;
     AuipcLui_ex <= AuipcLui_id;
     pc_ex <= pc_id;
-    read_data_1_ex <= read_data_1_id;
-    read_data_2_ex <= read_data_2_id;
     immediate_ex <= immediate_id;
     inst_30_and_14_to_12_ex <= inst_30_and_14_to_12_id;
     inst_11_to_7_ex <= inst_11_to_7_id;
     inst_6_to_0_ex <= inst_6_to_0_id;
-end     
+end    
+
+assign read_data_1_ex = read_data_1_id;
+assign read_data_2_ex = read_data_2_id;
 
 endmodule
 `endif
