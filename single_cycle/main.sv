@@ -26,7 +26,7 @@ module main
 wire [ADDR_SIZE-1:0] next_pc_wire;
 
 bit [ADDR_SIZE-1:0] PC_aux;
-bit [ADDR_SIZE-1:0] PC; 
+bit [ADDR_SIZE-1:0] PC;
 
 always_ff @(posedge CLK or negedge RESET_N) begin
     if(RESET_N == 0) begin
@@ -41,7 +41,7 @@ ALU #(.SIZE(ADDR_SIZE)) pc_alu(
     .A(PC),
     .B(10'd4),
     .OPERATION(ADD),
-    .RESULT(next_consecutive_pc_wire),  
+    .RESULT(next_consecutive_pc_wire),
     .ZERO()
 );
 
@@ -61,7 +61,7 @@ wire branch_id, reg_write_id, mem_read_id, mem_write_id, alu_src_id;
 wire [1:0] mem_to_reg_id;
 wire [1:0] AuipcLui_id;
 CONTROL control(
-    .OPCODE(inst_id[6:0]), 
+    .OPCODE(inst_id[6:0]),
     .BRANCH(branch_id),
     .REG_WRITE(reg_write_id),
     .MEM_READ(mem_read_id),
@@ -72,6 +72,8 @@ CONTROL control(
 );
 
 wire [DATA_SIZE-1:0] read_data_1_id, read_data_2_id;
+wire [DATA_SIZE-1:0] data_mux_result_wire;
+wire reg_write_wb;
 banco_registros #(.SIZE(DATA_SIZE)) registros(
     .CLK(CLK),
     .RESET_N(RESET_N),
@@ -213,7 +215,6 @@ wire PCSrc;
 assign PCSrc = branch_mem & ((inst_14_to_12_mem == 'b001 && !address_alu_zero_mem) || (inst_14_to_12_mem != 001 && address_alu_zero_mem));
 
 wire [1:0] mem_to_reg_wb;
-wire reg_write_wb;
 wire [DATA_SIZE-1:0] ddata_r_wb, address_alu_result_wb;
 wire [4:0] inst_11_to_7_wb;
 MEM_WB_REG mem_wb_reg(
@@ -232,10 +233,9 @@ MEM_WB_REG mem_wb_reg(
 );
 
 wire [DATA_SIZE-1:0] myInput_data_mux [3];
-assign myInput_data_mux[0] = address_alu_result_wb; 
+assign myInput_data_mux[0] = address_alu_result_wb;
 assign myInput_data_mux[1] = ddata_r_wb;
 assign myInput_data_mux[2] = {22'b0, next_consecutive_pc_wire[9:0]};
-wire [DATA_SIZE-1:0] data_mux_result_wire;
 MUX #(.SIZE(DATA_SIZE), .INPUTS(3)) data_mux (
     .all_inputs(myInput_data_mux),
     .sel(mem_to_reg_wb),
@@ -339,7 +339,7 @@ MUX #(.SIZE(ADDR_SIZE), .INPUTS(2)) pc_mux(
 //     end
 //     B_FORMAT: begin
 //         immediate = { {21{idata[31]}}, idata[7], idata[30:25], idata[11:8], 1'b0};
-        
+
 //     end
 
 //     default: $error("Invalid instruction format");

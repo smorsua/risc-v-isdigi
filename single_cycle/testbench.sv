@@ -19,11 +19,11 @@ defparam ram.data_width = data_width;
 ROM rom(.CLK(CLK), .iaddr(iaddr), .idata(idata));
 defparam rom.addr_width = addr_width;
 defparam rom.data_width = data_width;
-defparam rom.file = "test.txt" ;
+defparam rom.file = "instructions.txt" ;
 
 main main(CLK, RESET_N, idata, iaddr, daddr, ddata_r, ddata_w, MemWrite, MemRead);
-defparam main.ADDR_WIDTH = addr_width;
-defparam main.SIZE = data_width;
+defparam main.ADDR_SIZE = addr_width;
+defparam main.DATA_SIZE = data_width;
 
 initial
 begin
