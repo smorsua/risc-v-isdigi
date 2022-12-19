@@ -278,8 +278,40 @@ sequence s3;
   (1, src1=registros.banco_registros[idata[19:15]], src2={ {21{idata[31]}}, idata[30:20] },add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]!=(src1<src2) );
 endsequence
 
-idea3: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]==7'b0010011 &&idata[14:12]==3'b001 &&idata[11:7]!=5'b00000|->s3 )
+idea3: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]==7'b0010011 &&idata[14:12]==3'b001 && idata[11:7]!=5'b00000|->s3 )
 else $error("I format SLTIU");
+
+/*XORI*/
+sequence s4;
+  logic [31:0]  src1,src2;
+  logic [4:0]   add_destino;
+  (1, src1=registros.banco_registros[idata[19:15]], src2={ {21{idata[31]}}, idata[30:20] },add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]==(src1^src2) );
+endsequence
+
+idea4: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]==7'b0010011 &&idata[14:12]==3'b100 && idata[11:7]!=5'b00000|->s4 )
+else $error("I format XORI");
+
+/*SLTI*/
+sequence s5;
+  logic [31:0]  src1,src2;
+  logic [4:0]   add_destino;
+  (1, src1=registros.banco_registros[idata[19:15]], src2={ {21{idata[31]}}, idata[30:20] },add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]!=(signed'(src1)<signed'(src2)) );
+endsequence
+
+idea5: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]==7'b0010011 &&idata[14:12]==3'b010 && idata[11:7]!=5'b00000|->s5 )
+else $error("I format SLTI");
+
+/*ORI*/
+sequence s6;
+  logic [31:0]  src1,src2;
+  logic [4:0]   add_destino;
+  (1, src1=registros.banco_registros[idata[19:15]], src2={ {21{idata[31]}}, idata[30:20] },add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]==(src1|src2) );
+endsequence
+
+idea6: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]==7'b0010011 &&idata[14:12]==3'b110 && idata[11:7]!=5'b00000|->s6 )
+else $error("I format ORI");
+/*ANDI*/
+
 
 
 
