@@ -105,16 +105,6 @@ ALU #(.SIZE(SIZE)) address_alu(
 
 assign daddr = {2'b0, address_alu_result[31:2]};
 
-/*wire [SIZE-1:0] read_data_wire;
-RAM #(.data_width(SIZE), .addr_width(ADDR_WIDTH)) data_memory (
-    .CLK(CLK),
-    .d_rw(MemWrite),
-    .ADDR_R(alu_address_wire),
-    .ADDR_W(alu_address_wire),
-    .ddata_w(data_2_wire),
-    .Q_R(read_data_wire)
-
-);*/
 
 wire [SIZE-1:0] myInput_data_mux [3];
 assign myInput_data_mux[0] = address_alu_result;
@@ -249,7 +239,7 @@ always @(posedge CLK) begin
     end
     B_FORMAT: begin
         immediate = { {21{idata[31]}}, idata[7], idata[30:25], idata[11:8], 1'b0};
-        
+
     end
 
     default: $error("Invalid instruction format");
