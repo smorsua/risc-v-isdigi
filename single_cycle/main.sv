@@ -333,7 +333,7 @@ idea10: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]==
 else $error("R-format ADD");
 
 /*SUB ----- S11*/
-sequence s10;
+sequence s11;
   logic [31:0]  src1,src2;
   logic [4:0]   add_destino;
   (1, src1=registros.banco_registros[idata[19:15]], src2=registros.banco_registros[idata[24:20]],add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]== src1 - src2 );
@@ -362,12 +362,12 @@ endsequence
 idea13: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]== 7'b0110011 && idata[14:12]==3'b010 |-> s13 )
 else $error("R-format SLT");
 
-
+/*SLT 3'b010: assert(data_mux_result_wire == (!(signed'(data_1_wire) < signed'(data_2_wire)))) */ 
 /*SLTU*/
 sequence s14;
   logic [31:0]  src1,src2;
   logic [4:0]   add_destino;
-  (1, src1=registros.banco_registros[idata[19:15]], src2=registros.banco_registros[idata[24:20]],add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]== src1 << src2 );
+  (1, src1=registros.banco_registros[idata[19:15]], src2=registros.banco_registros[idata[24:20]],add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]==  (!(signed'(src1) < signed'(src2))) );
 endsequence
 
 idea14: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]== 7'b0110011 && idata[14:12]==3'b011 |-> s14 )
