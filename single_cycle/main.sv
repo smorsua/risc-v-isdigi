@@ -319,8 +319,29 @@ else $error("I format ORI");
 
 /*R-FORMAT*/
 
+
+/*R-FORMAT*/
+
 /*ADD ----- S10*/
+sequence s10;
+  logic [31:0]  src1,src2;
+  logic [4:0]   add_destino;
+  (1, src1=registros.banco_registros[idata[19:15]], src2=registros.banco_registros[idata[24:20]],add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]== src1 + src2 );
+endsequence
+
+idea10: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]== 7'b0110011 && idata[14:12]==3'b000 && idata[31:25]== 7'b0000000 |-> s10 )
+else $error("R-format ADD");
+
 /*SUB ----- S11*/
+sequence s10;
+  logic [31:0]  src1,src2;
+  logic [4:0]   add_destino;
+  (1, src1=registros.banco_registros[idata[19:15]], src2=registros.banco_registros[idata[24:20]],add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]== src1 - src2 );
+endsequence
+
+idea11: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]== 7'b0110011 && idata[14:12]==3'b000 && idata[31:25]== 7'b0100000 |-> s11 )
+else $error("R-format SUB");
+
 /*SLL*/
 sequence s12;
   logic [31:0]  src1,src2;
@@ -343,14 +364,64 @@ else $error("R-format SLT");
 
 
 /*SLTU*/
+sequence s14;
+  logic [31:0]  src1,src2;
+  logic [4:0]   add_destino;
+  (1, src1=registros.banco_registros[idata[19:15]], src2=registros.banco_registros[idata[24:20]],add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]== src1 << src2 );
+endsequence
 
-
+idea14: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]== 7'b0110011 && idata[14:12]==3'b011 |-> s14 )
+else $error("R-format SLTU");
 
 /*XOR*/
+sequence s15;
+  logic [31:0]  src1,src2;
+  logic [4:0]   add_destino;
+  (1, src1=registros.banco_registros[idata[19:15]], src2=registros.banco_registros[idata[24:20]],add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]== src1 ^ src2 );
+endsequence
+
+idea15: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]== 7'b0110011 && idata[14:12]==3'b100 |-> s15 )
+else $error("R-format XOR");
+
 /*SRL*/
+sequence s16;
+  logic [31:0]  src1,src2;
+  logic [4:0]   add_destino;
+  (1, src1=registros.banco_registros[idata[19:15]], src2=registros.banco_registros[idata[24:20]],add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]== src1 >> src2 );
+endsequence
+
+idea16: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]== 7'b0110011 && idata[14:12]==3'b101  && idata[31:25]== 7'b0000000 |-> s16 )
+else $error("R-format SRL");
+
 /*SRA*/
+sequence s17;
+  logic [31:0]  src1,src2;
+  logic [4:0]   add_destino;
+  (1, src1=registros.banco_registros[idata[19:15]], src2=registros.banco_registros[idata[24:20]],add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]== src1 >> src2 );
+endsequence
+
+idea17: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]== 7'b0110011 && idata[14:12]==3'b101  && idata[31:25]== 7'b0100000|-> s17 )
+else $error("R-format SRA");
+
 /*OR*/
+sequence s18;
+  logic [31:0]  src1,src2;
+  logic [4:0]   add_destino;
+  (1, src1=registros.banco_registros[idata[19:15]], src2=registros.banco_registros[idata[24:20]],add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]== src1 | src2 );
+endsequence
+
+idea18: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]== 7'b0110011 && idata[14:12]==3'b110 |-> s18 )
+else $error("R-format OR");
+ 
 /*AND*/
+sequence s19;
+  logic [31:0]  src1,src2;
+  logic [4:0]   add_destino;
+  (1, src1=registros.banco_registros[idata[19:15]], src2=registros.banco_registros[idata[24:20]],add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]== src1 & src2 );
+endsequence
+
+idea19: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]== 7'b0110011 && idata[14:12]==3'b111 |-> s19 )
+else $error("R-format AND");
 
 
 endmodule
