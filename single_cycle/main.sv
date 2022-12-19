@@ -252,24 +252,34 @@ logic [31:0] immediate;
 //////////////////////////////////I-FORMAT//////////////////////////////////////
 /*ADDI*/
 
-sequence s0;
+sequence s1;
   logic [31:0]  src1,src2;
   logic [4:0]   add_destino;
   (1, src1=registros.banco_registros[idata[19:15]], /*inmediato*/src2={ {21{idata[31]}}, idata[30:20] },add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]==src1+src2 );
 endsequence
-idea1: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]==7'b0010011 &&idata[14:12]==3'b000 &&idata[11:7]!=5'b00000|->s0 )
+idea1: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]==7'b0010011 &&idata[14:12]==3'b000 &&idata[11:7]!=5'b00000|->s1 )
 else $error("I format addi");
 
 /*SLLI*/
 
-sequence s1;
+sequence s2;
   logic [31:0]  src1,src2;
   logic [4:0]   add_destino;
   (1, src1=registros.banco_registros[idata[19:15]], src2={ {21{idata[31]}}, idata[30:20] },add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]==src1<<src2 );
 endsequence
 
-idea2: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]==7'b0010011 &&idata[14:12]==3'b001 &&idata[11:7]!=5'b00000|->s0 )
+idea2: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]==7'b0010011 &&idata[14:12]==3'b001 &&idata[11:7]!=5'b00000|->s2 )
 else $error("I format SLLI");
+
+/*SLTIU*/
+sequence s3;
+  logic [31:0]  src1,src2;
+  logic [4:0]   add_destino;
+  (1, src1=registros.banco_registros[idata[19:15]], src2={ {21{idata[31]}}, idata[30:20] },add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]!=(src1<src2) );
+endsequence
+
+idea3: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]==7'b0010011 &&idata[14:12]==3'b001 &&idata[11:7]!=5'b00000|->s3 )
+else $error("I format SLTIU");
 
 
 endmodule
