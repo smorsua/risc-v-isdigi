@@ -486,11 +486,6 @@ endsequence
 idea24: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]== 7'b1100011 && idata[14:12]==3'b001 && ((idata[19:15] - idata[24:20]) != 1'b0)|-> s24 )
 else $error("B-format BNE");*/
 
-
-
-
-
-
 endmodule
 
 `endif //MAIN_GUARD
