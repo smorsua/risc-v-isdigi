@@ -11,6 +11,7 @@ module RAM
 
 	integer i;
 	initial begin
+		ddata_r = 0;
 		for(i=0; i < 2 ** addr_width; i++) begin
 			ram[i] = 'b0;
 		end
