@@ -1,4 +1,4 @@
-module ROM
+module ROM_golden
 #(parameter data_width=32, parameter addr_width=10, parameter file = "rom_init.txt")
 (
 	input [(addr_width-1):0] iaddr,

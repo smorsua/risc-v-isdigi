@@ -13,7 +13,7 @@ localparam  T = 20, addr_width = 10, data_width = 32;
     logic  [(data_width-1):0] ddata_w;
 	logic [(data_width-1):0] ddata_r;
 
-RAM ram(CLK, daddr, d_rw, ddata_w, ddata_r);
+RAM_golden ram(CLK, daddr, d_rw, ddata_w, ddata_r);
 defparam ram.addr_width = addr_width;
 defparam ram.data_width = data_width;
 

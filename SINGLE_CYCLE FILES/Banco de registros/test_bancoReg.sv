@@ -14,7 +14,7 @@ module test_bancoReg();
 
     //instancias 
      
-    banco_registros #(.SIZE(SIZE)) DUV ( 
+    banco_registros_golden #(.SIZE(SIZE)) DUV ( 
 	 .RESET(RST_N),
     .CLK(CLK),
     .reg1r(reg1r), 

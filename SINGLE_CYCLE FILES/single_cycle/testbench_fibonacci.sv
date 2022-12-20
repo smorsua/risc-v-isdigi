@@ -12,16 +12,16 @@ logic  [(data_width-1):0] ddata_r;
 logic [(addr_width-1):0] iaddr;
 logic  [(data_width-1):0] idata;
 
-RAM ram(CLK, daddr, d_rw,ddata_w, ddata_r);
+RAM_golden ram(CLK, daddr, d_rw,ddata_w, ddata_r);
 defparam ram.addr_width = addr_width;
 defparam ram.data_width = data_width;
 
-ROM rom(.iaddr(iaddr), .idata(idata));
+ROM_golden rom(.iaddr(iaddr), .idata(idata));
 defparam rom.addr_width = addr_width;
 defparam rom.data_width = data_width;
 defparam rom.file = "fibonacci.txt" ;
 
-main main(CLK, RESET_N, idata, iaddr, daddr, ddata_r, ddata_w, d_rw);
+golden main(CLK, RESET_N, idata, iaddr, daddr, ddata_r, ddata_w, d_rw);
 defparam main.ADDR_WIDTH = addr_width;
 defparam main.SIZE = data_width;
 

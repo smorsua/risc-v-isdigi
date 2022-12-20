@@ -2,7 +2,7 @@
 `include "if_rom.sv"
 `include "../single_cycle/main.sv"
 module ram_with_if(if_ram.ram_module bus);
-  RAM ram(CLK, bus.daddr, bus.d_rw, bus.ddata_w, bus.ddata_r);
+  RAM_golden ram(CLK, bus.daddr, bus.d_rw, bus.ddata_w, bus.ddata_r);
   defparam ram.addr_width = 10;
   defparam ram.data_width = 32;
 endmodule
@@ -42,7 +42,7 @@ module rom_aleatoria_tb ();
 
 
 
-  main main_circuit(
+  golden main_circuit(
       .CLK(CLK),
       .RESET_N(RESET_N),
       .idata(interface_rom.main_circuit.idata),

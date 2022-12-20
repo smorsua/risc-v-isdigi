@@ -3,7 +3,7 @@
 
 `include "../ALU/operation_type.sv"
 `include "instruction_type.sv"
-module main
+module golden
 #(parameter SIZE = 32, parameter ADDR_WIDTH = 10)(
     input CLK,
     input RESET_N,
@@ -18,7 +18,7 @@ module main
 bit [ADDR_WIDTH-1:0] PC;
 wire [ADDR_WIDTH-1:0] next_consecutive_pc_wire;
 
-ALU #(.SIZE(ADDR_WIDTH)) pc_alu(
+ALU_golden #(.SIZE(ADDR_WIDTH)) pc_alu(
     .A(PC),
     .B(10'd4),
     .OPERATION(ADD),
@@ -42,7 +42,7 @@ CONTROL control(
 
 wire [SIZE-1:0] data_mux_result_wire;
 wire [SIZE-1:0] data_1_wire, data_2_wire;
-BANCO_REGISTROS #(.SIZE(SIZE)) registros(
+BANCO_REGISTROS_golden #(.SIZE(SIZE)) registros(
     .CLK(CLK),
     .RESET_N(RESET_N),
     .read_reg1(idata[19:15]),
@@ -95,7 +95,7 @@ ALU_CONTROL alu_control(
 
 wire address_alu_zero;
 wire [SIZE-1:0] address_alu_result;
-ALU #(.SIZE(SIZE)) address_alu(
+ALU_golden #(.SIZE(SIZE)) address_alu(
     .A(first_operand_wire),
     .B(second_operand_wire),
     .OPERATION(ALUSelection_wire),
@@ -128,7 +128,7 @@ MUX #(.SIZE(SIZE), .INPUTS(3)) data_mux (
 );
 
 wire [ADDR_WIDTH-1:0] branch_target_wire;
-ALU #(.SIZE(ADDR_WIDTH)) jump_alu(
+ALU_golden #(.SIZE(ADDR_WIDTH)) jump_alu(
     .A(PC),
     .B(imm_wire),
     .OPERATION(ADD),
