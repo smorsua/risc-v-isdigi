@@ -1,6 +1,6 @@
 `include "operation_type.sv"
 
-module ALU #(parameter SIZE = 32) (
+module ALU_golden #(parameter SIZE = 32) (
     input [SIZE-1:0] A,
     input [SIZE-1:0] B,
     input [3:0] OPERATION,

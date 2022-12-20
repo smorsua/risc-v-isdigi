@@ -1,4 +1,4 @@
-module BANCO_REGISTROS #(parameter SIZE = 32) (
+module BANCO_REGISTROS_golden #(parameter SIZE = 32) (
     CLK,
     RESET_N,
     read_reg1,

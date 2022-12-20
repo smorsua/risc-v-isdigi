@@ -47,7 +47,7 @@ initial begin
     $stop;
 end
 
-ALU #(.SIZE(SIZE)) duv(
+ALU_golden #(.SIZE(SIZE)) duv(
     .A(A),
     .B(B),
     .OPERATION(OPERATION),
