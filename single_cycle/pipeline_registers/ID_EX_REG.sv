@@ -3,6 +3,7 @@
 
 module ID_EX_REG #(parameter DATA_SIZE = 32, parameter ADDR_SIZE = 10) (
     input clk,
+    input clear,
     input branch_id,
     input reg_write_id,
     input mem_read_id,
@@ -34,19 +35,34 @@ module ID_EX_REG #(parameter DATA_SIZE = 32, parameter ADDR_SIZE = 10) (
     output reg [6:0] inst_6_to_0_ex
 );
 
-always_ff @(posedge clk) begin 
-    branch_ex <= branch_id;
-    mem_read_ex <= mem_read_id;
-    mem_write_ex <= mem_write_id;
-    mem_to_reg_ex <= mem_to_reg_id;
-    alu_src_ex <= alu_src_id;
-    reg_write_ex <= reg_write_id;
-    AuipcLui_ex <= AuipcLui_id;
-    pc_ex <= pc_id;
-    immediate_ex <= immediate_id;
-    inst_30_and_14_to_12_ex <= inst_30_and_14_to_12_id;
-    inst_11_to_7_ex <= inst_11_to_7_id;
-    inst_6_to_0_ex <= inst_6_to_0_id;
+always_ff @(posedge clk or posedge clear) begin 
+    if(clear == 1) begin
+        branch_ex <= 0;
+        mem_read_ex <= 0;
+        mem_write_ex <= 0;
+        mem_to_reg_ex <= 0;
+        alu_src_ex <= 0;
+        reg_write_ex <= 0;
+        AuipcLui_ex <= 0;
+        pc_ex <= 0;
+        immediate_ex <= 0;
+        inst_30_and_14_to_12_ex <= 0;
+        inst_11_to_7_ex <= 0;
+        inst_6_to_0_ex <= 0;
+    end else begin
+        branch_ex <= branch_id;
+        mem_read_ex <= mem_read_id;
+        mem_write_ex <= mem_write_id;
+        mem_to_reg_ex <= mem_to_reg_id;
+        alu_src_ex <= alu_src_id;
+        reg_write_ex <= reg_write_id;
+        AuipcLui_ex <= AuipcLui_id;
+        pc_ex <= pc_id;
+        immediate_ex <= immediate_id;
+        inst_30_and_14_to_12_ex <= inst_30_and_14_to_12_id;
+        inst_11_to_7_ex <= inst_11_to_7_id;
+        inst_6_to_0_ex <= inst_6_to_0_id;
+    end
 end    
 
 assign read_data_1_ex = read_data_1_id;

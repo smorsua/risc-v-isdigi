@@ -15,6 +15,7 @@ module main
 #(parameter DATA_SIZE = 32, parameter ADDR_SIZE = 10)(
     input                   CLK,
     input                   RESET_N,
+    input                   CLEAR,
     input  [DATA_SIZE-1:0]  idata,
     output [ADDR_SIZE-1:0]  iaddr,
     output [ADDR_SIZE-1:0]  daddr,
@@ -51,6 +52,7 @@ wire [ADDR_SIZE-1:0] pc_id;
 wire [DATA_SIZE-1:0] inst_id;
 IF_ID_REG #(.DATA_SIZE(DATA_SIZE), .ADDR_SIZE(ADDR_SIZE)) if_id_reg(
     .clk(CLK),
+    .clear(CLEAR),
     .pc_if(PC),
     .inst_if(idata),
     .pc_id(pc_id),
@@ -103,6 +105,7 @@ wire [4:0] inst_11_to_7_ex;
 wire [6:0] inst_6_to_0_ex;
 ID_EX_REG id_ex_reg(
     .clk(CLK),
+    .clear(CLEAR),
     .branch_id(branch_id),
     .reg_write_id(reg_write_id),
     .mem_read_id(mem_read_id),
@@ -181,6 +184,7 @@ wire [2:0] inst_14_to_12_mem;
 wire address_alu_zero_mem;
 EX_MEM_REG #(.DATA_SIZE(32), .ADDR_SIZE(10)) ex_mem_reg  (
     .clk(CLK),
+    .clear(CLEAR),
     .branch_ex(branch_ex),
     .reg_write_ex(reg_write_ex),
     .mem_read_ex(mem_read_ex),
@@ -220,6 +224,7 @@ wire [1:0] mem_to_reg_wb;
 wire [DATA_SIZE-1:0] ddata_r_wb, address_alu_result_wb;
 MEM_WB_REG mem_wb_reg(
     .clk(CLK),
+    .clear(CLEAR),
     .mem_to_reg_mem(mem_to_reg_mem),
     .reg_write_mem(reg_write_mem),
     .ddata_r_mem(ddata_r),

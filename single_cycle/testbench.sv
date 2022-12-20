@@ -5,6 +5,7 @@ localparam  T = 20, addr_width = 10, data_width = 32;
 
 logic CLK;
 logic RESET_N;
+logic CLEAR;
 logic MemWrite, MemRead;
 logic  [(data_width-1):0] ddata_w;
 logic [(addr_width-1):0] daddr;
@@ -21,7 +22,7 @@ defparam rom.addr_width = addr_width;
 defparam rom.data_width = data_width;
 defparam rom.file = "instructions.txt" ;
 
-main main(CLK, RESET_N, idata, iaddr, daddr, ddata_r, ddata_w, MemWrite, MemRead);
+main main(CLK, RESET_N, CLEAR, idata, iaddr, daddr, ddata_r, ddata_w, MemWrite, MemRead);
 defparam main.ADDR_SIZE = addr_width;
 defparam main.DATA_SIZE = data_width;
 
@@ -34,10 +35,12 @@ end
 initial
     begin
         RESET_N = 0;
+        CLEAR = 1;
 		    #(T)
 		RESET_N = 1;
+        CLEAR = 0;
         //load_program("instructions.txt");
-        #(T*400);
+        #(T*900000);
         $stop;
 
     end

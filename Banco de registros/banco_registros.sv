@@ -14,7 +14,7 @@ module banco_registros #(parameter SIZE = 32) (CLK, RESET_N, read_reg1, read_reg
 always @(posedge CLK or negedge RESET_N)
 begin 
     if(!RESET_N)
-	 banco_registros <= '0;  
+	 banco_registros <= '0;
 
     else if(RegWrite && write_reg !== '0)
         banco_registros[write_reg] <= writeData;
@@ -23,10 +23,15 @@ end
 
 //caso lectura
 
-always_ff @(posedge CLK)
+always_ff @(posedge CLK or negedge RESET_N)
 	begin
-		Data1 <= banco_registros[read_reg1];  
-		Data2 <= banco_registros[read_reg2];
+        if(!RESET_N) begin
+            Data1 <= 0;
+            Data2 <= 0;
+        end else begin
+            Data1 <= banco_registros[read_reg1];  
+            Data2 <= banco_registros[read_reg2];            
+        end
 	end
 
 
