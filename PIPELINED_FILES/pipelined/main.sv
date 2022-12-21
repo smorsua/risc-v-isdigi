@@ -6,6 +6,8 @@
 `include "../ALU/operation_type.sv"
 `include "instruction_type.sv"
 
+
+
 `include "pipeline_registers/IF_ID_REG.sv"
 `include "pipeline_registers/ID_EX_REG.sv"
 `include "pipeline_registers/EX_MEM_REG.sv"
@@ -48,7 +50,7 @@ ALU #(.SIZE(ADDR_SIZE + 2)) pc_alu(
 
 assign iaddr = PC[11:2];
 
-wire [ADDR_SIZE-1:0] pc_id;
+wire [ADDR_SIZE-1+2:0] pc_id;
 wire [DATA_SIZE-1:0] inst_id;
 IF_ID_REG #(.DATA_SIZE(DATA_SIZE), .ADDR_SIZE(ADDR_SIZE)) if_id_reg(
     .clk(CLK),
@@ -98,7 +100,7 @@ IMMEDIATE_GENERATOR imm_gen(
 
 wire branch_ex, reg_write_ex, mem_read_ex, mem_write_ex, alu_src_ex;
 wire [1:0] mem_to_reg_ex, AuipcLui_ex;
-wire [ADDR_SIZE-1:0] pc_ex;
+wire [ADDR_SIZE-1+2:0] pc_ex;
 wire [DATA_SIZE-1:0] read_data_1_ex, read_data_2_ex, immediate_ex;
 wire [3:0] inst_30_and_14_to_12_ex;
 wire [4:0] inst_11_to_7_ex;
@@ -165,8 +167,8 @@ ALU #(.SIZE(DATA_SIZE)) address_alu(
     .ZERO(address_alu_zero_ex)
 );
 
-wire [ADDR_SIZE-1:0] jump_alu_result_ex;
-ALU #(.SIZE(ADDR_SIZE)) jump_alu(
+wire [ADDR_SIZE-1+2:0] jump_alu_result_ex;
+ALU #(.SIZE(ADDR_SIZE+2)) jump_alu(
     .A(pc_ex),
     .B(immediate_ex),
     .OPERATION(ADD),
@@ -178,7 +180,7 @@ wire branch_mem, reg_write_mem, mem_read_mem, mem_write_mem;
 wire [1:0] mem_to_reg_mem, AuipcLui_mem;
 wire [DATA_SIZE-1:0] read_data_2_mem;
 wire [4:0] inst_11_to_7_mem;
-wire [ADDR_SIZE-1:0] jump_alu_result_mem;
+wire [ADDR_SIZE-1+2:0] jump_alu_result_mem;
 wire [DATA_SIZE-1:0] address_alu_result_mem;
 wire [2:0] inst_14_to_12_mem;
 wire address_alu_zero_mem;
