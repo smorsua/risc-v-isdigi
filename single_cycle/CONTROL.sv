@@ -12,6 +12,7 @@ module CONTROL(
 );
 
 
+
 always_comb begin
     casex (OPCODE)
         R_FORMAT: begin
