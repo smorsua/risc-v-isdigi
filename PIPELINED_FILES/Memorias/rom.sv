@@ -1,4 +1,4 @@
-module ROM
+module rom
 #(parameter data_width=32, parameter addr_width=10, parameter file = "bubble.txt")
 (
 	input CLK,
