@@ -6,9 +6,14 @@ module ROM
 	output reg [(data_width-1):0] idata
 );
 	reg [data_width-1:0] rom[2**addr_width-1:0];
+	integer i;
+
 	initial // Read the memory contents in the file
 			 //dual_port_rom_init.txt. 
 	begin
+		for(i=0; i < 2 ** addr_width; i++) begin
+			rom[i] = 'b0;
+		end
 		$readmemh(file, rom);
 	end
 
