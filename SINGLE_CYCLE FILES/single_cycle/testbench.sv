@@ -19,7 +19,7 @@ defparam ram.data_width = data_width;
 ROM_golden rom(.iaddr(iaddr), .idata(idata));
 defparam rom.addr_width = addr_width;
 defparam rom.data_width = data_width;
-defparam rom.file = "..\\fibonacci.txt" ;
+defparam rom.file = "instructions.txt" ;
 
 golden main(CLK, RESET_N, idata, iaddr, daddr, ddata_r, ddata_w, d_rw);
 defparam main.ADDR_WIDTH = addr_width;
