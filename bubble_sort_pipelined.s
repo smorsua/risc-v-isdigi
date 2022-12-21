@@ -98,7 +98,7 @@ WhileLoop:
     nop
     addi x28 x28 4 # Primer elemento del array
     li x7 1
-    ForLoop:
+    ForLoop:	
         bge x28 x6 EndFor
         nop
         nop
@@ -113,6 +113,11 @@ WhileLoop:
 		nop
 		nop
         lw x11 0(x28)
+        nop
+        nop
+        nop
+        nop
+        nop
         addi x28 x28 -4
         ble x10 x11 NotSwap
         nop

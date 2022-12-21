@@ -28,7 +28,7 @@ defparam main.DATA_SIZE = data_width;
 
 initial
 begin
-	CLK = 0;
+	CLK = 1;
 	forever  #(T/2) CLK = ~CLK;
 end
 
@@ -40,7 +40,7 @@ initial
 		RESET_N = 1;
         CLEAR = 0;
         //load_program("instructions.txt");
-        #(T*400);
+        #(T*100000);
         $stop;
 
     end

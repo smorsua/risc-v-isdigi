@@ -26,8 +26,11 @@ module main
 
 wire [ADDR_SIZE-1:0] next_pc_wire;
 
-bit [ADDR_SIZE-1:0] PC_aux;
 bit [ADDR_SIZE-1:0] PC;
+
+initial begin
+    PC = 0;
+end
 
 always_ff @(posedge CLK or negedge RESET_N) begin
     if(RESET_N == 0) begin
@@ -218,7 +221,7 @@ assign mem_write = mem_write_mem;
 assign mem_read = mem_read_mem;
 
 wire PCSrc;
-assign PCSrc = branch_mem & ((inst_14_to_12_mem == 'b001 && !address_alu_zero_mem) || (inst_14_to_12_mem != 001 && address_alu_zero_mem));
+assign PCSrc = branch_mem & ((inst_14_to_12_mem == 'b001 && !address_alu_zero_mem) || (inst_14_to_12_mem != 'b001 && address_alu_zero_mem));
 
 wire [1:0] mem_to_reg_wb;
 wire [DATA_SIZE-1:0] ddata_r_wb, address_alu_result_wb;
