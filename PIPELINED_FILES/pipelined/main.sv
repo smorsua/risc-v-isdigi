@@ -24,10 +24,10 @@ module main
     output mem_write, mem_read
 );
 
-wire [ADDR_SIZE-1:0] next_pc_wire;
+wire [ADDR_SIZE-1+2:0] next_pc_wire;
 
-bit [ADDR_SIZE-1:0] PC_aux;
-bit [ADDR_SIZE-1:0] PC;
+bit [ADDR_SIZE -1 + 2:0] PC;
+
 
 always_ff @(posedge CLK or negedge RESET_N) begin
     if(RESET_N == 0) begin
@@ -37,16 +37,16 @@ always_ff @(posedge CLK or negedge RESET_N) begin
     end
 end
 
-wire [ADDR_SIZE-1:0] next_consecutive_pc_wire;
-ALU #(.SIZE(ADDR_SIZE)) pc_alu(
+wire [ADDR_SIZE - 1 + 2:0] next_consecutive_pc_wire;
+ALU #(.SIZE(ADDR_SIZE + 2)) pc_alu(
     .A(PC),
-    .B(10'd4),
+    .B(12'd4),
     .OPERATION(ADD),
     .RESULT(next_consecutive_pc_wire),
     .ZERO()
 );
 
-assign iaddr = {2'b0, PC[9:2]};
+assign iaddr = PC[11:2];
 
 wire [ADDR_SIZE-1:0] pc_id;
 wire [DATA_SIZE-1:0] inst_id;
@@ -218,7 +218,7 @@ assign mem_write = mem_write_mem;
 assign mem_read = mem_read_mem;
 
 wire PCSrc;
-assign PCSrc = branch_mem & ((inst_14_to_12_mem == 'b001 && !address_alu_zero_mem) || (inst_14_to_12_mem != 001 && address_alu_zero_mem));
+assign PCSrc = branch_mem & ((inst_14_to_12_mem == 'b001 && !address_alu_zero_mem) || (inst_14_to_12_mem != 'b001 && address_alu_zero_mem));
 
 wire [1:0] mem_to_reg_wb;
 wire [DATA_SIZE-1:0] ddata_r_wb, address_alu_result_wb;
@@ -241,17 +241,17 @@ MEM_WB_REG mem_wb_reg(
 wire [DATA_SIZE-1:0] myInput_data_mux [3];
 assign myInput_data_mux[0] = address_alu_result_wb;
 assign myInput_data_mux[1] = ddata_r_wb;
-assign myInput_data_mux[2] = {22'b0, next_consecutive_pc_wire[9:0]};
+assign myInput_data_mux[2] = {next_consecutive_pc_wire};
 MUX #(.SIZE(DATA_SIZE), .INPUTS(3)) data_mux (
     .all_inputs(myInput_data_mux),
     .sel(mem_to_reg_wb),
     .result(data_mux_result_wire)
 );
 
-wire [ADDR_SIZE-1:0] myInput_pc_mux [2];
+wire [ADDR_SIZE-1+2:0] myInput_pc_mux [2];
 assign myInput_pc_mux[0] = next_consecutive_pc_wire;
 assign myInput_pc_mux[1] = jump_alu_result_mem;
-MUX #(.SIZE(ADDR_SIZE), .INPUTS(2)) pc_mux(
+MUX #(.SIZE(ADDR_SIZE+2), .INPUTS(2)) pc_mux(
     .all_inputs(myInput_pc_mux),
     .sel(PCSrc),
     .result(next_pc_wire)
