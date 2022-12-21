@@ -21,7 +21,7 @@ defparam rom.addr_width = addr_width;
 defparam rom.data_width = data_width;
 defparam rom.file = "fibonacci_pipelined.txt" ;
 
-main main(CLK, RESET_N, idata, iaddr, daddr, ddata_r, ddata_w, MemWrite, MemRead);
+main main(CLK, RESET_N, CLEAR, idata, iaddr, daddr, ddata_r, ddata_w, MemWrite, MemRead);
 defparam main.ADDR_SIZE = addr_width;
 defparam main.DATA_SIZE = data_width;
 
