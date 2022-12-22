@@ -14,7 +14,7 @@ localparam  T = 20, addr_width = 10, data_width = 32;
 
 logic CLK;
 logic RESET_N;
-logic CLEAR
+logic CLEAR;
 logic d_rw, d_rw_golden;
 logic  [(data_width-1):0] ddata_w, ddata_w_golden;
 logic [(addr_width-1):0] daddr, daddr_golden;
@@ -33,11 +33,11 @@ defparam ram.data_width = data_width;
 rom rom(.CLK(CLK), .iaddr(iaddr), .idata(idata));
 defparam rom.addr_width = addr_width;
 defparam rom.data_width = data_width;
-defparam rom.file = "fibonacci.txt" ;
+defparam rom.file = "fibonacci_pipelined.txt" ;
 
 main pipelined (CLK, RESET_N, CLEAR, idata, iaddr, daddr, ddata_r, ddata_w, MemWrite, MemRead);
-defparam main.ADDR_SIZE = addr_width;
-defparam main.DATA_SIZE = data_width;
+defparam pipelined.ADDR_SIZE = addr_width;
+defparam pipelined.DATA_SIZE = data_width;
 
 /*--------------------------------------------------------------------------------
  *  Golden Model 

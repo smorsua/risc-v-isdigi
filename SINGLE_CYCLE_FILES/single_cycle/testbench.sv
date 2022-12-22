@@ -12,11 +12,11 @@ logic  [(data_width-1):0] ddata_r;
 logic [(addr_width-1):0] iaddr;
 logic  [(data_width-1):0] idata;
 
-RAM_golden ram(CLK, daddr, d_rw,ddata_w, ddata_r);
+ram_golden ram(CLK, daddr, d_rw,ddata_w, ddata_r);
 defparam ram.addr_width = addr_width;
 defparam ram.data_width = data_width;
 
-ROM_golden rom(.iaddr(iaddr), .idata(idata));
+rom_golden rom(.iaddr(iaddr), .idata(idata));
 defparam rom.addr_width = addr_width;
 defparam rom.data_width = data_width;
 defparam rom.file = "instructions.txt" ;

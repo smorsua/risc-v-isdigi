@@ -2,7 +2,7 @@
 `include "if_rom.sv"
 `include "../single_cycle/main.sv"
 module ram_with_if(if_ram.ram_module bus);
-  RAM_golden ram(CLK, bus.daddr, bus.d_rw, bus.ddata_w, bus.ddata_r);
+  ram_golden ram(CLK, bus.daddr, bus.d_rw, bus.ddata_w, bus.ddata_r);
   defparam ram.addr_width = 10;
   defparam ram.data_width = 32;
 endmodule

@@ -170,7 +170,7 @@ ALU #(.SIZE(DATA_SIZE)) address_alu(
 wire [ADDR_SIZE-1+2:0] jump_alu_result_ex;
 ALU #(.SIZE(ADDR_SIZE+2)) jump_alu(
     .A(pc_ex),
-    .B(immediate_ex),
+    .B(immediate_ex[11:0]),
     .OPERATION(ADD),
     .RESULT(jump_alu_result_ex),
     .ZERO()

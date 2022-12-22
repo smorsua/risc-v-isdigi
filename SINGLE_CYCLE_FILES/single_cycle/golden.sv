@@ -15,12 +15,12 @@ module golden
     output d_rw
 );
 
-bit [ADDR_WIDTH-1:0] PC;
-wire [ADDR_WIDTH-1:0] next_consecutive_pc_wire;
+bit [ADDR_WIDTH-1+2:0] PC;
+wire [ADDR_WIDTH-1+2:0] next_consecutive_pc_wire;
 
-ALU_golden #(.SIZE(ADDR_WIDTH)) pc_alu(
+ALU_golden #(.SIZE(ADDR_WIDTH+2)) pc_alu(
     .A(PC),
-    .B(10'd4),
+    .B(12'd4),
     .OPERATION(ADD),
     .RESULT(next_consecutive_pc_wire),
     .ZERO()
@@ -119,7 +119,7 @@ RAM #(.data_width(SIZE), .addr_width(ADDR_WIDTH)) data_memory (
 wire [SIZE-1:0] myInput_data_mux [3];
 assign myInput_data_mux[0] = address_alu_result;
 assign myInput_data_mux[1] = ddata_r;
-assign myInput_data_mux[2] = {22'b0, next_consecutive_pc_wire[9:0]};
+assign myInput_data_mux[2] = {20'b0, next_consecutive_pc_wire[11:0]};
 
 MUX #(.SIZE(SIZE), .INPUTS(3)) data_mux (
     .all_inputs(myInput_data_mux),
@@ -127,10 +127,10 @@ MUX #(.SIZE(SIZE), .INPUTS(3)) data_mux (
     .result(data_mux_result_wire)
 );
 
-wire [ADDR_WIDTH-1:0] branch_target_wire;
-ALU_golden #(.SIZE(ADDR_WIDTH)) jump_alu(
+wire [ADDR_WIDTH+2-1:0] branch_target_wire;
+ALU_golden #(.SIZE(ADDR_WIDTH+2)) jump_alu(
     .A(PC),
-    .B(imm_wire),
+    .B(imm_wire[11:0]),
     .OPERATION(ADD),
     .RESULT(branch_target_wire),
     .ZERO()
@@ -138,13 +138,13 @@ ALU_golden #(.SIZE(ADDR_WIDTH)) jump_alu(
 
 wire PCSrc;
 assign PCSrc = Branch & ((idata[14:12] == 001 && !address_alu_zero) || (idata[14:12] != 001 && address_alu_zero));
-wire [ADDR_WIDTH-1:0] next_pc_wire;
+wire [ADDR_WIDTH+2-1:0] next_pc_wire;
 
-wire [ADDR_WIDTH-1:0] myInput_pc_mux [2];
+wire [ADDR_WIDTH+2-1:0] myInput_pc_mux [2];
 assign myInput_pc_mux[0] = next_consecutive_pc_wire;
 assign myInput_pc_mux[1] = branch_target_wire;
 
-MUX #(.SIZE(ADDR_WIDTH), .INPUTS(2)) pc_mux(
+MUX #(.SIZE(ADDR_WIDTH+2), .INPUTS(2)) pc_mux(
     .all_inputs(myInput_pc_mux),
     .sel(PCSrc),
     .result(next_pc_wire)
@@ -158,7 +158,7 @@ always @(posedge CLK or negedge RESET_N) begin
         PC <= next_pc_wire;
     end
 end
-assign iaddr = {2'b0, PC[9:2]};
+assign iaddr = PC[11:2];
 
 
 logic [6:0] opcode;
