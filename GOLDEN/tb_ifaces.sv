@@ -49,22 +49,22 @@ logic [addr_width-1:0] iaddr_golden, daddr_golden;
 logic [data_width-1:0] idata_golden, ddata_golden, ddata_r_golden;
 logic MemWrite_golden, MemRead_golden;
 
-ram_golden ram(.CLK(iface.golden.CLK), .daddr( daddr_golden), .MemWrite( MemWrite_golden), .MemRead( MemRead_golden), .ddata_w( ddata_golden), .ddata_r( ddata_r_golden));
-defparam ram.addr_width = addr_width;
-defparam ram.data_width = data_width;
+ram_golden ram_golden(.CLK(iface.golden.CLK), .daddr( daddr_golden), .MemWrite( MemWrite_golden), .MemRead( MemRead_golden), .ddata_w( ddata_golden), .ddata_r( ddata_r_golden));
+defparam ram_golden.addr_width = addr_width;
+defparam ram_golden.data_width = data_width;
 
-rom_golden rom(.CLK(iface.golden.CLK), .iaddr( iaddr_golden), .idata( idata_golden));
-defparam rom.addr_width = addr_width;
-defparam rom.data_width = data_width;
-defparam rom.file = "fibonacci.txt" ;
+rom_golden rom_golden(.CLK(iface.golden.CLK), .iaddr( iaddr_golden), .idata( idata_golden));
+defparam rom_golden.addr_width = addr_width;
+defparam rom_golden.data_width = data_width;
+defparam rom_golden.file = "fibonacci.txt" ;
 
 golden golden (.CLK(iface.golden.CLK), .RESET_N(iface.golden.RESET_N), .CLEAR(iface.golden.CLEAR), 
           .idata( idata_golden), .iaddr( iaddr_golden), 
           .daddr( daddr_golden), .ddata_r( ddata_r_golden), 
           .ddata_w( ddata_golden), .MemWrite( MemWrite_golden), 
           .MemRead( MemRead_golden));
-defparam main.ADDR_SIZE = addr_width;
-defparam main.DATA_SIZE = data_width;
+defparam golden.ADDR_SIZE = addr_width;
+defparam golden.DATA_SIZE = data_width;
 //asignacion de las salidas del interfaz, a conexiones entre el core y la memoria
 assign iface.golden.iaddr_golden = iaddr_golden;
 assign iface.golden.idata_golden = idata_golden;
