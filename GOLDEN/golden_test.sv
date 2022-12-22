@@ -61,7 +61,6 @@ begin
 	CLK = 0;
 	forever  #(T/2) CLK = ~CLK;
 end
-
 initial
     begin
         RESET_N = 0;
@@ -73,9 +72,6 @@ initial
         $stop;
 
     end
-
-
-
 
 
 endmodule

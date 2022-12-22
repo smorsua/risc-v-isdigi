@@ -34,7 +34,7 @@ defparam ram.data_width = data_width;
 rom rom(.CLK(CLK), .iaddr(iaddr), .idata(idata));
 defparam rom.addr_width = addr_width;
 defparam rom.data_width = data_width;
-defparam rom.file = "fibonacci.txt" ;
+defparam rom.file = "fibonacci_pipelined.txt" ;
 
 main DUV (.CLK(CLK), .RESET_N(RESET_N), .CLEAR(CLEAR), 
           .idata(idata), .iaddr(iaddr), 
@@ -53,7 +53,7 @@ assign iface.duv.MemWrite = MemWrite;
 assign iface.duv.MemRead = MemRead;
 
 /*--------------------------------------------------------------------------------
- *  Golden Model
+ *  Golden Model (SINGLE-CYCLE)
  *-------------------------------------------------------------------------------*/
 logic d_rw_golden; 
 logic [addr_width-1:0] iaddr_golden, daddr_golden;
