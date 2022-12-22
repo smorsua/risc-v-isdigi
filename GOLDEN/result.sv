@@ -10,7 +10,8 @@ function new (virtual ifaces.monitor scoreboard);
 endfunction
 
 
-
+//aquí hay que realizar las tasks, para conseguir comparar las señales del golden model y el
+//resultado del pipelined
 
 
 
