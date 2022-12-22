@@ -21,9 +21,11 @@ logic [(addr_width-1):0] daddr, daddr_golden;
 logic  [(data_width-1):0] ddata_r, ddata_r_golden;
 logic [(addr_width-1):0] iaddr, iaddr_golden;
 logic  [(data_width-1):0] idata, idata_golden;
-logic MemWrite,MemRead;
+logic MemWrite, MemRead;
 
-//pipelined
+/*--------------------------------------------------------------------------------
+ *  Pipelined
+ *-------------------------------------------------------------------------------*/
 ram ram(CLK, daddr, MemWrite, MemRead, ddata_w, ddata_r);
 defparam ram.addr_width = addr_width;
 defparam ram.data_width = data_width;
@@ -37,7 +39,9 @@ main pipelined (CLK, RESET_N, CLEAR, idata, iaddr, daddr, ddata_r, ddata_w, MemW
 defparam main.ADDR_SIZE = addr_width;
 defparam main.DATA_SIZE = data_width;
 
-//single_cycle_
+/*--------------------------------------------------------------------------------
+ *  Golden Model 
+ *-------------------------------------------------------------------------------*/
 ram_golden ram_golden(CLK, daddr_golden, d_rw_golden,ddata_w_golden, ddata_r_golden);
 defparam ram_golden.addr_width = addr_width;
 defparam ram_golden.data_width = data_width;
