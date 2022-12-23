@@ -41,7 +41,7 @@ task comprueba_banco;
 	begin
 		while(1)
 		begin
-		@(scoreboard_if.reg_data_in)
+		@(negedge scoreboard_if.CLK)
 		if (scoreboard_if.RegWrite_golden == 1'b1 && scoreboard_if.RESET_N)
 		begin
 		data_golden = scoreboard_if.writeData_golden;
