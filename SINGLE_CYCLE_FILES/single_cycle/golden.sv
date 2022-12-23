@@ -162,6 +162,7 @@ always @(posedge CLK or negedge RESET_N) begin
 end
 assign iaddr = PC[11:2];
 
+assign reg_write_data = data_mux_result_wire; //para el golden
 
 logic [6:0] opcode;
 logic [2:0] funct3;

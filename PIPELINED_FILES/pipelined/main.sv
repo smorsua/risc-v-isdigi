@@ -259,7 +259,7 @@ MUX #(.SIZE(ADDR_SIZE+2), .INPUTS(2)) pc_mux(
     .sel(PCSrc),
     .result(next_pc_wire)
 );
-
+assign reg_write_data = data_mux_result_wire; //para el golden
 // logic [6:0] opcode;
 // logic [2:0] funct3;
 // logic [6:0] funct7;

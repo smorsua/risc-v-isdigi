@@ -8,6 +8,7 @@
 `include "../PIPELINED_FILES/pipelined/main.sv"
 `include "../PIPELINED_FILES/Memorias/ram.sv"
 `include "../PIPELINED_FILES/Memorias/rom.sv"
+
 module golden_test();
 localparam  T = 20, addr_width = 10, data_width = 32;
 
@@ -21,6 +22,7 @@ logic [(addr_width-1):0] daddr, daddr_golden;
 logic  [(data_width-1):0] ddata_r, ddata_r_golden;
 logic [(addr_width-1):0] iaddr, iaddr_golden;
 logic  [(data_width-1):0] idata, idata_golden;
+logic  [(data_width-1):0] reg_write_data, reg_write_data_golden; //para comparar y comprobar banco reg
 logic MemWrite, MemRead;
 
 /*--------------------------------------------------------------------------------
@@ -35,12 +37,12 @@ defparam rom.addr_width = addr_width;
 defparam rom.data_width = data_width;
 defparam rom.file = "fibonacci_pipelined.txt" ;
 
-main pipelined (CLK, RESET_N, CLEAR, idata, iaddr, daddr, ddata_r, ddata_w, MemWrite, MemRead);
+main pipelined (CLK, RESET_N, CLEAR, idata, iaddr, daddr, ddata_r, ddata_w, MemWrite, MemRead,reg_write_data);
 defparam pipelined.ADDR_SIZE = addr_width;
 defparam pipelined.DATA_SIZE = data_width;
 
 /*--------------------------------------------------------------------------------
- *  Golden Model 
+ *  Golden Model
  *-------------------------------------------------------------------------------*/
 ram_golden ram_golden(CLK, daddr_golden, d_rw_golden,ddata_w_golden, ddata_r_golden);
 defparam ram_golden.addr_width = addr_width;
@@ -51,7 +53,7 @@ defparam rom_golden.addr_width = addr_width;
 defparam rom_golden.data_width = data_width;
 defparam rom_golden.file = "fibonacci.txt" ;
 
-golden golden(CLK, RESET_N, idata_golden, iaddr_golden, daddr_golden, ddata_r_golden, ddata_w_golden, d_rw_golden);
+golden golden(CLK, RESET_N, idata_golden, iaddr_golden, daddr_golden, ddata_r_golden, ddata_w_golden, d_rw_golden, reg_write_data_golden);
 defparam golden.ADDR_WIDTH = addr_width;
 defparam golden.SIZE = data_width;
 

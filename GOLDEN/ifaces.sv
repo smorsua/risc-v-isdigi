@@ -13,7 +13,7 @@ logic [data_width-1:0]  ddata_r, ddata_r_golden ;
 logic [addr_width-1:0]  iaddr, iaddr_golden ;
 logic [data_width-1:0]  idata, idata_golden ;
 logic                   MemRead, MemWrite;
-logic [data_width-1:0]  reg_write_data;
+logic [data_width-1:0]  reg_write_data, reg_write_data_golden;
 /*--------------------------------------
 * Este modport está principalmente usado para el muestreo de las señales, tu cuando muestreas básicamente estás
 * sacando los valores del diseño.
@@ -23,11 +23,11 @@ modport monitor(
     input RESET_N,
     input CLEAR,
     input d_rw_golden,
-    input ddata_w, 
+    input ddata_w,
     input ddata_w_golden,
-    input daddr,   
+    input daddr,
     input daddr_golden,
-    input ddata_r, 
+    input ddata_r,
     input ddata_r_golden,
     input iaddr,
     input iaddr_golden,
@@ -35,7 +35,8 @@ modport monitor(
     input idata_golden,
     input MemRead,
     input MemWrite,
-    input reg_write_data
+    input reg_write_data,
+    input reg_write_data_golden
 );
 
 /*--------------------------------------
