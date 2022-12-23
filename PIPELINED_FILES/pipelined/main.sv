@@ -24,7 +24,9 @@ module main
     input  [DATA_SIZE-1:0]  ddata_r,
     output [DATA_SIZE-1:0]  ddata_w,
     output mem_write, mem_read,
-    output [DATA_SIZE-1:0] reg_write_data
+    output [DATA_SIZE-1:0] reg_write_data,
+    output reg_write_enable,
+    output [4:0] write_register
 );
 
 wire [ADDR_SIZE-1+2:0] next_pc_wire;
@@ -92,6 +94,9 @@ banco_registros #(.SIZE(DATA_SIZE)) registros(
     .Data1(read_data_1_id),
     .Data2(read_data_2_id)
 );
+
+assign reg_write_enable = reg_write_wb;
+assign write_register = inst_11_to_7_wb;
 
 wire [DATA_SIZE-1:0] immediate_id;
 IMMEDIATE_GENERATOR imm_gen(

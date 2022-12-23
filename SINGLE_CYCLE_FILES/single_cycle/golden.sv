@@ -13,8 +13,9 @@ module golden
     input  [SIZE-1:0] ddata_r,
     output  [SIZE-1:0] ddata_w,
     output d_rw,
-    output [SIZE-1:0] reg_write_data
-
+    output [SIZE-1:0] reg_write_data,
+    output reg_write_enable,
+    output [4:0] write_register
 );
 
 bit [ADDR_WIDTH-1+2:0] PC;
@@ -55,7 +56,10 @@ BANCO_REGISTROS_golden #(.SIZE(SIZE)) registros(
     .Data1(data_1_wire),
     .Data2(data_2_wire)
 );
+
 assign ddata_w = data_2_wire;
+assign reg_write_enable = RegWrite;
+assign write_register = idata[11:7];
 wire [SIZE-1:0] imm_wire;
 //Como hay que trocear la instruccion a mano, solo funciona para 32 bits
 

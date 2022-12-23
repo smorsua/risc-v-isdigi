@@ -1,10 +1,3 @@
-li x28 20
-nop
-nop
-nop
-nop
-nop
-addi x28 x28 4
 li sp 1000
 nop
 nop

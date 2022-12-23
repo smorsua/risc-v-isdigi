@@ -1,3 +1,5 @@
+`ifndef IFACES_GUARD
+`define IFACES_GUARD
 interface ifaces(input CLK, input RESET_N, input CLEAR);
 //Del interfaz tu defines siempre las señales más globales, las que no dependen del diseño
 
@@ -14,30 +16,40 @@ logic [addr_width-1:0]  iaddr, iaddr_golden ;
 logic [data_width-1:0]  idata, idata_golden ;
 logic                   MemRead, MemWrite;
 logic [data_width-1:0]  reg_write_data, reg_write_data_golden;
+logic reg_write_enable, reg_write_enable_golden;
+logic [4:0] write_register_golden, write_register;
 /*--------------------------------------
 * Este modport está principalmente usado para el muestreo de las señales, tu cuando muestreas básicamente estás
 * sacando los valores del diseño.
 ----------------------------------------*/
-modport monitor(
-    input CLK,
-    input RESET_N,
-    input CLEAR,
-    input d_rw_golden,
-    input ddata_w,
-    input ddata_w_golden,
-    input daddr,
-    input daddr_golden,
-    input ddata_r,
-    input ddata_r_golden,
-    input iaddr,
-    input iaddr_golden,
-    input idata,
-    input idata_golden,
-    input MemRead,
-    input MemWrite,
-    input reg_write_data,
-    input reg_write_data_golden
-);
+
+ clocking monitor_cb @(posedge CLK);
+    default input #3ns;
+    input CLK;
+    input RESET_N;
+    input CLEAR;
+    input d_rw_golden;
+    input ddata_w;
+    input ddata_w_golden;
+    input daddr;
+    input daddr_golden;
+    input ddata_r;
+    input ddata_r_golden;
+    input iaddr;
+    input iaddr_golden;
+    input idata;
+    input idata_golden;
+    input MemRead;
+    input MemWrite;
+    input reg_write_data;
+    input reg_write_data_golden;
+    input reg_write_enable;
+    input reg_write_enable_golden;
+    input write_register_golden;
+    input write_register;
+    endclocking : monitor_cb;
+
+modport monitor(clocking monitor_cb);
 
 /*--------------------------------------
 *Este modport es el de testeo, que es lo que te he dicho antes que serviría para modificar tu las señales,
@@ -76,7 +88,10 @@ modport pipelined(
     input ddata_r,
     output ddata_w,
     output MemRead,
-    output MemWrite
+    output MemWrite,
+    output reg_write_data,
+    output reg_write_enable,
+    output write_register
 );
 
 /*--------------------------------------
@@ -91,7 +106,10 @@ modport golden(
     output daddr_golden,
     input ddata_r_golden,
     output iaddr_golden,
-    input idata_golden
+    input idata_golden,
+    output reg_write_data_golden,
+    output reg_write_enable_golden,
+    output write_register_golden
 );
 
 modport memories(
@@ -99,19 +117,20 @@ modport memories(
     input RESET_N,
     input CLEAR,
     input iaddr,
+    input iaddr_golden,
     output idata,
+    output idata_golden,
     input daddr,
-    output ddata_r,
+    input daddr_golden,
     input ddata_w,
+    input ddata_w_golden,
+    output ddata_r,
+    output ddata_r_golden,
     input MemRead,
     input MemWrite,
-    input d_rw_golden,
-    input daddr_golden,
-    input ddata_w_golden,
-    output ddata_r_golden,
-    input iaddr_golden,
-    output idata_golden
+    input d_rw_golden
 );
 
 
 endinterface
+`endif

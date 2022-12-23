@@ -1,7 +1,8 @@
 
-`include "Scoreboard.sv"
-
 `timescale 1ns/1ps
+
+`include "Scoreboard.sv"
+`include "ifaces.sv"
 module tb_ifaces();
 parameter addr_width = 10;
 parameter data_width = 32;
@@ -46,7 +47,9 @@ main pipelined (
     .ddata_w(iface.pipelined.ddata_w),
     .mem_write(iface.pipelined.MemWrite),
     .mem_read(iface.pipelined.MemRead),
-    .reg_write_data(iface.pipelined.reg_write_data));
+    .reg_write_data(iface.pipelined.reg_write_data),
+    .reg_write_enable(iface.pipelined.reg_write_enable),
+    .write_register(iface.pipelined.write_register));
 defparam pipelined.ADDR_SIZE = addr_width;
 defparam pipelined.DATA_SIZE = data_width;
 
@@ -73,7 +76,9 @@ golden golden (
     .ddata_r(iface.golden.ddata_r_golden),
     .ddata_w(iface.golden.ddata_w_golden),
     .d_rw(iface.golden.d_rw_golden),
-    .reg_write_data(iface.golden.reg_write_data_golden));
+    .reg_write_data(iface.golden.reg_write_data_golden),
+    .reg_write_enable(iface.golden.reg_write_enable_golden),
+    .write_register(iface.golden.write_register_golden));
 defparam golden.ADDR_WIDTH = addr_width;
 defparam golden.SIZE = data_width;
 
@@ -84,6 +89,7 @@ begin
 
     fork
         scoreboard.monitor_input();
+        scoreboard.monitor_output();
     join_none
 
 	CLK = 0;
@@ -94,7 +100,7 @@ initial
     begin
         RESET_N = 0;
         CLEAR = 1;
-		    #(T/2)
+		    #(T/4)
 		RESET_N = 1;
         CLEAR = 0;
         #(T*500);

@@ -57,7 +57,6 @@ golden golden(CLK, RESET_N, idata_golden, iaddr_golden, daddr_golden, ddata_r_go
 defparam golden.ADDR_WIDTH = addr_width;
 defparam golden.SIZE = data_width;
 
-
 initial
 begin
 	CLK = 0;
