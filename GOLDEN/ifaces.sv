@@ -26,8 +26,8 @@ input daddr,    input daddr_golden,
 input ddata_r,  input ddata_r_golden,
 input iaddr,    input iaddr_golden,
 input idata,    input idata_golden,
-input MemRead,  
-input MemWrite, 
+input MemRead,
+input MemWrite,
 input CLEAR
 );
 
@@ -42,25 +42,25 @@ input daddr,    input daddr_golden,
 input ddata_r,  input ddata_r_golden,
 input iaddr,    input iaddr_golden,
 input idata,    input idata_golden,
-input MemRead,  
-input MemWrite, 
+input MemRead,
+input MemWrite,
 input CLEAR
 );
 
 
 /*--------------------------------------
 * Aquí definimos otros dos modports que son básicamente los que respetan las entradas y salidas del diseño, tanto
-* pipelined como golden model. ya está, sería lo mismo coger y hacelro directamente pero ya que haces interfaces 
-* 
+* pipelined como golden model. ya está, sería lo mismo coger y hacelro directamente pero ya que haces interfaces
+*
 ----------------------------------------*/
-modport duv( 
-input CLK, 
-input RESET_N,    
-input CLEAR,   
-output ddata_w, 
-output daddr,   
-output ddata_r, 
-output iaddr,   
+modport duv(
+input CLK,
+input RESET_N,
+input CLEAR,
+output ddata_w,
+output daddr,
+output ddata_r,
+output iaddr,
 output idata,
 output MemRead,
 output MemWrite
@@ -71,13 +71,13 @@ output MemWrite
 ----------------------------------------*/
 
 modport golden(
-input CLK, 
-input RESET_N,    
-output d_rw_golden,    
-output ddata_w_golden, 
-output daddr_golden,   
-output ddata_r_golden, 
-output iaddr_golden,   
+input CLK,
+input RESET_N,
+output d_rw_golden,
+output ddata_w_golden,
+output daddr_golden,
+output ddata_r_golden,
+output iaddr_golden,
 output idata_golden
 
 );

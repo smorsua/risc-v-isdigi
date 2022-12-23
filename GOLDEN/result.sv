@@ -14,6 +14,43 @@ endfunction
 //resultado del pipelined
 
 
+//TASK PARA COMPROBAR LA RAM
+
+	task comprueba_RAM;
+		reg [31:0] data_golden;
+		begin
+			while(1)
+			begin
+			@(negedge scoreboard_if.CLK)
+			if (scoreboard_if.d_rw_golden ==1'b1 && scoreboard_if.RESET_N)
+			begin
+			data_golden = scoreboard_if.ddata_w_golden;
+			assert (data_golden == (##2 scoreboard_if.ddata_w)) else $error("El valor escrito en la RAM es incorrecto");
+			end
+			end
+		end
+
+	endtask
+
+
+	// TASK PARA COMPROBAR EL BANCO REGISTROS
+
+
+task comprueba_banco;
+	reg [31:0] data_golden;
+	begin
+		while(1)
+		begin
+		@(scoreboard_if.reg_data_in)
+		if (scoreboard_if.RegWrite_golden == 1'b1 && scoreboard_if.RESET_N)
+		begin
+		data_golden = scoreboard_if.writeData_golden;
+		assert (data_golden == (##5 scoreboard_if.writeData)) else $error("El valor escrito en los  Banco de Registros es incorrecto");
+		end
+		end
+		end
+endtask
+
 
 
 
