@@ -12,7 +12,9 @@ module golden
     output  [ADDR_WIDTH-1:0] daddr,
     input  [SIZE-1:0] ddata_r,
     output  [SIZE-1:0] ddata_w,
-    output d_rw
+    output d_rw,
+    output [SIZE-1:0] reg_write_data
+
 );
 
 bit [ADDR_WIDTH-1+2:0] PC;

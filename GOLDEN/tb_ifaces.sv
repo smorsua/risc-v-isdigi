@@ -1,4 +1,6 @@
 
+`include "Scoreboard.sv"
+
 `timescale 1ns/1ps
 module tb_ifaces();
 parameter addr_width = 10; 
@@ -10,80 +12,78 @@ logic CLK, RESET_N, CLEAR;
 
 // inicializamos la interfaz
 ifaces iface(.CLK(CLK), .RESET_N(RESET_N), .CLEAR(CLEAR));
-
-
-
+Scoreboard scoreboard;
 /*--------------------------------------------------------------------------------
  *  Pipelined
  *-------------------------------------------------------------------------------*/
 
-// "INICIALIZO" los dos cores primero el pipelined y el golden 
-//DUV
-// Aquí tenemos un problema y es que realmente, no podemos conectar directamente con interfaces el bicho este
-// porque todo esta conectado, así que voy a tener que realizar las conexiones y luego hacer asignacions sino esto
-// no va a funcionar.
-// Defino todos los cables que hay que usar
-logic [addr_width-1:0] iaddr, daddr;
-logic [data_width-1:0] idata, ddata_w, ddata_r;
-logic MemWrite, MemRead;
-
-ram ram(.CLK(CLK), .daddr(daddr), .MemWrite(MemWrite), .MemRead(MemRead), .ddata_w(ddata_w), .ddata_r(ddata_r));
+ram ram(
+    .CLK(iface.memories.CLK), 
+    .daddr(iface.memories.daddr), 
+    .MemWrite(iface.memories.MemWrite), 
+    .MemRead(iface.memories.MemRead), 
+    .ddata_w(iface.memories.ddata_w), 
+    .ddata_r(iface.memories.ddata_r));
 defparam ram.addr_width = addr_width;
 defparam ram.data_width = data_width;
 
-rom rom(.CLK(CLK), .iaddr(iaddr), .idata(idata));
+rom rom(
+    .CLK(iface.memories.CLK), 
+    .iaddr(iface.memories.iaddr), 
+    .idata(iface.memories.idata));
 defparam rom.addr_width = addr_width;
 defparam rom.data_width = data_width;
 defparam rom.file = "fibonacci_pipelined.txt" ;
 
-main DUV (.CLK(CLK), .RESET_N(RESET_N), .CLEAR(CLEAR), 
-          .idata(idata), .iaddr(iaddr), 
-          .daddr(daddr), .ddata_r(ddata_r), 
-          .ddata_w(ddata_w), .mem_write(MemWrite), 
-          .mem_read(MemRead));
-defparam DUV.ADDR_SIZE = addr_width;
-defparam DUV.DATA_SIZE = data_width;
-//asignacion de las entradas del interfaz, a conexiones entre el core y la memoria
-assign iface.duv.iaddr = iaddr;
-assign iface.duv.idata = idata;
-assign iface.duv.daddr = daddr;
-assign iface.duv.ddata_r = ddata_r;
-assign iface.duv.ddata_w = ddata_w;
-assign iface.duv.MemWrite = MemWrite;
-assign iface.duv.MemRead = MemRead;
+main pipelined (
+    .CLK(iface.pipelined.CLK), 
+    .RESET_N(iface.pipelined.RESET_N), 
+    .CLEAR(iface.pipelined.CLEAR), 
+    .idata(iface.pipelined.idata), 
+    .iaddr(iface.pipelined.iaddr), 
+    .daddr(iface.pipelined.daddr), 
+    .ddata_r(iface.pipelined.ddata_r), 
+    .ddata_w(iface.pipelined.ddata_w), 
+    .mem_write(iface.pipelined.MemWrite), 
+    .mem_read(iface.pipelined.MemRead));
+defparam pipelined.ADDR_SIZE = addr_width;
+defparam pipelined.DATA_SIZE = data_width;
 
-/*--------------------------------------------------------------------------------
- *  Golden Model (SINGLE-CYCLE)
- *-------------------------------------------------------------------------------*/
-logic d_rw_golden; 
-logic [addr_width-1:0] iaddr_golden, daddr_golden;
-logic [data_width-1:0] idata_golden, ddata_golden, ddata_r_golden;
-ram_golden ram_golden(.CLK(CLK), .d_rw(d_rw_golden), .daddr( daddr_golden), .ddata_w( ddata_golden), .ddata_r( ddata_r_golden));
+ram_golden ram_golden(
+    .CLK(iface.memories.CLK), 
+    .d_rw(iface.memories.d_rw_golden), 
+    .daddr(iface.memories.daddr_golden), 
+    .ddata_w(iface.memories.ddata_w_golden),
+    .ddata_r(iface.memories.ddata_r_golden));
 defparam ram_golden.addr_width = addr_width;
 defparam ram_golden.data_width = data_width;
 
-rom_golden rom_golden(.iaddr( iaddr_golden), .idata( idata_golden));
+rom_golden rom_golden(.iaddr(iface.memories.iaddr_golden), .idata(iface.memories.idata_golden));
 defparam rom_golden.addr_width = addr_width;
 defparam rom_golden.data_width = data_width;
 defparam rom_golden.file = "fibonacci.txt" ;
 
-golden golden (.CLK(CLK), .RESET_N(RESET_N),
-          .idata( idata_golden), .iaddr( iaddr_golden), 
-          .daddr( daddr_golden), .ddata_r( ddata_r_golden), 
-          .ddata_w( ddata_golden), .d_rw(d_rw_golden));
+golden golden (
+    .CLK(CLK), 
+    .RESET_N(RESET_N),
+    .idata(iface.golden.idata_golden), 
+    .iaddr(iface.golden.iaddr_golden), 
+    .daddr(iface.golden.daddr_golden), 
+    .ddata_r(iface.golden.ddata_r_golden), 
+    .ddata_w(iface.golden.ddata_w_golden), 
+    .d_rw(iface.golden.d_rw_golden));
 defparam golden.ADDR_WIDTH = addr_width;
 defparam golden.SIZE = data_width;
-//asignacion de las salidas del interfaz, a conexiones entre el core y la memoria
-assign iface.golden.iaddr_golden = iaddr_golden;
-assign iface.golden.idata_golden = idata_golden;
-assign iface.golden.daddr_golden = daddr_golden;
-assign iface.golden.ddata_r_golden = ddata_r_golden;
-assign iface.golden.ddata_w_golden = ddata_golden;
-assign iface.golden.d_rw_golden = d_rw_golden;
 
 
 initial
 begin
+    scoreboard = new(iface.monitor, golden.registros.writeData);
+
+    fork
+        scoreboard.monitor_input();
+    join_none
+
 	CLK = 0;
 	forever  #(T/2) CLK = ~CLK;
 end

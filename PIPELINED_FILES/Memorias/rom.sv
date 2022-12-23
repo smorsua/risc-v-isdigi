@@ -11,13 +11,14 @@ module rom
 	initial // Read the memory contents in the file
 			 //dual_port_rom_init.txt. 
 	begin
+        idata = 0;
 		for(i=0; i < 2 ** addr_width; i++) begin
 			rom[i] = 'b0;
 		end
 		$readmemh(file, rom);
 	end
 
-	always_ff @(posedge CLK)
+	always @(posedge CLK)
 	begin
 	 	idata <= rom[iaddr];
 	end

@@ -23,7 +23,8 @@ module main
     output [ADDR_SIZE-1:0]  daddr,
     input  [DATA_SIZE-1:0]  ddata_r,
     output [DATA_SIZE-1:0]  ddata_w,
-    output mem_write, mem_read
+    output mem_write, mem_read,
+    output [DATA_SIZE-1:0] reg_write_data
 );
 
 wire [ADDR_SIZE-1+2:0] next_pc_wire;
@@ -215,7 +216,7 @@ EX_MEM_REG #(.DATA_SIZE(32), .ADDR_SIZE(10)) ex_mem_reg  (
 );
 
 assign ddata_w = read_data_2_mem;
-assign daddr = {2'b0, address_alu_result_mem[9:2]};
+assign daddr = address_alu_result_mem[11:2];
 assign mem_write = mem_write_mem;
 assign mem_read = mem_read_mem;
 

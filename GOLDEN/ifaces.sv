@@ -1,4 +1,4 @@
-interface ifaces( input CLK, input RESET_N, input CLEAR);
+interface ifaces(input CLK, input RESET_N, input CLEAR);
 //Del interfaz tu defines siempre las señales más globales, las que no dependen del diseño
 
 parameter data_width = 32; // data width in bits
@@ -6,29 +6,36 @@ parameter addr_width = 10; // address width in bits
 
 // interface signals
 // Aquí definimos todas las señales que vamos a utilizar.
-logic d_rw_golden ;
-logic  [(data_width-1):0] ddata_w, ddata_w_golden ;
-logic [(addr_width-1):0] daddr, daddr_golden ;
-logic  [(data_width-1):0] ddata_r, ddata_r_golden ;
-logic [(addr_width-1):0] iaddr, iaddr_golden ;
-logic  [(data_width-1):0] idata, idata_golden ;
-logic MemRead, MemWrite;
-
+logic                   d_rw_golden ;
+logic [data_width-1:0]  ddata_w, ddata_w_golden ;
+logic [addr_width-1:0]  daddr, daddr_golden ;
+logic [data_width-1:0]  ddata_r, ddata_r_golden ;
+logic [addr_width-1:0]  iaddr, iaddr_golden ;
+logic [data_width-1:0]  idata, idata_golden ;
+logic                   MemRead, MemWrite;
+logic [data_width-1:0]  reg_write_data;
 /*--------------------------------------
 * Este modport está principalmente usado para el muestreo de las señales, tu cuando muestreas básicamente estás
 * sacando los valores del diseño.
 ----------------------------------------*/
 modport monitor(
-input CLK,      input RESET_N,
-                input d_rw_golden,
-input ddata_w,  input ddata_w_golden,
-input daddr,    input daddr_golden,
-input ddata_r,  input ddata_r_golden,
-input iaddr,    input iaddr_golden,
-input idata,    input idata_golden,
-input MemRead,
-input MemWrite,
-input CLEAR
+    input CLK,
+    input RESET_N,
+    input CLEAR,
+    input d_rw_golden,
+    input ddata_w, 
+    input ddata_w_golden,
+    input daddr,   
+    input daddr_golden,
+    input ddata_r, 
+    input ddata_r_golden,
+    input iaddr,
+    input iaddr_golden,
+    input idata,
+    input idata_golden,
+    input MemRead,
+    input MemWrite,
+    input reg_write_data
 );
 
 /*--------------------------------------
@@ -36,15 +43,20 @@ input CLEAR
 * la señal que quieres modificar tendría que ser definida como output y no cmoo input
 ----------------------------------------*/
 modport testeo(
-                input d_rw_golden,
-input ddata_w,  input ddata_w_golden,
-input daddr,    input daddr_golden,
-input ddata_r,  input ddata_r_golden,
-input iaddr,    input iaddr_golden,
-input idata,    input idata_golden,
-input MemRead,
-input MemWrite,
-input CLEAR
+    input d_rw_golden,
+    input ddata_w,
+    input ddata_w_golden,
+    input daddr,
+    input daddr_golden,
+    input ddata_r,
+    input ddata_r_golden,
+    input iaddr,
+    input iaddr_golden,
+    input idata,
+    input idata_golden,
+    input MemRead,
+    input MemWrite,
+    input CLEAR
 );
 
 
@@ -53,17 +65,17 @@ input CLEAR
 * pipelined como golden model. ya está, sería lo mismo coger y hacelro directamente pero ya que haces interfaces
 *
 ----------------------------------------*/
-modport duv(
-input CLK,
-input RESET_N,
-input CLEAR,
-output ddata_w,
-output daddr,
-output ddata_r,
-output iaddr,
-output idata,
-output MemRead,
-output MemWrite
+modport pipelined(
+    input CLK,
+    input RESET_N,
+    input CLEAR,
+    output iaddr,
+    input idata,
+    output daddr,
+    input ddata_r,
+    output ddata_w,
+    output MemRead,
+    output MemWrite
 );
 
 /*--------------------------------------
@@ -71,15 +83,33 @@ output MemWrite
 ----------------------------------------*/
 
 modport golden(
-input CLK,
-input RESET_N,
-output d_rw_golden,
-output ddata_w_golden,
-output daddr_golden,
-output ddata_r_golden,
-output iaddr_golden,
-output idata_golden
+    input CLK,
+    input RESET_N,
+    output d_rw_golden,
+    output ddata_w_golden,
+    output daddr_golden,
+    input ddata_r_golden,
+    output iaddr_golden,
+    input idata_golden
+);
 
+modport memories(
+    input CLK,
+    input RESET_N,
+    input CLEAR,
+    input iaddr,
+    output idata,
+    input daddr,
+    output ddata_r,
+    input ddata_w,
+    input MemRead,
+    input MemWrite,
+    input d_rw_golden,
+    input daddr_golden,
+    input ddata_w_golden,
+    output ddata_r_golden,
+    input iaddr_golden,
+    output idata_golden
 );
 
 
