@@ -12,14 +12,14 @@ logic  [(data_width-1):0] ddata_r;
 logic [(addr_width-1):0] iaddr;
 logic  [(data_width-1):0] idata;
 
-RAM ram(CLK, daddr, MemWrite, MemRead,ddata_w, ddata_r);
+ram ram(CLK, daddr, MemWrite, MemRead,ddata_w, ddata_r);
 defparam ram.addr_width = addr_width;
 defparam ram.data_width = data_width;
 
-ROM rom(.CLK(CLK), .iaddr(iaddr), .idata(idata));
+rom rom(.CLK(CLK), .iaddr(iaddr), .idata(idata));
 defparam rom.addr_width = addr_width;
 defparam rom.data_width = data_width;
-defparam rom.file = "fibonacci_pipelined.txt" ;
+defparam rom.file = "prueba.txt" ;
 
 main main(CLK, RESET_N, CLEAR, idata, iaddr, daddr, ddata_r, ddata_w, MemWrite, MemRead);
 defparam main.ADDR_SIZE = addr_width;

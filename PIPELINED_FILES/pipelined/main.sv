@@ -6,8 +6,6 @@
 `include "../ALU/operation_type.sv"
 `include "instruction_type.sv"
 
-
-
 `include "pipeline_registers/IF_ID_REG.sv"
 `include "pipeline_registers/ID_EX_REG.sv"
 `include "pipeline_registers/EX_MEM_REG.sv"
@@ -33,12 +31,13 @@ wire [ADDR_SIZE-1+2:0] next_pc_wire;
 
 bit [ADDR_SIZE -1 + 2:0] PC;
 
+logic PC_frozen;
 
 always_ff @(posedge CLK or negedge RESET_N) begin
     if(RESET_N == 0) begin
         PC <= 0;
     end else begin
-        PC <= next_pc_wire;
+        PC <= PC_frozen ? PC : next_pc_wire;
     end
 end
 
@@ -63,6 +62,14 @@ IF_ID_REG #(.DATA_SIZE(DATA_SIZE), .ADDR_SIZE(ADDR_SIZE)) if_id_reg(
     .pc_id(pc_id),
     .inst_id(inst_id)
 );
+
+
+hazard_detection #(.SIZE(DATA_SIZE)) hazard_detection(
+    .CLK(CLK),
+    .instruction(idata),
+    .PC_frozen(PC_frozen),
+    .CLEAR(CLEAR)
+    );
 
 wire branch_id, reg_write_id, mem_read_id, mem_write_id, alu_src_id;
 wire [1:0] mem_to_reg_id;
