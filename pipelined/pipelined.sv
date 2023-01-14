@@ -44,7 +44,7 @@ always_ff @(posedge CLK or negedge RESET_N) begin
     if(RESET_N == 0) begin
         PC <= 0;
     end else begin
-        PC <= PCWrite ? PC : next_pc_wire;
+        PC <= PCWrite ? next_pc_wire: PC;
     end
 end
 
