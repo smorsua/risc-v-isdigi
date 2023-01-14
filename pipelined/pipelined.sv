@@ -116,6 +116,7 @@ wire [DATA_SIZE-1:0] read_data_1_ex, read_data_2_ex, immediate_ex;
 wire [3:0] inst_30_and_14_to_12_ex;
 wire [4:0] inst_11_to_7_ex;
 wire [6:0] inst_6_to_0_ex;
+wire [4:0] inst_19_to_15_ex, inst_24_to_20_ex;
 ID_EX_REG id_ex_reg(
     .clk(CLK),
     .clear(CLEAR),
@@ -133,6 +134,8 @@ ID_EX_REG id_ex_reg(
     .inst_30_and_14_to_12_id({inst_id[30], inst_id[14:12]}),
     .inst_11_to_7_id(inst_id[11:7]),
     .inst_6_to_0_id(inst_id[6:0]),
+    .inst_19_to_15_id(inst_id[4:0]),
+    .inst_24_to_20_id(inst_id[4:0]),
 
     .branch_ex(branch_ex),
     .reg_write_ex(reg_write_ex),
@@ -147,9 +150,12 @@ ID_EX_REG id_ex_reg(
     .immediate_ex(immediate_ex),
     .inst_30_and_14_to_12_ex(inst_30_and_14_to_12_ex),
     .inst_11_to_7_ex(inst_11_to_7_ex),
-    .inst_6_to_0_ex(inst_6_to_0_ex)
+    .inst_6_to_0_ex(inst_6_to_0_ex),
+    .inst_19_to_15_ex(inst_19_to_15_ex),
+    .inst_24_to_20_ex(inst_24_to_20_ex)
 );
 
+wire [1:0] forwardA, forwardB;
 wire [DATA_SIZE-1:0] second_operand_wire;
 wire [DATA_SIZE-1:0] myInput_alu_src_2_mux[2];
 assign myInput_alu_src_2_mux[0] = read_data_2_ex;
@@ -166,6 +172,28 @@ ALU_CONTROL alu_control(
     .funct3(inst_30_and_14_to_12_ex[2:0]),
     .bit30(inst_30_and_14_to_12_ex[3]),
     .ALUSelection(ALUSelection_wire)
+);
+wire [DATA_SIZE-1:0] address_alu_result_mem;
+wire [DATA_SIZE-1:0] forwardA_mux [3];
+wire [DATA_SIZE-1:0] result_fordwardA;
+assign forwardA_mux [0] = read_data_1_ex;
+assign forwardA_mux [1] = data_mux_result_wire;
+assign forwardA_mux [2] =  address_alu_result_mem;
+MUX #(.SIZE(DATA_SIZE), .INPUTS(3)) forwardAmux(
+    .all_inputs(forwardA_mux),
+    .sel(forwardA),
+    .result(result_fordwardA)
+);
+
+wire [DATA_SIZE-1:0] forwardB_mux [3];
+wire [DATA_SIZE-1:0] result_fordwardB;
+assign forwardB_mux [0] = second_operand_wire;
+assign forwardB_mux [1] = data_mux_result_wire;
+assign forwardB_mux [2] =  address_alu_result_mem;
+MUX #(.SIZE(DATA_SIZE), .INPUTS(3)) forwardBmux(
+    .all_inputs(forwardB_mux),
+    .sel(forwardB),
+    .result(result_fordwardB)
 );
 
 wire [DATA_SIZE-1:0] address_alu_result_ex;
@@ -187,12 +215,22 @@ ALU #(.SIZE(ADDR_SIZE+2)) jump_alu(
     .ZERO()
 );
 
-wire branch_mem, reg_write_mem, mem_read_mem, mem_write_mem;
+wire [4:0] inst_11_to_7_mem;
+data_forwarding #(.SIZE(DATA_SIZE)) data_forwarding(
+    .reg_write_mem(reg_write_mem), 
+    .reg_write_ex(reg_write_ex),
+    .reg_write_wb(reg_write_wb),
+    .inst_11_to_7_mem(inst_11_to_7_mem),
+    .inst_11_to_7_wb(inst_11_to_7_wb),
+    .inst_19_to_15_ex(inst_19_to_15_ex),
+    .inst_24_to_20_ex(inst_24_to_20_ex),
+    .forwardA(forwardA),
+    .forwardB(forwardB)
+);
+wire branch_mem, mem_read_mem, mem_write_mem;
 wire [1:0] mem_to_reg_mem, AuipcLui_mem;
 wire [DATA_SIZE-1:0] read_data_2_mem;
-wire [4:0] inst_11_to_7_mem;
 wire [ADDR_SIZE-1+2:0] jump_alu_result_mem;
-wire [DATA_SIZE-1:0] address_alu_result_mem;
 wire [2:0] inst_14_to_12_mem;
 wire address_alu_zero_mem;
 EX_MEM_REG #(.DATA_SIZE(32), .ADDR_SIZE(10)) ex_mem_reg  (
