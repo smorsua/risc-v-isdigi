@@ -25,17 +25,18 @@ module placa
     input                   CLK,
     input                   RESET_N,
     input                   CLEAR,
-    input  [DATA_SIZE-1:0]  idata,
-    output [ADDR_SIZE-1:0]  iaddr,
-    output [ADDR_SIZE-1:0]  daddr,
-    input  [DATA_SIZE-1:0]  ddata_r,
-    output [DATA_SIZE-1:0]  ddata_w,
-    output mem_write, mem_read,
-    output [DATA_SIZE-1:0] reg_write_data,
-    output reg_write_enable,
-    output [4:0] write_register,
     output [7:0]LED
 );
+
+wire [DATA_SIZE-1:0]  idata;
+wire [ADDR_SIZE-1:0]  iaddr;
+wire [ADDR_SIZE-1:0]  daddr;
+wire [DATA_SIZE-1:0]  ddata_r;
+wire [DATA_SIZE-1:0]  ddata_w;
+wire mem_write, mem_read;
+wire [DATA_SIZE-1:0] reg_write_data;
+wire reg_write_enable;
+wire [4:0] write_register;
 
 wire [ADDR_SIZE-1+2:0] next_pc_wire;
 wire PCWrite;
@@ -312,6 +313,15 @@ MUX #(.SIZE(ADDR_SIZE+2), .INPUTS(2)) pc_mux(
     .result(next_pc_wire)
 );
 assign reg_write_data = data_mux_result_wire; //para el golden
+
+ram_registered ram_registered(CLK, daddr, mem_write, mem_read, ddata_w, ddata_r);
+defparam ram_registered.addr_width = ADDR_SIZE;
+defparam ram_registered.data_width = DATA_SIZE;
+
+rom_registered rom_registered(.CLK(CLK), .iaddr(iaddr), .idata(idata));
+defparam rom_registered.addr_width = ADDR_SIZE;
+defparam rom_registered.data_width = DATA_SIZE;
+defparam rom_registered.file = "./prueba.txt" ;
 
 reg [7:0] aux;
 always @(data_mux_result_wire)
