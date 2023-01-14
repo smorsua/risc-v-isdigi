@@ -79,15 +79,12 @@ IF_ID_REG #(.DATA_SIZE(DATA_SIZE), .ADDR_SIZE(ADDR_SIZE)) if_id_reg(
     .inst_id(inst_id)
 );
 
-
-
 wire branch_id, reg_write_id, mem_read_id, mem_write_id, alu_src_id;
 wire [1:0] mem_to_reg_id;
 wire [1:0] AuipcLui_id;
-wire [6:0] control_delayed = CLEAR ? 7'h13 : inst_id[6:0];
 
 CONTROL control(
-    .OPCODE(control_delayed),
+    .OPCODE(inst_id[6:0]),
     .BRANCH(branch_id),
     .REG_WRITE(reg_write_id),
     .MEM_READ(mem_read_id),
