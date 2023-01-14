@@ -61,7 +61,7 @@ assign iaddr = PC[11:2];
 wire branch_ex, reg_write_ex, mem_read_ex, mem_write_ex, alu_src_ex;
 wire [DATA_SIZE-1:0] inst_id;
 wire if_id_clear;
-wire enable_nop_mux;
+wire control_mux_sel;
 
 wire [1:0] mem_to_reg_ex, AuipcLui_ex;
 wire [ADDR_SIZE-1+2:0] pc_ex;
@@ -79,7 +79,7 @@ hazard_detection #(.SIZE(DATA_SIZE)) hazard_detection(
     .ex_register_rd(inst_11_to_7_ex),
     .PCWrite(PCWrite),
     .if_id_clear(if_id_clear),
-    .enable_nop_mux(enable_nop_mux)
+    .enable_nop_mux(control_mux_sel)
     );
 
 wire [ADDR_SIZE-1+2:0] pc_id;
@@ -112,9 +112,9 @@ CONTROL control(
 
 assign input_mux_control[0] = {branch_id,reg_write_id,mem_read_id,mem_write_id,alu_src_id,mem_to_reg_id,AuipcLui_id};
 assign input_mux_control[1] = 9'b0;
-MUX #(.SIZE(DATA_SIZE), .INPUTS(2)) control_mux(
+MUX #(.SIZE(9), .INPUTS(2)) control_mux(
     .all_inputs(input_mux_control),
-    .sel(enable_mux), //enable mux que sale del hazard
+    .sel(control_mux_sel), //enable mux que sale del hazard
     .result(salida_mux_control)
 );
 
@@ -145,7 +145,8 @@ IMMEDIATE_GENERATOR imm_gen(
 );
 
 
-
+wire branch_id_mux,reg_write_id_mux,mem_read_id_mux,mem_write_id_mux,alu_src_id_mux;
+wire [1:0]  mem_to_reg_id_mux, AuipcLui_id_mux;
 assign {
     branch_id_mux,
     reg_write_id_mux,
@@ -310,102 +311,8 @@ MUX #(.SIZE(ADDR_SIZE+2), .INPUTS(2)) pc_mux(
     .result(next_pc_wire)
 );
 assign reg_write_data = data_mux_result_wire; //para el golden
-// logic [6:0] opcode;
-// logic [2:0] funct3;
-// logic [6:0] funct7;
-// logic [4:0] rs1;
-// logic [4:0] rs2;
-// logic [4:0] rd;
-// logic [31:0] immediate;
 
-// always @(posedge CLK) begin
-//     opcode = idata[6:0];
-//     casex(opcode)
-//     R_FORMAT: begin
-//         rd = idata[11:7];
-//         funct3 = idata[14:12];
-//         rs1 = idata[19:15];
-//         rs2 = idata[24:20];
-//         funct7 = idata[31:25];
-//         casex(funct3)
-//         3'b000: begin
-//             case(funct7)
-//             /*ADD*/ 7'b0000000: assert(data_mux_result_wire == data_1_wire + data_2_wire);
-//             /*SUB*/ 7'b0100000: assert(data_mux_result_wire == data_1_wire - data_2_wire);
-//             default: $error("Incorrect funct7");
-//             endcase
-//         end
-//         /*SLL*/  3'b001: assert(data_mux_result_wire == (data_1_wire << data_2_wire));
-//         /*SLT*/  3'b010: assert(data_mux_result_wire == (!(signed'(data_1_wire) < signed'(data_2_wire))));
-//         /*SLTU*/ 3'b011: assert(data_mux_result_wire == (!(data_1_wire < data_2_wire)));
-//         /*XOR*/  3'b100: assert(data_mux_result_wire == (data_1_wire ^ data_2_wire));
-//         3'b101: begin
-//             case(funct7)
-//             /*SRL*/ 7'b0000000: assert(data_mux_result_wire == (data_1_wire >> data_2_wire));
-//             /*SRA*/ 7'b0100000: assert(data_mux_result_wire == (data_1_wire >>> data_2_wire));
-//             default: $error("Incorrect funct 7");
-//             endcase
-//         end
-//         /*OR*/ 3'b110: assert(data_mux_result_wire == (data_1_wire | data_2_wire));
-//         /*AND*/ 3'b111: assert(data_mux_result_wire == (data_1_wire & data_2_wire));
-//         default: $error("Incorrect funct3");
-//         endcase
-//     end
-//     I_FORMAT: begin
-//         funct3 = idata[14:12];
-//         rs1 = idata[19:15];
-//         rd = idata[11:7];
-//         immediate = { {21{idata[31]}}, idata[30:20] };
 
-//         case(opcode)
-//         7'b0000011: begin //memory operations
-//             /*LW*/ assert(data_mux_result_wire == ddata_r) ;
-
-//         end
-//         7'b0010011: begin //arithmetic operations
-//             case(funct3)
-//             /*ADDI*/ 3'b000: assert(data_mux_result_wire == (data_1_wire + immediate));
-//             /*SLLI*/ 3'b001: assert(data_mux_result_wire == (data_1_wire << immediate));
-//             /*SLTIU*/3'b011: assert(data_mux_result_wire == (!(data_1_wire < immediate)));
-//             /*XORI*/ 3'b100: assert(data_mux_result_wire == (data_1_wire ^ immediate));
-//             /*SLTI*/ 3'b010: assert(data_mux_result_wire == (!(signed'(data_1_wire) < signed'(immediate))));
-//             3'b101: begin
-//                 case(immediate[11:6])
-//                 /*SRLI*/ 7'b0000000: assert(data_mux_result_wire == (data_1_wire >> immediate[5:0]));
-//                 /*SRAI*/ 7'b0100000: assert(data_mux_result_wire == (data_1_wire >>> immediate[5:0]));
-//                 endcase
-//             end
-//             /*ORI*/ 3'b110: assert(data_mux_result_wire == (data_1_wire | immediate));
-//             /*ANDI*/3'b111: assert(data_mux_result_wire == (data_1_wire & immediate));
-//             default: $error("Invalid funct3");
-//             endcase
-//         end
-//         default: $error("Invalid opcode");
-//         endcase
-//     end
-//     U_FORMAT: begin
-//         rd = idata[11:7];
-//         immediate = { idata[31:12], 12'b0 };
-//         case(opcode)
-//         /*AUIPC*/ 7'b0010111: assert(data_mux_result_wire == PC + immediate);
-//         /*LUI*/ 7'b0110111: assert(data_mux_result_wire == immediate);
-//         default: $error("invalid opcode");
-//         endcase
-//     end
-//     S_FORMAT: begin
-//         immediate = { {21{idata[31]}}, idata[30:25], idata[11:7]};
-//         /*SW*/ assert(address_alu_result == data_1_wire + immediate);
-//     end
-//     B_FORMAT: begin
-//         immediate = { {21{idata[31]}}, idata[7], idata[30:25], idata[11:8], 1'b0};
-
-//     end
-
-//     default: $error("Invalid instruction format");
-//     endcase
-// end
-
-// assert property (@(posedge CLK) address_alu_zero == '1 && idata[6:0] == 'b1100011 |-> (branch_target_wire == (immediate + PC)) ) else $fatal("No realiza correctamente el salto condicional");
 
 endmodule
 

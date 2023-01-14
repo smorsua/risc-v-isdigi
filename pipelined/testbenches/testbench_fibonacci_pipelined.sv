@@ -1,19 +1,22 @@
 `include "../memories/ram_registered.sv"
 `include "../memories/rom_registered.sv"
 `include "../pipelined.sv"
- 
+
 `timescale 1ns/1ps
 module testbench_fibonacci_pipelined();
 localparam  T = 20, addr_width = 10, data_width = 32;
 
 logic CLK;
 logic RESET_N;
+logic CLEAR;
 logic mem_write, mem_read;
 logic  [(data_width-1):0] ddata_w;
 logic [(addr_width-1):0] daddr;
 logic  [(data_width-1):0] ddata_r;
 logic [(addr_width-1):0] iaddr;
 logic  [(data_width-1):0] idata;
+
+
 
 ram_registered ram_registered(CLK, daddr, mem_write, mem_read, ddata_w, ddata_r);
 defparam ram_registered.addr_width = addr_width;
@@ -25,7 +28,7 @@ defparam rom_registered.data_width = data_width;
 defparam rom_registered.file = "./prueba.txt" ;
 
 pipelined pipelined(
-    .CLK(CLK), 
+    .CLK(CLK),
     .RESET_N(RESET_N),
     .CLEAR(CLEAR),
     .idata(idata),
@@ -51,6 +54,7 @@ end
 
 initial
     begin
+        CLEAR = 1'b0;
         RESET_N = 0;
 		#(T)
 		RESET_N = 1;
