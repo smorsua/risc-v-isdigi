@@ -25,7 +25,7 @@ defparam ram_registered.data_width = data_width;
 rom_registered rom_registered(.CLK(CLK), .iaddr(iaddr), .idata(idata));
 defparam rom_registered.addr_width = addr_width;
 defparam rom_registered.data_width = data_width;
-defparam rom_registered.file = "instructions.txt" ;
+defparam rom_registered.file = "prueba.txt" ;
 
 pipelined pipelined(CLK, RESET_N, CLEAR, idata, iaddr, daddr, ddata_r, ddata_w, MemWrite, MemRead);
 defparam pipelined.ADDR_SIZE = addr_width;
