@@ -59,8 +59,18 @@ ALU #(.SIZE(ADDR_SIZE + 2)) pc_alu(
 
 assign iaddr = PC[11:2];
 
-
 wire if_id_clear;
+wire enable_nop_mux;
+hazard_detection #(.SIZE(DATA_SIZE)) hazard_detection(
+    .id_rs1(inst_id[19:15]),
+    .id_rs2(inst_id[24:20]),
+    .ex_mem_read(mem_read_ex),
+    .ex_register_rd(inst_11_to_7_ex),
+    .PCWrite(PCWrite),
+    .if_id_clear(if_id_clear)
+    .enable_nop_mux(enable_nop_mux)
+    );
+
 wire [ADDR_SIZE-1+2:0] pc_id;
 wire [DATA_SIZE-1:0] inst_id;
 IF_ID_REG #(.DATA_SIZE(DATA_SIZE), .ADDR_SIZE(ADDR_SIZE)) if_id_reg(
@@ -71,25 +81,6 @@ IF_ID_REG #(.DATA_SIZE(DATA_SIZE), .ADDR_SIZE(ADDR_SIZE)) if_id_reg(
     .pc_id(pc_id),
     .inst_id(inst_id)
 );
-
-
-wire [1:0] mem_to_reg_ex, AuipcLui_ex;
-wire [ADDR_SIZE-1+2:0] pc_ex;
-wire [DATA_SIZE-1:0] read_data_1_ex, read_data_2_ex, immediate_ex;
-wire [3:0] inst_30_and_14_to_12_ex;
-wire [4:0] inst_11_to_7_ex;
-wire [6:0] inst_6_to_0_ex;
-wire enable_nop_mux;
-wire branch_ex, reg_write_ex, mem_read_ex, mem_write_ex, alu_src_ex;
-hazard_detection #(.SIZE(DATA_SIZE)) hazard_detection(
-    .id_rs1(inst_id[19:15]),
-    .id_rs2(inst_id[24:20]),
-    .ex_mem_read(mem_read_ex),
-    .ex_register_rd(inst_11_to_7_ex),
-    .PCWrite(PCWrite),
-    .if_id_clear(if_id_clear),
-    .enable_nop_mux(enable_nop_mux)
-    );
 
 wire branch_id, reg_write_id, mem_read_id, mem_write_id, alu_src_id;
 wire [1:0] mem_to_reg_id;
@@ -143,9 +134,15 @@ IMMEDIATE_GENERATOR imm_gen(
     .IMMEDIATE(immediate_id)
 );
 
+wire branch_ex, reg_write_ex, mem_read_ex, mem_write_ex, alu_src_ex;
+wire [1:0] mem_to_reg_ex, AuipcLui_ex;
+wire [ADDR_SIZE-1+2:0] pc_ex;
+wire [DATA_SIZE-1:0] read_data_1_ex, read_data_2_ex, immediate_ex;
+wire [3:0] inst_30_and_14_to_12_ex;
+wire [4:0] inst_11_to_7_ex;
+wire [6:0] inst_6_to_0_ex;
 
-
-assign {
+assign { 
     branch_id_mux,
     reg_write_id_mux,
     mem_read_id_mux,
@@ -153,18 +150,18 @@ assign {
     alu_src_id_mux,
     mem_to_reg_id_mux,
     AuipcLui_id_mux
-} = salida_mux_control;
+} = salida_mux_control
 
 ID_EX_REG id_ex_reg(
     .clk(CLK),
     .clear(CLEAR),
-    .branch_id(branch_id),
-    .reg_write_id(reg_write_id),
-    .mem_read_id(mem_read_id),
-    .mem_write_id(mem_write_id),
-    .alu_src_id(alu_src_id),
-    .mem_to_reg_id(mem_to_reg_id),
-    .AuipcLui_id(AuipcLui_id),
+    .branch_id(branch_id_mux),
+    .reg_write_id(reg_write_id_mux),
+    .mem_read_id(mem_read_id_mux),
+    .mem_write_id(mem_write_id_mux),
+    .alu_src_id(alu_src_id_mux),
+    .mem_to_reg_id(mem_to_reg_id_mux),
+    .AuipcLui_id(AuipcLui_id_mux),
     .pc_id(pc_id),
     .read_data_1_id(read_data_1_id),
     .read_data_2_id(read_data_2_id),
