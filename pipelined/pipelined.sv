@@ -134,8 +134,8 @@ ID_EX_REG id_ex_reg(
     .inst_30_and_14_to_12_id({inst_id[30], inst_id[14:12]}),
     .inst_11_to_7_id(inst_id[11:7]),
     .inst_6_to_0_id(inst_id[6:0]),
-    .inst_19_to_15_id(inst_id[4:0]),
-    .inst_24_to_20_id(inst_id[4:0]),
+    .inst_19_to_15_id(inst_id[19:15]),
+    .inst_24_to_20_id(inst_id[24:20]),
 
     .branch_ex(branch_ex),
     .reg_write_ex(reg_write_ex),
