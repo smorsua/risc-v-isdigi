@@ -3,8 +3,8 @@ module hazard_detection #(parameter SIZE = 32) (
 input CLK,
 input [SIZE-1 : 0] instruction,
 output logic PC_frozen,
-output CLEAR
-
+output CLEAR,
+output enable_mux
 );
 
 logic clear_aux;
@@ -28,17 +28,19 @@ always_ff @(posedge CLK) begin
     end
 
 end
-
-
-
 assign CLEAR = clear_aux;
+
 always_comb begin
     if ( (instruction[14:12] == 3'b010) && (instruction[6:0] == 7'b0000011) ) begin
     PC_frozen = 1'b1;
+    enable_mux =1'b1;
+
     end
     else  begin
         PC_frozen = 1'b0; 
+        enable_mux =1'b0;o0
     end
 end
+
 
 endmodule
