@@ -36,7 +36,8 @@ always_comb begin
                 end  //Intrucciones de carga
                 7'b001x011: begin
                     MEM_TO_REG = 0;
-                    MEM_READ = 0; 
+                    MEM_READ = 0;
+     
                 end                    
             default: begin
                 MEM_TO_REG = 0;

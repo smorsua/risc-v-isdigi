@@ -1,6 +1,6 @@
 `include "if_ram.sv"
 `include "if_rom.sv"
-`include "../single_cycle/main.sv"
+`include "../single_cycle/golden.sv"
 module ram_with_if(if_ram.ram_module bus);
   RAM ram(CLK, bus.daddr, bus.d_rw, bus.ddata_w, bus.ddata_r);
   defparam ram.addr_width = 10;

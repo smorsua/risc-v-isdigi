@@ -74,8 +74,14 @@ hazard_detection #(.SIZE(DATA_SIZE)) hazard_detection(
 wire branch_id, reg_write_id, mem_read_id, mem_write_id, alu_src_id;
 wire [1:0] mem_to_reg_id;
 wire [1:0] AuipcLui_id;
+/*
+señal añadida con el objetivo de hacer una limpieza en la etapa en la que se realiza la espera para que la lectura a memoria de tiempo
+a realizarse. En lugar de cambiar manualmente las señales de control, hacemos que lo que reciba el control sea una señal nop
+*/
+wire [6:0] control_delayed;
+assign control_delayed = CLEAR ? 7'h13 : inst_id[6:0];
 CONTROL control(
-    .OPCODE(inst_id[6:0]),
+    .OPCODE(control_delayed),
     .BRANCH(branch_id),
     .REG_WRITE(reg_write_id),
     .MEM_READ(mem_read_id),
