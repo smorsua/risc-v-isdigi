@@ -108,7 +108,6 @@ MUX #(.SIZE(DATA_SIZE), .INPUTS(2)) control_mux(
     .sel(enable_mux), //enable mux que sale del hazard
     .result(salida_mux_control)
 );
-assign 
 
 wire [DATA_SIZE-1:0] read_data_1_id, read_data_2_id;
 wire [DATA_SIZE-1:0] data_mux_result_wire;
@@ -144,13 +143,15 @@ wire [3:0] inst_30_and_14_to_12_ex;
 wire [4:0] inst_11_to_7_ex;
 wire [6:0] inst_6_to_0_ex;
 
-assign  {inst_id_mux,branch_id_mux,reg_write_id_mux,mem_read_id_mux,
-mem_write_id_mux,alu_src_id_mux,mem_to_reg_id_mux,AuipcLui_id_mux} = {
-    salida_mux_control[31],salida_mux_control[30],salida_mux_control[29],salida_mux_control[28],salida_mux_control[]
-}
-{
-
-}
+assign { 
+    branch_id_mux,
+    reg_write_id_mux,
+    mem_read_id_mux,
+    mem_write_id_mux,
+    alu_src_id_mux,
+    mem_to_reg_id_mux,
+    AuipcLui_id_mux
+} = salida_mux_control
 
 ID_EX_REG id_ex_reg(
     .clk(CLK),
