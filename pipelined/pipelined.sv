@@ -37,23 +37,14 @@ module pipelined
 );
 
 wire [ADDR_SIZE-1+2:0] next_pc_wire;
-
+wire PCWrite;
 bit [ADDR_SIZE -1 + 2:0] PC;
-
-wire PC_frozen;
-hazard_detection #(.SIZE(DATA_SIZE)) hazard_detection(
-    .CLK(CLK),
-    .instruction(idata),
-    .PC_frozen(PC_frozen),
-    .CLEAR(CLEAR)
-    );
-
 
 always_ff @(posedge CLK or negedge RESET_N) begin
     if(RESET_N == 0) begin
         PC <= 0;
     end else begin
-        PC <= PC_frozen ? PC : next_pc_wire;
+        PC <= PCWrite ? PC : next_pc_wire;
     end
 end
 
@@ -68,26 +59,37 @@ ALU #(.SIZE(ADDR_SIZE + 2)) pc_alu(
 
 assign iaddr = PC[11:2];
 
+wire if_id_clear;
+wire enable_nop_mux;
+hazard_detection #(.SIZE(DATA_SIZE)) hazard_detection(
+    .id_rs1(inst_id[19:15]),
+    .id_rs2(inst_id[24:20]),
+    .ex_mem_read(mem_read_ex),
+    .ex_register_rd(inst_11_to_7_ex),
+    .PCWrite(PCWrite),
+    .if_id_clear(if_id_clear)
+    .enable_nop_mux(enable_nop_mux)
+    );
+
+
 wire [ADDR_SIZE-1+2:0] pc_id;
 wire [DATA_SIZE-1:0] inst_id;
 IF_ID_REG #(.DATA_SIZE(DATA_SIZE), .ADDR_SIZE(ADDR_SIZE)) if_id_reg(
     .clk(CLK),
-    .clear(CLEAR),
+    .clear(if_id_clear),
     .pc_if(PC),
     .inst_if(idata),
     .pc_id(pc_id),
     .inst_id(inst_id)
 );
 
-
-
 wire branch_id, reg_write_id, mem_read_id, mem_write_id, alu_src_id;
 wire [1:0] mem_to_reg_id;
 wire [1:0] AuipcLui_id;
-wire [6:0] control_delayed = CLEAR ? 7'h13 : inst_id[6:0];
 
+//wire [6:0] control_delayed = CLEAR ? 7'h13 : inst_id[6:0];
 CONTROL control(
-    .OPCODE(control_delayed),
+    .OPCODE(inst_id),
     .BRANCH(branch_id),
     .REG_WRITE(reg_write_id),
     .MEM_READ(mem_read_id),
@@ -96,6 +98,17 @@ CONTROL control(
     .MEM_TO_REG(mem_to_reg_id),
     .AuipcLui(AuipcLui_id)
 );
+
+wire [8:0] salida_mux_control;
+wire [8:0] input_mux_control[2];
+assign input_mux_control[0] = {branch_id,reg_write_id,mem_read_id,mem_write_id,alu_src_id,mem_to_reg_id,AuipcLui_id};
+assign input_mux_control[1] = 9'b0;
+MUX #(.SIZE(DATA_SIZE), .INPUTS(2)) control_mux(
+    .all_inputs(input_mux_control),
+    .sel(enable_mux), //enable mux que sale del hazard
+    .result(salida_mux_control)
+);
+assign 
 
 wire [DATA_SIZE-1:0] read_data_1_id, read_data_2_id;
 wire [DATA_SIZE-1:0] data_mux_result_wire;
@@ -130,6 +143,15 @@ wire [DATA_SIZE-1:0] read_data_1_ex, read_data_2_ex, immediate_ex;
 wire [3:0] inst_30_and_14_to_12_ex;
 wire [4:0] inst_11_to_7_ex;
 wire [6:0] inst_6_to_0_ex;
+
+assign  {inst_id_mux,branch_id_mux,reg_write_id_mux,mem_read_id_mux,
+mem_write_id_mux,alu_src_id_mux,mem_to_reg_id_mux,AuipcLui_id_mux} = {
+    salida_mux_control[31],salida_mux_control[30],salida_mux_control[29],salida_mux_control[28],salida_mux_control[]
+}
+{
+
+}
+
 ID_EX_REG id_ex_reg(
     .clk(CLK),
     .clear(CLEAR),
