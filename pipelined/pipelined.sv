@@ -38,7 +38,7 @@ module pipelined
 
 wire [ADDR_SIZE-1+2:0] next_pc_wire;
 wire PCWrite;
-bit [ADDR_SIZE -1 + 2:0] PC;
+bit [ADDR_SIZE - 1 + 2:0] PC;
 
 always_ff @(posedge CLK or negedge RESET_N) begin
     if(RESET_N == 0) begin
