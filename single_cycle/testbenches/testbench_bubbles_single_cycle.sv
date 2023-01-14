@@ -1,4 +1,8 @@
- `timescale 1ns/1ps
+`include "../memories/ram_unregistered.sv"
+`include "../memories/rom_unregistered.sv"
+`include "../single_cycle.sv"
+ 
+`timescale 1ns/1ps
 module testbench_bubbles_single_cycle();
 localparam  T = 20, addr_width = 10, data_width = 32;
 
@@ -20,9 +24,9 @@ defparam rom_unregistered.addr_width = addr_width;
 defparam rom_unregistered.data_width = data_width;
 defparam rom_unregistered.file = "bubble.txt" ;
 
-golden main(CLK, RESET_N, idata, iaddr, daddr, ddata_r, ddata_w, d_rw);
-defparam main.ADDR_WIDTH = addr_width;
-defparam main.SIZE = data_width;
+single_cycle single_cycle(CLK, RESET_N, idata, iaddr, daddr, ddata_r, ddata_w, d_rw);
+defparam single_cycle.ADDR_WIDTH = addr_width;
+defparam single_cycle.SIZE = data_width;
 
 initial
 begin
@@ -40,18 +44,5 @@ initial
         $stop;
 
     end
-
-
-/*task  read(input [addr_width-1:0] address_read, input [7:0] cicles = 1);
-    ADDR_ROM = address_read; //error con dependiendo version questa
-endtask*/
-
-task load_program(input file);
-begin
-@(negedge CLK)
-file = "instructions.txt" ;
-@(negedge CLK);
-end
-endtask
 
 endmodule

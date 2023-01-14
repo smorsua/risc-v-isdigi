@@ -15,4 +15,4 @@ typedef enum bit [3:0] {
 	RIGHT_SHIFT_SIGNED,
 	RIGHT_SHIFT_UNSIGNED			
 	} e_operations;
-`endif // OPERATION_TYPE_GUARD
+`endif

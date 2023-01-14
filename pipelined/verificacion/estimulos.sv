@@ -1,5 +1,5 @@
 `ifndef ESTIMULOS_PIPELINED_GUARD
-`defined ESTIMULOS_PIPELINED_GUARD
+`define ESTIMULOS_PIPELINED_GUARD
 
 program estimulos(/*if_rom.testar testar_ports,*/ if_rom.monitorizar monitorizar_ports);
 

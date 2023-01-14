@@ -11,7 +11,6 @@ module EX_MEM_REG #(parameter DATA_SIZE = 32, parameter ADDR_SIZE = 10) (
     input [1:0] mem_to_reg_ex,
     input [1:0] AuipcLui_ex,
     input [4:0] inst_11_to_7_ex,
-    input [ADDR_SIZE-1+2:0] jump_alu_result_ex,
     input [DATA_SIZE-1:0] address_alu_result_ex,
     input address_alu_zero_ex,
     input [DATA_SIZE-1:0] read_data_2_ex,
@@ -24,7 +23,6 @@ module EX_MEM_REG #(parameter DATA_SIZE = 32, parameter ADDR_SIZE = 10) (
     output reg [1:0] mem_to_reg_mem,
     output reg [1:0] AuipcLui_mem,
     output reg [4:0] inst_11_to_7_mem,
-    output reg [ADDR_SIZE-1+2:0] jump_alu_result_mem,
     output reg [DATA_SIZE-1:0] address_alu_result_mem,
     output reg address_alu_zero_mem,
     output reg [DATA_SIZE-1:0] read_data_2_mem,
@@ -40,7 +38,6 @@ always_ff @(posedge clk or posedge clear) begin
         mem_to_reg_mem  <= 0;
         AuipcLui_mem  <= 0;
         inst_11_to_7_mem  <= 0;
-        jump_alu_result_mem  <= 0;
         address_alu_result_mem  <= 0;
         address_alu_zero_mem  <= 0;
         read_data_2_mem <= 0;
@@ -53,7 +50,6 @@ always_ff @(posedge clk or posedge clear) begin
         mem_to_reg_mem <= mem_to_reg_ex;
         AuipcLui_mem <= AuipcLui_ex;
         inst_11_to_7_mem <= inst_11_to_7_ex;
-        jump_alu_result_mem <= jump_alu_result_ex;
         address_alu_result_mem <= address_alu_result_ex;
         address_alu_zero_mem <= address_alu_zero_ex;
         read_data_2_mem <= read_data_2_ex;

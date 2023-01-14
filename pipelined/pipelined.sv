@@ -19,6 +19,7 @@
 `include "./pipelined_registers/MEM_WB_REG.sv"
 
 `include "./risk_detection/hazard_detection.sv"
+`include "./risk_detection/jump_predictor.sv"
 
 module pipelined
 #(parameter DATA_SIZE = 32, parameter ADDR_SIZE = 10)(
@@ -83,9 +84,10 @@ hazard_detection #(.SIZE(DATA_SIZE)) hazard_detection(
     );
 
 wire [ADDR_SIZE-1+2:0] pc_id;
+wire clear_if_jump_predictor;
 IF_ID_REG #(.DATA_SIZE(DATA_SIZE), .ADDR_SIZE(ADDR_SIZE)) if_id_reg(
     .clk(CLK),
-    .clear(if_id_clear),
+    .clear(if_id_clear || clear_if_jump_predictor),
     .pc_if(PC),
     .inst_if(idata),
     .pc_id(pc_id),
@@ -219,20 +221,10 @@ ALU #(.SIZE(DATA_SIZE)) address_alu(
     .ZERO(address_alu_zero_ex)
 );
 
-wire [ADDR_SIZE-1+2:0] jump_alu_result_ex;
-ALU #(.SIZE(ADDR_SIZE+2)) jump_alu(
-    .A(pc_ex),
-    .B(immediate_ex[11:0]),
-    .OPERATION(ADD),
-    .RESULT(jump_alu_result_ex),
-    .ZERO()
-);
-
 wire branch_mem, reg_write_mem, mem_read_mem, mem_write_mem;
 wire [1:0] mem_to_reg_mem, AuipcLui_mem;
 wire [DATA_SIZE-1:0] read_data_2_mem;
 wire [4:0] inst_11_to_7_mem;
-wire [ADDR_SIZE-1+2:0] jump_alu_result_mem;
 wire [DATA_SIZE-1:0] address_alu_result_mem;
 wire [2:0] inst_14_to_12_mem;
 wire address_alu_zero_mem;
@@ -246,7 +238,6 @@ EX_MEM_REG #(.DATA_SIZE(32), .ADDR_SIZE(10)) ex_mem_reg  (
     .mem_to_reg_ex(mem_to_reg_ex),
     .AuipcLui_ex(AuipcLui_ex),
     .inst_11_to_7_ex(inst_11_to_7_ex),
-    .jump_alu_result_ex(jump_alu_result_ex),
     .address_alu_result_ex(address_alu_result_ex),
     .address_alu_zero_ex(address_alu_zero_ex),
     .read_data_2_ex(read_data_2_ex),
@@ -259,7 +250,6 @@ EX_MEM_REG #(.DATA_SIZE(32), .ADDR_SIZE(10)) ex_mem_reg  (
     .mem_to_reg_mem(mem_to_reg_mem),
     .AuipcLui_mem(AuipcLui_mem),
     .inst_11_to_7_mem(inst_11_to_7_mem),
-    .jump_alu_result_mem(jump_alu_result_mem),
     .address_alu_result_mem(address_alu_result_mem),
     .address_alu_zero_mem(address_alu_zero_mem),
     .read_data_2_mem(read_data_2_mem),
@@ -271,8 +261,8 @@ assign daddr = address_alu_result_mem[11:2];
 assign mem_write = mem_write_mem;
 assign mem_read = mem_read_mem;
 
-wire PCSrc;
-assign PCSrc = branch_mem & ((inst_14_to_12_mem == 'b001 && !address_alu_zero_mem) || (inst_14_to_12_mem != 'b001 && address_alu_zero_mem));
+wire should_have_jumped_wire;
+assign should_have_jumped_wire = branch_mem & ((inst_14_to_12_mem == 'b001 && !address_alu_zero_mem) || (inst_14_to_12_mem != 'b001 && address_alu_zero_mem));
 
 wire [1:0] mem_to_reg_wb;
 wire [DATA_SIZE-1:0] ddata_r_wb, address_alu_result_wb;
@@ -302,17 +292,40 @@ MUX #(.SIZE(DATA_SIZE), .INPUTS(3)) data_mux (
     .result(data_mux_result_wire)
 );
 
-wire [ADDR_SIZE-1+2:0] myInput_pc_mux [2];
-assign myInput_pc_mux[0] = next_consecutive_pc_wire;
-assign myInput_pc_mux[1] = jump_alu_result_mem;
-MUX #(.SIZE(ADDR_SIZE+2), .INPUTS(2)) pc_mux(
-    .all_inputs(myInput_pc_mux),
-    .sel(PCSrc),
-    .result(next_pc_wire)
-);
+
 assign reg_write_data = data_mux_result_wire; //para el golden
 
+wire [ADDR_SIZE-1+2:0] jump_alu_result;
+ALU #(.SIZE(ADDR_SIZE+2)) jump_alu(
+    .A(pc_ex),
+    .B(immediate_ex[11:0]),
+    .OPERATION(ADD),
+    .RESULT(jump_alu_result),
+    .ZERO()
+);
 
+wire do_jump_wire;
+wire [ADDR_SIZE + 2] predictor_jump_pc_wire;
+jump_predictor #(.PC_SIZE(ADDR_SIZE + 2)) jump_predictor(
+    .CLK(CLK),
+    .opcode(inst_id[6:0]),
+    .current_pc(pc_id),
+    .next_consecutive_pc(next_consecutive_pc_wire),
+    .jump_pc(jump_alu_result),
+    .should_have_jumped(should_have_jumped_wire),
+    .do_jump(do_jump_wire),
+    .predictor_jump_pc(predictor_jump_pc_wire),
+    .clear_if(clear_if_jump_predictor)
+);
+
+wire [ADDR_SIZE-1+2:0] myInput_pc_mux[2];
+assign myInput_pc_mux[0] = next_consecutive_pc_wire;
+assign myInput_pc_mux[1] = predictor_jump_pc_wire;
+MUX #(.SIZE(ADDR_SIZE+2), .INPUTS(2)) pc_mux(
+    .all_inputs(myInput_pc_mux),
+    .sel(do_jump_wire),
+    .result(next_pc_wire)
+);
 
 endmodule
 

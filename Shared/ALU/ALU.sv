@@ -1,6 +1,6 @@
 `ifndef ALU_GUARD
 `define ALU_GUARD
-`include "operation_type.sv"
+`include "./operation_type.sv"
 
 module ALU #(parameter SIZE = 32) (
     input [SIZE-1:0] A,

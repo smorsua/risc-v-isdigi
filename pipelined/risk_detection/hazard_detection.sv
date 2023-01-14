@@ -3,7 +3,7 @@ module hazard_detection #(parameter SIZE = 32) (
     input [4:0] id_rs1,
     input [4:0] id_rs2,
     input ex_mem_read,
-    input ex_register_rd,
+    input [4:0] ex_register_rd,
     output reg PCWrite,
     output reg enable_nop_mux,
     output reg if_id_clear
