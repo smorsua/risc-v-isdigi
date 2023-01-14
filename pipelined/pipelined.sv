@@ -199,8 +199,8 @@ MUX #(.SIZE(DATA_SIZE), .INPUTS(3)) forwardBmux(
 wire [DATA_SIZE-1:0] address_alu_result_ex;
 wire address_alu_zero_ex;
 ALU #(.SIZE(DATA_SIZE)) address_alu(
-    .A(read_data_1_ex),
-    .B(second_operand_wire),
+    .A(result_fordwardA),
+    .B(result_fordwardB),
     .OPERATION(ALUSelection_wire),
     .RESULT(address_alu_result_ex),
     .ZERO(address_alu_zero_ex)
