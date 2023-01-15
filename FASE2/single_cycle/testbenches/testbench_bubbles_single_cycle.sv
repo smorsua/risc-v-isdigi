@@ -15,10 +15,10 @@ ram_unregistered ram_unregistered(CLK, daddr, d_rw, ddata_w, ddata_r);
 defparam ram_unregistered.addr_width = addr_width;
 defparam ram_unregistered.data_width = data_width;
 
-rom_unregistered rom_unregistered(.iaddr(iaddr), .idata(idata));
+rom_unregistered  rom_unregistered(.iaddr(iaddr), .idata(idata));
 defparam rom_unregistered.addr_width = addr_width;
 defparam rom_unregistered.data_width = data_width;
-defparam rom_unregistered.file = "./assembly/bubble_sort.txt" ;
+defparam rom_unregistered.file = "./bubble_sort.txt" ;
 
 single_cycle main(CLK, RESET_N, idata, iaddr, daddr, ddata_r, ddata_w, d_rw);
 defparam main.ADDR_WIDTH = addr_width;

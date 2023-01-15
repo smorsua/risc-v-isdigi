@@ -23,7 +23,7 @@ defparam ram_unregistered.data_width = data_width;
 rom_unregistered rom_unregistered(.iaddr(iaddr), .idata(idata));
 defparam rom_unregistered.addr_width = addr_width;
 defparam rom_unregistered.data_width = data_width;
-defparam rom_unregistered.file = "./assembly/fibonacci.txt" ;
+defparam rom_unregistered.file = "./fibonacci.txt" ;
 
 single_cycle single_cycle(CLK, RESET_N, idata, iaddr, daddr, ddata_r, ddata_w, d_rw);
 defparam single_cycle.ADDR_WIDTH = addr_width;
