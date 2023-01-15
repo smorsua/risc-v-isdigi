@@ -6,6 +6,9 @@ nop
 nop
 nop
 beq x10 x11 label
+li x12 30
+li x12 31
+li x12 32
 li x12 33
 li x13 33
 label:

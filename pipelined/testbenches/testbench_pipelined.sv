@@ -40,7 +40,7 @@ initial
     begin
         RESET_N = 0;
         CLEAR = 1;
-		    #(T)
+		#(T/2)
 		RESET_N = 1;
         CLEAR = 0;
         #(T*100);

@@ -38,15 +38,21 @@ module pipelined
     output [4:0] write_register
 );
 
-wire [ADDR_SIZE-1+2:0] next_pc_wire;
+wire [ADDR_SIZE + 2 - 1:0] next_pc_wire;
 wire PCWrite;
-bit [ADDR_SIZE - 1 + 2:0] PC;
+logic [ADDR_SIZE + 2 - 1:0] PC;
 
-always_ff @(posedge CLK or negedge RESET_N) begin
+initial begin
+    PC = 0;
+end
+
+wire [ADDR_SIZE + 2 - 1:0] final_pc;
+assign final_pc = PCWrite ? next_pc_wire : PC;
+always @(posedge CLK or negedge RESET_N) begin
     if(RESET_N == 0) begin
         PC <= 0;
     end else begin
-        PC <= PCWrite ? next_pc_wire: PC;
+        PC <= final_pc;
     end
 end
 
@@ -85,10 +91,10 @@ hazard_detection #(.SIZE(DATA_SIZE)) hazard_detection(
     );
 
 wire [ADDR_SIZE-1+2:0] pc_id;
-wire clear_if_jump_predictor;
+wire do_jump_wire;
 IF_ID_REG #(.DATA_SIZE(DATA_SIZE), .ADDR_SIZE(ADDR_SIZE)) if_id_reg(
     .clk(CLK),
-    .clear(if_id_clear || clear_if_jump_predictor),
+    .clear(if_id_clear || do_jump_wire),
     .pc_if(PC),
     .inst_if(idata),
     .pc_id(pc_id),
@@ -111,8 +117,6 @@ CONTROL control(
     .AuipcLui(AuipcLui_id)
 );
 
-
-
 assign input_mux_control[0] = {branch_id,reg_write_id,mem_read_id,mem_write_id,alu_src_id,mem_to_reg_id,AuipcLui_id};
 assign input_mux_control[1] = 9'b0;
 MUX #(.SIZE(9), .INPUTS(2)) control_mux(
@@ -121,11 +125,10 @@ MUX #(.SIZE(9), .INPUTS(2)) control_mux(
     .result(salida_mux_control)
 );
 
-
-logic [DATA_SIZE-1:0] read_data_1_id, read_data_2_id;
-logic [DATA_SIZE-1:0] data_mux_result_wire;
-logic reg_write_wb;
-logic [4:0] inst_11_to_7_wb;
+wire [DATA_SIZE-1:0] read_data_1_id, read_data_2_id;
+wire [DATA_SIZE-1:0] data_mux_result_wire;
+wire reg_write_wb;
+wire [4:0] inst_11_to_7_wb;
 
 banco_registros_registered #(.SIZE(DATA_SIZE)) registros(
     .CLK(CLK),
@@ -161,6 +164,8 @@ assign {
     AuipcLui_id_mux
 } = salida_mux_control;
 
+wire [4:0] inst_19_to_15_ex;
+wire [4:0] inst_24_to_20_ex;
 ID_EX_REG id_ex_reg(
     .clk(CLK),
     .clear(CLEAR),
@@ -203,9 +208,9 @@ wire [1:0] forwardA, forwardB;
 wire [DATA_SIZE-1:0] second_operand_wire;
 wire [DATA_SIZE-1:0] myInput_alu_src_2_mux[2];
 
-wire [4:0] inst_11_to_7_wb_aux;
-wire reg_write_wb_aux;
-wire data_mux_result_wire_aux;
+logic [4:0] inst_11_to_7_wb_aux;
+logic reg_write_wb_aux;
+logic [DATA_SIZE-1:0] data_mux_result_wire_aux;
 
 assign myInput_alu_src_2_mux[0] = read_data_2_ex;
 assign myInput_alu_src_2_mux[1] = immediate_ex;
@@ -258,6 +263,8 @@ ALU #(.SIZE(DATA_SIZE)) address_alu(
 );
 
 wire [4:0] inst_11_to_7_mem;
+
+wire reg_write_mem;
 data_forwarding #(.SIZE(DATA_SIZE)) data_forwarding(
     .reg_write_mem(reg_write_mem), 
     .reg_write_ex(reg_write_ex),
@@ -341,7 +348,7 @@ begin
     data_mux_result_wire_aux <= data_mux_result_wire;
 end
 
-logic [DATA_SIZE-1:0] myInput_data_mux [3];
+wire [DATA_SIZE-1:0] myInput_data_mux [3];
 assign myInput_data_mux[0] = address_alu_result_wb;
 assign myInput_data_mux[1] = ddata_r_wb;
 assign myInput_data_mux[2] = {next_consecutive_pc_wire};
@@ -363,7 +370,6 @@ ALU #(.SIZE(ADDR_SIZE + 2)) jump_alu(
     .ZERO()
 );
 
-wire do_jump_wire;
 wire [ADDR_SIZE + 2 - 1: 0] predictor_jump_pc_wire;
 jump_predictor #(.PC_SIZE(ADDR_SIZE + 2)) jump_predictor(
     .CLK(CLK),
@@ -373,14 +379,13 @@ jump_predictor #(.PC_SIZE(ADDR_SIZE + 2)) jump_predictor(
     .jump_pc(jump_alu_result),
     .should_have_jumped(should_have_jumped_wire),
     .do_jump(do_jump_wire),
-    .predictor_jump_pc(predictor_jump_pc_wire),
-    .clear_if(clear_if_jump_predictor)
+    .predictor_jump_pc(predictor_jump_pc_wire)
 );
 
 wire [ADDR_SIZE-1+2:0] myInput_pc_mux[2];
 assign myInput_pc_mux[0] = next_consecutive_pc_wire;
 assign myInput_pc_mux[1] = predictor_jump_pc_wire;
-MUX #(.SIZE(ADDR_SIZE+2), .INPUTS(2)) pc_mux(
+MUX #(.SIZE(ADDR_SIZE + 2), .INPUTS(2)) pc_mux(
     .all_inputs(myInput_pc_mux),
     .sel(do_jump_wire),
     .result(next_pc_wire)

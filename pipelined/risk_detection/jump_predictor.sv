@@ -6,13 +6,12 @@
 module jump_predictor #(parameter PC_SIZE = 12) (
     input CLK,
     input [6:0] opcode,
-    input [PC_SIZE-1:0] current_pc,
-    input [PC_SIZE-1:0] next_consecutive_pc,
-    input [PC_SIZE-1:0] jump_pc,
+    input [PC_SIZE - 1:0] current_pc,
+    input [PC_SIZE - 1:0] next_consecutive_pc,
+    input [PC_SIZE - 1:0] jump_pc,
     input should_have_jumped,
     output reg do_jump,
-    output reg [PC_SIZE-1:0] predictor_jump_pc,
-    output clear_if
+    output reg [PC_SIZE - 1:0] predictor_jump_pc
 );
 
 logic[1:0] iaddrToJumpPredictionCounter[(2 ** PC_SIZE) - 1:0];
@@ -56,8 +55,6 @@ always_comb predictor_jump_pc = getPredictorJumpPc();
 always @(posedge CLK) begin
     pcInCaseOfWrongPrediction <= shouldPredictJump() ? next_consecutive_pc : jump_pc;
 end
-
-assign clear_if = opcode == B_FORMAT || opcode == J_FORMAT || !prediction_was_correct;
 
 function bit shouldPredictJump();
     automatic integer predictionCounter = iaddrToJumpPredictionCounter[current_pc] > 2;
