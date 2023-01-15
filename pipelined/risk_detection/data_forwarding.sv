@@ -1,6 +1,6 @@
 module data_forwarding #(parameter SIZE) (
-    input reg_write_mem, reg_write_ex, reg_write_wb,    
-    input [4:0] inst_11_to_7_mem, inst_11_to_7_wb,
+    input reg_write_mem, reg_write_ex, reg_write_wb, reg_write_wb_aux,
+    input [4:0] inst_11_to_7_mem, inst_11_to_7_wb, inst_11_to_7_wb_aux,
     input [4:0] inst_19_to_15_ex, inst_24_to_20_ex,
     output logic [1:0] forwardA, forwardB
 );
@@ -13,6 +13,8 @@ always_comb begin
         forwardA = 10;
     else if(reg_write_wb && (inst_11_to_7_wb != 0) && (inst_11_to_7_wb == inst_19_to_15_ex))
         forwardA = 01;
+    else if(reg_write_wb_aux && (inst_11_to_7_wb_aux != 0) && (inst_11_to_7_wb_aux == inst_19_to_15_ex))
+        forwardA = 11;
     else
         forwardA = 00;
 
@@ -21,6 +23,8 @@ always_comb begin
         forwardB = 10;
     else if(reg_write_wb && (inst_11_to_7_wb != 0) && (inst_11_to_7_wb == inst_24_to_20_ex))
         forwardB = 01;
+    else if(reg_write_wb_aux && (inst_11_to_7_wb_aux != 0) && (inst_11_to_7_wb_aux == inst_19_to_15_ex))
+        forwardB = 11;
     else
         forwardB = 00;
     
