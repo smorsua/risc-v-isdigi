@@ -5,6 +5,7 @@ input [SIZE-1 : 0] instruction,
 output logic PC_frozen,
 output CLEAR
 
+
 );
 
 logic clear_aux;
@@ -16,7 +17,7 @@ aunque realmente lo que estamos haciendo con esto es añadir un retraso.
 Debemos congelar el pc, para que no siga sumando en ese momento de retraso, y además
 deberíamos introducir en todas las señales de control un 0??? para así que pare.
 Por tanto, tendríamos una salida seguro ahora mismo que es la de parada del pc, 
-y más salidas que serían las de congelado del micro en esa etapa.*/   
+y más salidas que serían las de congelado del micro en esa etapa. prueba*/   
 
 always_ff @(posedge CLK) begin
 
