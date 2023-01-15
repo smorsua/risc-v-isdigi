@@ -121,16 +121,6 @@ ALU #(.SIZE(SIZE)) address_alu(
 
 assign daddr = {2'b0, address_alu_result[31:2]};
 
-/*wire [SIZE-1:0] read_data_wire;
-RAM #(.data_width(SIZE), .addr_width(ADDR_WIDTH)) data_memory (
-    .CLK(CLK),
-    .d_rw(MemWrite),
-    .ADDR_R(alu_address_wire),
-    .ADDR_W(alu_address_wire),
-    .ddata_w(data_2_wire),
-    .Q_R(read_data_wire)
-
-);*/
 
 wire [SIZE-1:0] myInput_data_mux [3];
 assign myInput_data_mux[0] = address_alu_result;
@@ -187,7 +177,6 @@ logic [4:0] rd;
 logic [31:0] immediate;
 
 
-// assert property (@(posedge CLK) address_alu_zero == '1 && idata[6:0] == 'b1100011 |-> (branch_target_wire == (immediate + PC)) ) else $fatal("No realiza correctamente el salto condicional");
 
 endmodule
 
