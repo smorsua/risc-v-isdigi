@@ -319,14 +319,14 @@ defparam ram_registered.data_width = DATA_SIZE;
 rom_registered rom_registered(.CLK(CLK), .iaddr(iaddr), .idata(idata));
 defparam rom_registered.addr_width = ADDR_SIZE;
 defparam rom_registered.data_width = DATA_SIZE;
-defparam rom_registered.file = "./prueba.txt" ;
+defparam rom_registered.file = "./leds_placa.txt" ;
 
 reg [7:0] aux;
 always @(data_mux_result_wire)
 begin
 case(data_mux_result_wire)
 	32'd1 : aux = 8'b10000000;
-	32'd2 : aux= 8'b01000000;
+	32'd2 : aux = 8'b01000000;
 	32'd3 : aux = 8'b00100000;
 	32'd4 : aux = 8'b00010000;
 	32'd5 : aux = 8'b00001000;
