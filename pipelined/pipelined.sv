@@ -94,7 +94,7 @@ wire [ADDR_SIZE-1+2:0] pc_id;
 wire do_jump_wire;
 IF_ID_REG #(.DATA_SIZE(DATA_SIZE), .ADDR_SIZE(ADDR_SIZE)) if_id_reg(
     .clk(CLK),
-    .clear(if_id_clear || do_jump_wire),
+    .enable(if_id_enable || do_jump_wire),
     .pc_if(PC),
     .inst_if(idata),
     .pc_id(pc_id),
@@ -121,7 +121,7 @@ assign input_mux_control[0] = {branch_id,reg_write_id,mem_read_id,mem_write_id,a
 assign input_mux_control[1] = 9'b0;
 MUX #(.SIZE(9), .INPUTS(2)) control_mux(
     .all_inputs(input_mux_control),
-    .sel(control_mux_sel), //enable mux que sale del hazard
+    .sel(control_mux_sel || do_jump_wire), //enable mux que sale del hazard
     .result(salida_mux_control)
 );
 
