@@ -43,7 +43,7 @@ initial
 		#(T/4)
 		RESET_N = 1;
         CLEAR = 0;
-        #(T*100);
+        #(T*50);
         $stop;
 
     end

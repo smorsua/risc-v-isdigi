@@ -49,7 +49,7 @@ end
 wire do_jump_wire;
 
 wire [ADDR_SIZE + 2 - 1:0] final_pc;
-assign final_pc = (PCWrite || do_jump_wire) ? next_pc_wire : PC;
+assign final_pc = (PCWrite) ? next_pc_wire : PC;
 always @(posedge CLK or negedge RESET_N) begin
     if(RESET_N == 0) begin
         PC <= 0;
@@ -67,7 +67,17 @@ ALU #(.SIZE(ADDR_SIZE + 2)) pc_alu(
     .ZERO()
 );
 
-assign iaddr = PC[11:2];
+wire [ADDR_SIZE + 2 - 1: 0] predictor_jump_pc_wire;
+
+wire [9:0] iaddr_mux_control[2];
+assign iaddr_mux_control[0] = PC[11:2];
+assign iaddr_mux_control[1] = predictor_jump_pc_wire[11:2];
+MUX #(.SIZE(ADDR_SIZE), .INPUTS(2)) iaddr_mux(
+    .all_inputs(iaddr_mux_control),
+    .sel(do_jump_wire),
+    .result(iaddr)
+);
+
 wire branch_ex, reg_write_ex, mem_read_ex, mem_write_ex, alu_src_ex;
 wire [DATA_SIZE-1:0] inst_id;
 wire if_id_enable;
@@ -95,7 +105,7 @@ hazard_detection #(.SIZE(DATA_SIZE)) hazard_detection(
 wire [ADDR_SIZE-1+2:0] pc_id;
 IF_ID_REG #(.DATA_SIZE(DATA_SIZE), .ADDR_SIZE(ADDR_SIZE)) if_id_reg(
     .clk(CLK),
-    .enable(if_id_enable || !do_jump_wire),
+    .enable(if_id_enable),
     .pc_if(PC),
     .inst_if(idata),
     .pc_id(pc_id),
@@ -152,7 +162,6 @@ IMMEDIATE_GENERATOR imm_gen(
     .inst(inst_id),
     .IMMEDIATE(immediate_id)
 );
-
 
 wire branch_id_mux,reg_write_id_mux,mem_read_id_mux,mem_write_id_mux,alu_src_id_mux;
 wire [1:0]  mem_to_reg_id_mux, AuipcLui_id_mux;
@@ -372,7 +381,6 @@ ALU #(.SIZE(ADDR_SIZE + 2)) jump_alu(
     .ZERO()
 );
 
-wire [ADDR_SIZE + 2 - 1: 0] predictor_jump_pc_wire;
 jump_predictor #(.PC_SIZE(ADDR_SIZE + 2)) jump_predictor(
     .CLK(CLK),
     .RESET_N(RESET_N),
@@ -388,7 +396,7 @@ jump_predictor #(.PC_SIZE(ADDR_SIZE + 2)) jump_predictor(
 
 wire [ADDR_SIZE-1+2:0] myInput_pc_mux[2];
 assign myInput_pc_mux[0] = next_consecutive_pc_wire;
-assign myInput_pc_mux[1] = predictor_jump_pc_wire;
+assign myInput_pc_mux[1] = predictor_jump_pc_wire + 4;
 MUX #(.SIZE(ADDR_SIZE + 2), .INPUTS(2)) pc_mux(
     .all_inputs(myInput_pc_mux),
     .sel(do_jump_wire),
