@@ -20,6 +20,7 @@
 
 `include "./risk_detection/hazard_detection.sv"
 `include "./risk_detection/jump_predictor.sv"
+`include "././risk_detection/data_forwarding.sv"
 
 module pipelined
 #(parameter DATA_SIZE = 32, parameter ADDR_SIZE = 10)(
@@ -121,15 +122,6 @@ MUX #(.SIZE(9), .INPUTS(2)) control_mux(
 );
 
 
-
-assign input_mux_control[0] = {branch_id,reg_write_id,mem_read_id,mem_write_id,alu_src_id,mem_to_reg_id,AuipcLui_id};
-assign input_mux_control[1] = 9'b0;
-MUX #(.SIZE(9), .INPUTS(2)) control_mux(
-    .all_inputs(input_mux_control),
-    .sel(control_mux_sel), //enable mux que sale del hazard
-    .result(salida_mux_control)
-);
-
 logic [DATA_SIZE-1:0] read_data_1_id, read_data_2_id;
 logic [DATA_SIZE-1:0] data_mux_result_wire;
 logic reg_write_wb;
@@ -207,13 +199,13 @@ ID_EX_REG id_ex_reg(
     .inst_24_to_20_ex(inst_24_to_20_ex)
 );
 
-logic [1:0] forwardA, forwardB;
-logic [DATA_SIZE-1:0] second_operand_wire;
-logic [DATA_SIZE-1:0] myInput_alu_src_2_mux[2];
+wire [1:0] forwardA, forwardB;
+wire [DATA_SIZE-1:0] second_operand_wire;
+wire [DATA_SIZE-1:0] myInput_alu_src_2_mux[2];
 
-logic [4:0] inst_11_to_7_wb_aux;
-logic reg_write_wb_aux;
-logic data_mux_result_wire_aux;
+wire [4:0] inst_11_to_7_wb_aux;
+wire reg_write_wb_aux;
+wire data_mux_result_wire_aux;
 
 assign myInput_alu_src_2_mux[0] = read_data_2_ex;
 assign myInput_alu_src_2_mux[1] = immediate_ex;
@@ -223,16 +215,16 @@ MUX #(.SIZE(DATA_SIZE), .INPUTS(2)) alu_src_2_mux (
     .result(second_operand_wire)
 );
 
-logic [3:0] ALUSelection_wire;
+wire [3:0] ALUSelection_wire;
 ALU_CONTROL alu_control(
     .OPCODE(inst_6_to_0_ex),
     .funct3(inst_30_and_14_to_12_ex[2:0]),
     .bit30(inst_30_and_14_to_12_ex[3]),
     .ALUSelection(ALUSelection_wire)
 );
-logic [DATA_SIZE-1:0] address_alu_result_mem;
-logic [DATA_SIZE-1:0] forwardA_mux [4];
-logic [DATA_SIZE-1:0] result_fordwardA;
+wire [DATA_SIZE-1:0] address_alu_result_mem;
+wire [DATA_SIZE-1:0] forwardA_mux [4];
+wire [DATA_SIZE-1:0] result_fordwardA;
 assign forwardA_mux [0] = read_data_1_ex;
 assign forwardA_mux [1] = data_mux_result_wire;
 assign forwardA_mux [2] =  address_alu_result_mem;
@@ -243,8 +235,8 @@ MUX #(.SIZE(DATA_SIZE), .INPUTS(4)) forwardAmux(
     .result(result_fordwardA)
 );
 
-logic [DATA_SIZE-1:0] forwardB_mux [4];
-logic [DATA_SIZE-1:0] result_fordwardB;
+wire [DATA_SIZE-1:0] forwardB_mux [4];
+wire [DATA_SIZE-1:0] result_fordwardB;
 assign forwardB_mux [0] = second_operand_wire;
 assign forwardB_mux [1] = data_mux_result_wire;
 assign forwardB_mux [2] =  address_alu_result_mem;
@@ -255,8 +247,8 @@ MUX #(.SIZE(DATA_SIZE), .INPUTS(4)) forwardBmux(
     .result(result_fordwardB)
 );
 
-logic [DATA_SIZE-1:0] address_alu_result_ex;
-logic address_alu_zero_ex;
+wire [DATA_SIZE-1:0] address_alu_result_ex;
+wire address_alu_zero_ex;
 ALU #(.SIZE(DATA_SIZE)) address_alu(
     .A(result_fordwardA),
     .B(result_fordwardB),
@@ -265,16 +257,7 @@ ALU #(.SIZE(DATA_SIZE)) address_alu(
     .ZERO(address_alu_zero_ex)
 );
 
-wire [ADDR_SIZE-1+2:0] jump_alu_result_ex;
-ALU #(.SIZE(ADDR_SIZE+2)) jump_alu(
-    .A(pc_ex),
-    .B(immediate_ex[11:0]),
-    .OPERATION(ADD),
-    .RESULT(jump_alu_result_ex),
-    .ZERO()
-);
-
-logic [4:0] inst_11_to_7_mem;
+wire [4:0] inst_11_to_7_mem;
 data_forwarding #(.SIZE(DATA_SIZE)) data_forwarding(
     .reg_write_mem(reg_write_mem), 
     .reg_write_ex(reg_write_ex),

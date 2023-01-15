@@ -1,3 +1,5 @@
+`ifndef DATA_FORWARDING_GUARD
+`define DATA_FORWARDING_GUARD
 module data_forwarding #(parameter SIZE) (
     input reg_write_mem, reg_write_ex, reg_write_wb, reg_write_wb_aux,
     input [4:0] inst_11_to_7_mem, inst_11_to_7_wb, inst_11_to_7_wb_aux,
@@ -46,8 +48,5 @@ end
 
 end
 
-
-
-
-
 endmodule
+`endif
