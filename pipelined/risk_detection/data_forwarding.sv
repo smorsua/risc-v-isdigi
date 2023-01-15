@@ -43,7 +43,10 @@ else if (inst_6_to_0_ex == 7'b0010011) begin
     
     forwardB = 00;
 end
-
+else begin
+    forwardA = 00;
+    forwardB = 00;
+end
 end
 
 

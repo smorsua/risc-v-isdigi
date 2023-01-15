@@ -161,7 +161,7 @@ logic [DATA_SIZE-1:0] myInput_alu_src_2_mux[2];
 
 logic [4:0] inst_11_to_7_wb_aux;
 logic reg_write_wb_aux;
-logic data_mux_result_wire_aux;
+logic [DATA_SIZE-1:0] data_mux_result_wire_aux;
 
 assign myInput_alu_src_2_mux[0] = read_data_2_ex;
 assign myInput_alu_src_2_mux[1] = immediate_ex;
