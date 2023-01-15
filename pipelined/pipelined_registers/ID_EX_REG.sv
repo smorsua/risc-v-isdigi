@@ -35,7 +35,22 @@ module ID_EX_REG #(parameter DATA_SIZE = 32, parameter ADDR_SIZE = 10) (
     output reg [6:0] inst_6_to_0_ex
 );
 
-always_ff @(posedge clk or posedge clear) begin 
+initial begin
+    branch_ex = 0;
+    mem_read_ex = 0;
+    mem_write_ex = 0;
+    mem_to_reg_ex = 0;
+    alu_src_ex = 0;
+    reg_write_ex = 0;
+    AuipcLui_ex = 0;
+    pc_ex = 0;
+    immediate_ex = 0;
+    inst_30_and_14_to_12_ex = 0;
+    inst_11_to_7_ex = 0;
+    inst_6_to_0_ex = 0;
+end
+
+always @(posedge clk or posedge clear) begin 
     if(clear == 1) begin
         branch_ex <= 0;
         mem_read_ex <= 0;

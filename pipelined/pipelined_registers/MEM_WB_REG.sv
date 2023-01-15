@@ -17,7 +17,14 @@ module MEM_WB_REG #(parameter DATA_SIZE = 32) (
     output reg [4:0] inst_11_to_7_wb
 );
 
-always_ff @(posedge clk or posedge clear) begin
+initial begin
+    mem_to_reg_wb = 0;
+    reg_write_wb = 0;
+    address_alu_result_wb = 0;
+    inst_11_to_7_wb = 0;
+end
+
+always @(posedge clk or posedge clear) begin
     if(clear == 1) begin
         mem_to_reg_wb <= 0;
         reg_write_wb <= 0;

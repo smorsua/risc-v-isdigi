@@ -27,21 +27,35 @@ module EX_MEM_REG #(parameter DATA_SIZE = 32, parameter ADDR_SIZE = 10) (
     output reg address_alu_zero_mem,
     output reg [DATA_SIZE-1:0] read_data_2_mem,
     output reg [2:0] inst_14_to_12_mem
-    );
+);
 
-always_ff @(posedge clk or posedge clear) begin
+initial begin
+    branch_mem              = 0;
+    reg_write_mem           = 0;
+    mem_read_mem            = 0;
+    mem_write_mem           = 0;
+    mem_to_reg_mem          = 0;
+    AuipcLui_mem            = 0;
+    inst_11_to_7_mem        = 0;
+    address_alu_result_mem  = 0;
+    address_alu_zero_mem    = 0;
+    read_data_2_mem         = 0;
+    inst_14_to_12_mem       = 0;
+end
+
+always @(posedge clk or posedge clear) begin
     if(clear == 1) begin
-        branch_mem <= 0;
-        reg_write_mem <= 0;
-        mem_read_mem  <= 0;
-        mem_write_mem  <= 0;
-        mem_to_reg_mem  <= 0;
-        AuipcLui_mem  <= 0;
-        inst_11_to_7_mem  <= 0;
+        branch_mem              <= 0;
+        reg_write_mem           <= 0;
+        mem_read_mem            <= 0;
+        mem_write_mem           <= 0;
+        mem_to_reg_mem          <= 0;
+        AuipcLui_mem            <= 0;
+        inst_11_to_7_mem        <= 0;
         address_alu_result_mem  <= 0;
-        address_alu_zero_mem  <= 0;
-        read_data_2_mem <= 0;
-        inst_14_to_12_mem <= 0;
+        address_alu_zero_mem    <= 0;
+        read_data_2_mem         <= 0;
+        inst_14_to_12_mem       <= 0;
     end else begin
         branch_mem <= branch_ex;
         reg_write_mem <= reg_write_ex;

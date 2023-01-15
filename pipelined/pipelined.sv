@@ -262,7 +262,7 @@ assign mem_write = mem_write_mem;
 assign mem_read = mem_read_mem;
 
 wire should_have_jumped_wire;
-assign should_have_jumped_wire = branch_mem & ((inst_14_to_12_mem == 'b001 && !address_alu_zero_mem) || (inst_14_to_12_mem != 'b001 && address_alu_zero_mem));
+assign should_have_jumped_wire = branch_ex & ((inst_30_and_14_to_12_ex[2:0] == 'b001 && !address_alu_zero_ex) || (inst_30_and_14_to_12_ex[2:0] != 'b001 && address_alu_zero_ex));
 
 wire [1:0] mem_to_reg_wb;
 wire [DATA_SIZE-1:0] ddata_r_wb, address_alu_result_wb;
@@ -295,17 +295,17 @@ MUX #(.SIZE(DATA_SIZE), .INPUTS(3)) data_mux (
 
 assign reg_write_data = data_mux_result_wire; //para el golden
 
-wire [ADDR_SIZE-1+2:0] jump_alu_result;
-ALU #(.SIZE(ADDR_SIZE+2)) jump_alu(
-    .A(pc_ex),
-    .B(immediate_ex[11:0]),
+wire [ADDR_SIZE - 1 + 2:0] jump_alu_result;
+ALU #(.SIZE(ADDR_SIZE + 2)) jump_alu(
+    .A(pc_id),
+    .B(immediate_id[11:0]),
     .OPERATION(ADD),
     .RESULT(jump_alu_result),
     .ZERO()
 );
 
 wire do_jump_wire;
-wire [ADDR_SIZE + 2] predictor_jump_pc_wire;
+wire [ADDR_SIZE + 2 - 1: 0] predictor_jump_pc_wire;
 jump_predictor #(.PC_SIZE(ADDR_SIZE + 2)) jump_predictor(
     .CLK(CLK),
     .opcode(inst_id[6:0]),

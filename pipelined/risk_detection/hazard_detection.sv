@@ -1,3 +1,6 @@
+`ifndef HAZARD_DETECTION_GUARD
+`define HAZARD_DETECTION_GUARD
+
 module hazard_detection #(parameter SIZE = 32) (
     //input CLK,
     input [4:0] id_rs1,
@@ -20,6 +23,8 @@ always_comb begin
         if_id_clear = 0;
     end
 end
+
+
 
 
 
@@ -54,7 +59,7 @@ end
 // end
 
 endmodule
-
+`endif
 
 /*
 una vez que hemos detectado que estamos dentro de una señal de load

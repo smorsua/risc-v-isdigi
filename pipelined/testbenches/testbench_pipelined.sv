@@ -1,4 +1,4 @@
- `timescale 1ns/1ps
+`timescale 1ns/1ps
 
 `include "../memories/ram_registered.sv"
 `include "../memories/rom_registered.sv"
@@ -43,7 +43,6 @@ initial
 		    #(T)
 		RESET_N = 1;
         CLEAR = 0;
-        //load_program("instructions.txt");
         #(T*100);
         $stop;
 

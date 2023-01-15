@@ -1,3 +1,6 @@
+`ifndef BANCO_REGISTROS_REGISTERED_GUARD
+`define BANCO_REGISTROS_REGISTERED_GUARD
+
 module banco_registros_registered #(parameter SIZE = 32) (CLK, RESET_N, read_reg1, read_reg2, write_reg, writeData, RegWrite, Data1, Data2);
 
  
@@ -37,6 +40,7 @@ always_ff @(posedge CLK or negedge RESET_N)
 //assert property (@(posedge CLK) disable iff (RegWrite and regW!='0) |-> (writeData == banco_registros[regW])) else $error("No realiza correctamente la escritura")
 endmodule
 
+`endif  
 
 
 
