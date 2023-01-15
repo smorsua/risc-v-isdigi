@@ -1,4 +1,4 @@
-module data_forwarding #(parameter SIZE) (
+module data_forwarding #(parameter SIZE=32) (
     input reg_write_mem, reg_write_ex, reg_write_wb, reg_write_wb_aux,
     input [4:0] inst_11_to_7_mem, inst_11_to_7_wb, inst_11_to_7_wb_aux,
     input [4:0] inst_19_to_15_ex, inst_24_to_20_ex,
