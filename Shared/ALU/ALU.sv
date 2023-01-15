@@ -13,10 +13,10 @@ always_comb begin
     case(OPERATION)
         ADD: RESULT = A + B;
         SUB: RESULT = A - B;
-        LESS_THAN_SIGNED: RESULT = !(signed'(A) < signed'(B));
-        LESS_THAN_UNSIGNED: RESULT = !(A < B);
-        GREATER_OR_EQUAL_THAN_SIGNED: RESULT = !(signed'(A) >= signed'(B));
-        GREATER_OR_EQUAL_THAN_UNSIGNED: RESULT = !(A >= B);
+        LESS_THAN_SIGNED: RESULT = (signed'(A) < signed'(B));
+        LESS_THAN_UNSIGNED: RESULT = (A < B);
+        GREATER_OR_EQUAL_THAN_SIGNED: RESULT = (signed'(A) >= signed'(B));
+        GREATER_OR_EQUAL_THAN_UNSIGNED: RESULT = (A >= B);
         AND: RESULT = A & B;
         OR: RESULT = A | B;
         XOR: RESULT = A ^ B;
