@@ -233,6 +233,7 @@ data_forwarding #(.SIZE(DATA_SIZE)) data_forwarding(
     .inst_11_to_7_wb_aux(inst_11_to_7_wb_aux),
     .inst_19_to_15_ex(inst_19_to_15_ex),
     .inst_24_to_20_ex(inst_24_to_20_ex),
+    .inst_6_to_0_ex(inst_6_to_0_ex),
     .forwardA(forwardA),
     .forwardB(forwardB)
 );
@@ -303,7 +304,7 @@ MEM_WB_REG mem_wb_reg(
 always_ff @( posedge CLK ) 
 begin
     reg_write_wb_aux <= reg_write_wb;
-    inst_11_to_7_wb_aux <= reg_write_wb_aux;
+    inst_11_to_7_wb_aux <= inst_11_to_7_wb;
     data_mux_result_wire_aux <= data_mux_result_wire;
 end
 
