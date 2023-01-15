@@ -32,7 +32,7 @@ defparam pipelined.DATA_SIZE = data_width;
 
 initial
 begin
-	CLK = 1;
+	CLK = 0;
 	forever  #(T/2) CLK = ~CLK;
 end
 
@@ -40,7 +40,7 @@ initial
     begin
         RESET_N = 0;
         CLEAR = 1;
-		#(T/2)
+		#(T/4)
 		RESET_N = 1;
         CLEAR = 0;
         #(T*100);

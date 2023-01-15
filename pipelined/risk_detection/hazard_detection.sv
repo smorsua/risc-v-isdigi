@@ -24,7 +24,6 @@ always_comb begin
     end
 end
 
-`endif
 
 
 
@@ -58,6 +57,7 @@ end
 
 endmodule
 
+`endif
 
 /*
 una vez que hemos detectado que estamos dentro de una señal de load

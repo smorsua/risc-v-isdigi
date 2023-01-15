@@ -46,8 +46,10 @@ initial begin
     PC = 0;
 end
 
+wire do_jump_wire;
+
 wire [ADDR_SIZE + 2 - 1:0] final_pc;
-assign final_pc = PCWrite ? next_pc_wire : PC;
+assign final_pc = (PCWrite || do_jump_wire) ? next_pc_wire : PC;
 always @(posedge CLK or negedge RESET_N) begin
     if(RESET_N == 0) begin
         PC <= 0;
@@ -91,10 +93,9 @@ hazard_detection #(.SIZE(DATA_SIZE)) hazard_detection(
     );
 
 wire [ADDR_SIZE-1+2:0] pc_id;
-wire do_jump_wire;
 IF_ID_REG #(.DATA_SIZE(DATA_SIZE), .ADDR_SIZE(ADDR_SIZE)) if_id_reg(
     .clk(CLK),
-    .enable(if_id_enable || do_jump_wire),
+    .enable(if_id_enable || !do_jump_wire),
     .pc_if(PC),
     .inst_if(idata),
     .pc_id(pc_id),
@@ -117,11 +118,12 @@ CONTROL control(
     .AuipcLui(AuipcLui_id)
 );
 
+wire force_nop_wire;
 assign input_mux_control[0] = {branch_id,reg_write_id,mem_read_id,mem_write_id,alu_src_id,mem_to_reg_id,AuipcLui_id};
 assign input_mux_control[1] = 9'b0;
 MUX #(.SIZE(9), .INPUTS(2)) control_mux(
     .all_inputs(input_mux_control),
-    .sel(control_mux_sel || do_jump_wire), //enable mux que sale del hazard
+    .sel(control_mux_sel || force_nop_wire), //enable mux que sale del hazard
     .result(salida_mux_control)
 );
 
@@ -319,7 +321,7 @@ assign mem_write = mem_write_mem;
 assign mem_read = mem_read_mem;
 
 wire should_have_jumped_wire;
-assign should_have_jumped_wire = branch_ex & ((inst_30_and_14_to_12_ex[2:0] == 'b001 && !address_alu_zero_ex) || (inst_30_and_14_to_12_ex[2:0] != 'b001 && address_alu_zero_ex));
+assign should_have_jumped_wire = branch_ex && ((inst_30_and_14_to_12_ex[2:0] == 'b001 && !address_alu_zero_ex) || (inst_30_and_14_to_12_ex[2:0] != 'b001 && address_alu_zero_ex));
 
 logic [1:0] mem_to_reg_wb;
 logic [DATA_SIZE-1:0] ddata_r_wb, address_alu_result_wb;
@@ -373,13 +375,15 @@ ALU #(.SIZE(ADDR_SIZE + 2)) jump_alu(
 wire [ADDR_SIZE + 2 - 1: 0] predictor_jump_pc_wire;
 jump_predictor #(.PC_SIZE(ADDR_SIZE + 2)) jump_predictor(
     .CLK(CLK),
+    .RESET_N(RESET_N),
     .opcode(inst_id[6:0]),
     .current_pc(pc_id),
     .next_consecutive_pc(next_consecutive_pc_wire),
     .jump_pc(jump_alu_result),
     .should_have_jumped(should_have_jumped_wire),
     .do_jump(do_jump_wire),
-    .predictor_jump_pc(predictor_jump_pc_wire)
+    .predictor_jump_pc(predictor_jump_pc_wire),
+    .force_nop(force_nop_wire)
 );
 
 wire [ADDR_SIZE-1+2:0] myInput_pc_mux[2];

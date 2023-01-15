@@ -5,28 +5,36 @@
 
 module jump_predictor #(parameter PC_SIZE = 12) (
     input CLK,
+    input RESET_N,
     input [6:0] opcode,
     input [PC_SIZE - 1:0] current_pc,
     input [PC_SIZE - 1:0] next_consecutive_pc,
     input [PC_SIZE - 1:0] jump_pc,
     input should_have_jumped,
     output reg do_jump,
-    output reg [PC_SIZE - 1:0] predictor_jump_pc
+    output reg [PC_SIZE - 1:0] predictor_jump_pc,
+    output force_nop
 );
 
-logic[1:0] iaddrToJumpPredictionCounter[(2 ** PC_SIZE) - 1:0];
+typedef enum logic {
+    PREDICTING,
+    FIXING
+} jump_predictor_state;
 
+//PREDICTING = 0, FIXING = 1
+jump_predictor_state state, next_state;
+reg [1:0] nop_counter;
+reg [1:0] iaddrToJumpPredictionCounter[(2 ** PC_SIZE) - 1:0];
 reg previous_prediction;
-reg had_to_correct_mistake;
 reg [PC_SIZE-1:0] previous_pc;
+reg [PC_SIZE-1:0] pcInCaseOfWrongPrediction;
 wire prediction_was_correct;
-
-logic [PC_SIZE-1:0] pcInCaseOfWrongPrediction;
 
 integer i;
 initial begin
+    state = PREDICTING;
+    nop_counter = 0;
     previous_prediction = 0;
-    had_to_correct_mistake = 0;
     previous_pc = 0;
     pcInCaseOfWrongPrediction = 0;
     for(i = 0; i < $size(iaddrToJumpPredictionCounter); i += 1) begin
@@ -34,50 +42,117 @@ initial begin
     end
 end
 
-
-always @(posedge CLK) begin
-    if(prediction_was_correct) begin
-        incrementPredictionCounter();
+// Update state
+always @(posedge CLK or negedge RESET_N) begin
+    if(!RESET_N) begin
+        state <= PREDICTING;                
     end else begin
-        decrementPredictionCounter();
+        state <= next_state;        
     end
-    previous_pc <= current_pc;
-    previous_prediction <= shouldPredictJump();
-    had_to_correct_mistake <= !prediction_was_correct;
 end
-    
-assign prediction_was_correct = previous_prediction == should_have_jumped;
 
-always_comb do_jump = shouldPredictJump() || should_have_jumped;
+// Update next_state
+always_comb begin
+    case(state)
+    PREDICTING: begin
+        if(prediction_was_correct) begin
+            next_state = PREDICTING;
+        end else begin
+            next_state = FIXING;
+        end
+    end
+    FIXING: begin
+        if(nop_counter == 0) begin
+            next_state = PREDICTING;            
+        end else begin
+            next_state = FIXING;                    
+        end
+    end
+    default: begin
+        next_state = PREDICTING;                    
+    end
+    endcase
+end
+
+wire should_have_jumped_predictor;
+assign should_have_jumped_predictor = should_have_jumped && state == PREDICTING;
+assign prediction_was_correct = previous_prediction == should_have_jumped_predictor;
+
+// Update nop_counter
+always @(posedge CLK) begin
+    case(state)
+    PREDICTING: begin
+        if(prediction_was_correct) begin
+            nop_counter <= 0;            
+        end else begin
+            nop_counter <= 2;                        
+        end
+    end
+    FIXING: begin
+        nop_counter <= nop_counter - 1;
+    end
+    default: begin
+        nop_counter <= 0;    
+    end
+    endcase
+end
+
+// Update jump_table
+always @(posedge CLK) begin
+    case(state)
+    PREDICTING: begin
+        if(prediction_was_correct) begin
+            incrementPredictionCounter();
+        end else begin
+            decrementPredictionCounter();
+        end
+    end
+    FIXING: begin
+        iaddrToJumpPredictionCounter[previous_pc] <= iaddrToJumpPredictionCounter[previous_pc];
+    end
+    default: iaddrToJumpPredictionCounter[previous_pc] <= iaddrToJumpPredictionCounter[previous_pc];
+    endcase
+end
+
+// Update rest of variables
+always @(posedge CLK) begin
+    previous_pc <= current_pc;
+    previous_prediction <= isLikelyToJump();
+    pcInCaseOfWrongPrediction <= isLikelyToJump() ? next_consecutive_pc : jump_pc;
+end
+
+assign force_nop = prediction_was_correct;
+
+always_comb do_jump = isLikelyToJump() || !prediction_was_correct;
 
 always_comb predictor_jump_pc = getPredictorJumpPc();
 
-always @(posedge CLK) begin
-    pcInCaseOfWrongPrediction <= shouldPredictJump() ? next_consecutive_pc : jump_pc;
-end
-
-function bit shouldPredictJump();
-    automatic integer predictionCounter = iaddrToJumpPredictionCounter[current_pc] > 2;
-    return opcode == J_FORMAT || (opcode == B_FORMAT && predictionCounter);
+function bit isLikelyToJump();
+    return opcode == J_FORMAT || (opcode == B_FORMAT && iaddrToJumpPredictionCounter[current_pc] > 2);
 endfunction
 
 function logic[PC_SIZE - 1:0] getPredictorJumpPc();
-    if(prediction_was_correct || had_to_correct_mistake) begin
-        return shouldPredictJump() ? jump_pc : next_consecutive_pc;
-    end else begin
-        return pcInCaseOfWrongPrediction;
+    case(state)
+    PREDICTING: begin
+        if(prediction_was_correct) begin
+            return isLikelyToJump() ? jump_pc : next_consecutive_pc;        
+        end else begin
+            return pcInCaseOfWrongPrediction;
+        end
     end
+    default: return 0;
+    endcase
 endfunction
 
 task incrementPredictionCounter();
     if(iaddrToJumpPredictionCounter[previous_pc] < 4) begin
-        iaddrToJumpPredictionCounter[previous_pc] = iaddrToJumpPredictionCounter[previous_pc] + 1;
+        iaddrToJumpPredictionCounter[previous_pc] <= iaddrToJumpPredictionCounter[previous_pc] + 1;
     end
 endtask
 
 task decrementPredictionCounter();
     if(iaddrToJumpPredictionCounter[previous_pc] > 1) begin
-        iaddrToJumpPredictionCounter[previous_pc] = iaddrToJumpPredictionCounter[previous_pc] - 1;
+        iaddrToJumpPredictionCounter[previous_pc] <= iaddrToJumpPredictionCounter[previous_pc] - 1;
     end
 endtask
 
