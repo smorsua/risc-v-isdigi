@@ -16,6 +16,8 @@ module jump_predictor #(parameter PC_SIZE = 12) (
     output force_nop
 );
 
+const initialPrediction = 1;
+
 reg [1:0] jumpAddrToPredictionCounter[(2 ** PC_SIZE) - 1:0];
 reg previous_prediction;
 reg [PC_SIZE-1:0] previous_jump_pc;
@@ -28,7 +30,7 @@ initial begin
     previous_jump_pc = 0;
     pcInCaseOfWrongPrediction = 0;
     for(i = 0; i < $size(jumpAddrToPredictionCounter); i += 1) begin
-        jumpAddrToPredictionCounter[i] = 1;        
+        jumpAddrToPredictionCounter[i] = initialPrediction;        
     end
 end
 
@@ -65,7 +67,7 @@ always_comb predictor_jump_pc = getPredictorJumpPc();
 assign force_nop = !prediction_was_correct;
 
 function bit isLikelyToJump();
-    return opcode == J_FORMAT || (opcode == B_FORMAT && jumpAddrToPredictionCounter[jump_pc] > 2);
+    return opcode == J_FORMAT || (opcode == B_FORMAT && jumpAddrToPredictionCounter[jump_pc] >= 2);
 endfunction
 
 function logic[PC_SIZE - 1:0] getPredictorJumpPc();
@@ -77,13 +79,13 @@ function logic[PC_SIZE - 1:0] getPredictorJumpPc();
 endfunction
 
 task incrementPredictionCounter();
-    if(jumpAddrToPredictionCounter[previous_jump_pc] < 4) begin
+    if(jumpAddrToPredictionCounter[previous_jump_pc] < 3) begin
         jumpAddrToPredictionCounter[previous_jump_pc] <= jumpAddrToPredictionCounter[previous_jump_pc] + 1;
     end
 endtask
 
 task decrementPredictionCounter();
-    if(jumpAddrToPredictionCounter[previous_jump_pc] > 1) begin
+    if(jumpAddrToPredictionCounter[previous_jump_pc] > 0) begin
         jumpAddrToPredictionCounter[previous_jump_pc] <= jumpAddrToPredictionCounter[previous_jump_pc] - 1;
     end
 endtask
