@@ -153,7 +153,7 @@ ALU #(.SIZE(ADDR_WIDTH+2)) jump_alu(
 );
 
 wire PCSrc;
-assign PCSrc = Branch & ((idata[14:12] == 001 && !address_alu_zero) || (idata[14:12] != 001 && address_alu_zero));
+assign PCSrc = Branch & ((idata[ 14:12] == 000 && address_alu_zero) || (idata[14:12] != 000 && !address_alu_zero));
 wire [ADDR_WIDTH+2-1:0] next_pc_wire;
 
 wire [ADDR_WIDTH+2-1:0] myInput_pc_mux [2];
