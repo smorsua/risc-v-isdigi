@@ -22,7 +22,7 @@ ram_registered ram_registered(CLK, daddr, mem_write, mem_read, ddata_w, ddata_r)
 defparam ram_registered.addr_width = addr_width;
 defparam ram_registered.data_width = data_width;
 
-rom_registered rom_registered(.CLK(CLK), .iaddr(iaddr), .idata(idata));
+rom_registered #(.file("./fibonacci_pipelined.txt")) rom_registered(.CLK(CLK), .iaddr(iaddr), .idata(idata));
 defparam rom_registered.addr_width = addr_width;
 defparam rom_registered.data_width = data_width;
 defparam rom_registered.file = "./prueba.txt" ;

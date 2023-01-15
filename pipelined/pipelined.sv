@@ -49,7 +49,7 @@ always_ff @(posedge CLK or negedge RESET_N) begin
     end
 end
 
-wire [ADDR_SIZE - 1 + 2:0] next_consecutive_pc_wire;
+logic [ADDR_SIZE - 1 + 2:0] next_consecutive_pc_wire;
 ALU #(.SIZE(ADDR_SIZE + 2)) pc_alu(
     .A(PC),
     .B(12'd4),
@@ -120,10 +120,20 @@ MUX #(.SIZE(9), .INPUTS(2)) control_mux(
     .result(salida_mux_control)
 );
 
-wire [DATA_SIZE-1:0] read_data_1_id, read_data_2_id;
-wire [DATA_SIZE-1:0] data_mux_result_wire;
-wire reg_write_wb;
-wire [4:0] inst_11_to_7_wb;
+
+
+assign input_mux_control[0] = {branch_id,reg_write_id,mem_read_id,mem_write_id,alu_src_id,mem_to_reg_id,AuipcLui_id};
+assign input_mux_control[1] = 9'b0;
+MUX #(.SIZE(9), .INPUTS(2)) control_mux(
+    .all_inputs(input_mux_control),
+    .sel(control_mux_sel), //enable mux que sale del hazard
+    .result(salida_mux_control)
+);
+
+logic [DATA_SIZE-1:0] read_data_1_id, read_data_2_id;
+logic [DATA_SIZE-1:0] data_mux_result_wire;
+logic reg_write_wb;
+logic [4:0] inst_11_to_7_wb;
 
 banco_registros_registered #(.SIZE(DATA_SIZE)) registros(
     .CLK(CLK),
@@ -140,7 +150,7 @@ banco_registros_registered #(.SIZE(DATA_SIZE)) registros(
 assign reg_write_enable = reg_write_wb;
 assign write_register = inst_11_to_7_wb;
 
-wire [DATA_SIZE-1:0] immediate_id;
+logic [DATA_SIZE-1:0] immediate_id;
 IMMEDIATE_GENERATOR imm_gen(
     .inst(inst_id),
     .IMMEDIATE(immediate_id)
@@ -176,6 +186,8 @@ ID_EX_REG id_ex_reg(
     .inst_30_and_14_to_12_id({inst_id[30], inst_id[14:12]}),
     .inst_11_to_7_id(inst_id[11:7]),
     .inst_6_to_0_id(inst_id[6:0]),
+    .inst_19_to_15_id(inst_id[19:15]),
+    .inst_24_to_20_id(inst_id[24:20]),
 
     .branch_ex(branch_ex),
     .reg_write_ex(reg_write_ex),
@@ -190,11 +202,19 @@ ID_EX_REG id_ex_reg(
     .immediate_ex(immediate_ex),
     .inst_30_and_14_to_12_ex(inst_30_and_14_to_12_ex),
     .inst_11_to_7_ex(inst_11_to_7_ex),
-    .inst_6_to_0_ex(inst_6_to_0_ex)
+    .inst_6_to_0_ex(inst_6_to_0_ex),
+    .inst_19_to_15_ex(inst_19_to_15_ex),
+    .inst_24_to_20_ex(inst_24_to_20_ex)
 );
 
-wire [DATA_SIZE-1:0] second_operand_wire;
-wire [DATA_SIZE-1:0] myInput_alu_src_2_mux[2];
+logic [1:0] forwardA, forwardB;
+logic [DATA_SIZE-1:0] second_operand_wire;
+logic [DATA_SIZE-1:0] myInput_alu_src_2_mux[2];
+
+logic [4:0] inst_11_to_7_wb_aux;
+logic reg_write_wb_aux;
+logic data_mux_result_wire_aux;
+
 assign myInput_alu_src_2_mux[0] = read_data_2_ex;
 assign myInput_alu_src_2_mux[1] = immediate_ex;
 MUX #(.SIZE(DATA_SIZE), .INPUTS(2)) alu_src_2_mux (
@@ -203,31 +223,78 @@ MUX #(.SIZE(DATA_SIZE), .INPUTS(2)) alu_src_2_mux (
     .result(second_operand_wire)
 );
 
-wire [3:0] ALUSelection_wire;
+logic [3:0] ALUSelection_wire;
 ALU_CONTROL alu_control(
     .OPCODE(inst_6_to_0_ex),
     .funct3(inst_30_and_14_to_12_ex[2:0]),
     .bit30(inst_30_and_14_to_12_ex[3]),
     .ALUSelection(ALUSelection_wire)
 );
+logic [DATA_SIZE-1:0] address_alu_result_mem;
+logic [DATA_SIZE-1:0] forwardA_mux [4];
+logic [DATA_SIZE-1:0] result_fordwardA;
+assign forwardA_mux [0] = read_data_1_ex;
+assign forwardA_mux [1] = data_mux_result_wire;
+assign forwardA_mux [2] =  address_alu_result_mem;
+assign forwardA_mux [3] = data_mux_result_wire_aux;
+MUX #(.SIZE(DATA_SIZE), .INPUTS(4)) forwardAmux(
+    .all_inputs(forwardA_mux),
+    .sel(forwardA),
+    .result(result_fordwardA)
+);
 
-wire [DATA_SIZE-1:0] address_alu_result_ex;
-wire address_alu_zero_ex;
+logic [DATA_SIZE-1:0] forwardB_mux [4];
+logic [DATA_SIZE-1:0] result_fordwardB;
+assign forwardB_mux [0] = second_operand_wire;
+assign forwardB_mux [1] = data_mux_result_wire;
+assign forwardB_mux [2] =  address_alu_result_mem;
+assign forwardB_mux [3] = data_mux_result_wire_aux;
+MUX #(.SIZE(DATA_SIZE), .INPUTS(4)) forwardBmux(
+    .all_inputs(forwardB_mux),
+    .sel(forwardB),
+    .result(result_fordwardB)
+);
+
+logic [DATA_SIZE-1:0] address_alu_result_ex;
+logic address_alu_zero_ex;
 ALU #(.SIZE(DATA_SIZE)) address_alu(
-    .A(read_data_1_ex),
-    .B(second_operand_wire),
+    .A(result_fordwardA),
+    .B(result_fordwardB),
     .OPERATION(ALUSelection_wire),
     .RESULT(address_alu_result_ex),
     .ZERO(address_alu_zero_ex)
 );
 
-wire branch_mem, reg_write_mem, mem_read_mem, mem_write_mem;
-wire [1:0] mem_to_reg_mem, AuipcLui_mem;
-wire [DATA_SIZE-1:0] read_data_2_mem;
-wire [4:0] inst_11_to_7_mem;
-wire [DATA_SIZE-1:0] address_alu_result_mem;
-wire [2:0] inst_14_to_12_mem;
-wire address_alu_zero_mem;
+wire [ADDR_SIZE-1+2:0] jump_alu_result_ex;
+ALU #(.SIZE(ADDR_SIZE+2)) jump_alu(
+    .A(pc_ex),
+    .B(immediate_ex[11:0]),
+    .OPERATION(ADD),
+    .RESULT(jump_alu_result_ex),
+    .ZERO()
+);
+
+logic [4:0] inst_11_to_7_mem;
+data_forwarding #(.SIZE(DATA_SIZE)) data_forwarding(
+    .reg_write_mem(reg_write_mem), 
+    .reg_write_ex(reg_write_ex),
+    .reg_write_wb(reg_write_wb),
+    .reg_write_wb_aux(reg_write_wb_aux),
+    .inst_11_to_7_mem(inst_11_to_7_mem),
+    .inst_11_to_7_wb(inst_11_to_7_wb),
+    .inst_11_to_7_wb_aux(inst_11_to_7_wb_aux),
+    .inst_19_to_15_ex(inst_19_to_15_ex),
+    .inst_24_to_20_ex(inst_24_to_20_ex),
+    .inst_6_to_0_ex(inst_6_to_0_ex),
+    .forwardA(forwardA),
+    .forwardB(forwardB)
+);
+logic branch_mem, mem_read_mem, mem_write_mem;
+logic [1:0] mem_to_reg_mem, AuipcLui_mem;
+logic [DATA_SIZE-1:0] read_data_2_mem;
+logic [ADDR_SIZE-1+2:0] jump_alu_result_mem;
+logic [2:0] inst_14_to_12_mem;
+logic address_alu_zero_mem;
 EX_MEM_REG #(.DATA_SIZE(32), .ADDR_SIZE(10)) ex_mem_reg  (
     .clk(CLK),
     .clear(CLEAR),
@@ -264,8 +331,8 @@ assign mem_read = mem_read_mem;
 wire should_have_jumped_wire;
 assign should_have_jumped_wire = branch_ex & ((inst_30_and_14_to_12_ex[2:0] == 'b001 && !address_alu_zero_ex) || (inst_30_and_14_to_12_ex[2:0] != 'b001 && address_alu_zero_ex));
 
-wire [1:0] mem_to_reg_wb;
-wire [DATA_SIZE-1:0] ddata_r_wb, address_alu_result_wb;
+logic [1:0] mem_to_reg_wb;
+logic [DATA_SIZE-1:0] ddata_r_wb, address_alu_result_wb;
 MEM_WB_REG mem_wb_reg(
     .clk(CLK),
     .clear(CLEAR),
@@ -282,7 +349,16 @@ MEM_WB_REG mem_wb_reg(
     .inst_11_to_7_wb(inst_11_to_7_wb)
 );
 
-wire [DATA_SIZE-1:0] myInput_data_mux [3];
+//Vamos a incluir un registro auxiliar para retrasar un ciclo la señal rd_wb, con el fin de poder tener otro tipo de data forwarding,
+//porque nos hemos encontrado problemas porque se solapan y no coge el valor correcto, por eso vamos a aguantar un ciclo más la señal.
+always_ff @( posedge CLK ) 
+begin
+    reg_write_wb_aux <= reg_write_wb;
+    inst_11_to_7_wb_aux <= inst_11_to_7_wb;
+    data_mux_result_wire_aux <= data_mux_result_wire;
+end
+
+logic [DATA_SIZE-1:0] myInput_data_mux [3];
 assign myInput_data_mux[0] = address_alu_result_wb;
 assign myInput_data_mux[1] = ddata_r_wb;
 assign myInput_data_mux[2] = {next_consecutive_pc_wire};
@@ -326,14 +402,9 @@ MUX #(.SIZE(ADDR_SIZE+2), .INPUTS(2)) pc_mux(
     .sel(do_jump_wire),
     .result(next_pc_wire)
 );
-
+assign reg_write_data = data_mux_result_wire;
 endmodule
 
 `endif
 
 
-//Inst_IF (32bits) conectada a la rom
-//1 ciclo después cuando llegue el flancod e reloj Inst_ID pasa a la siguienten fase
-
-//always @(posedge CLK)
-//Inst_ID <= Inst_IF //los 32 bits de la fase IF pasan a la fase ID para ser decodificada

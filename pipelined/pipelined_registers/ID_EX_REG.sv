@@ -18,6 +18,8 @@ module ID_EX_REG #(parameter DATA_SIZE = 32, parameter ADDR_SIZE = 10) (
     input [3:0] inst_30_and_14_to_12_id,
     input [4:0] inst_11_to_7_id,
     input [6:0] inst_6_to_0_id,
+    input [4:0] inst_19_to_15_id,
+    input [4:0] inst_24_to_20_id,
 
     output reg branch_ex,
     output reg reg_write_ex,
@@ -32,7 +34,9 @@ module ID_EX_REG #(parameter DATA_SIZE = 32, parameter ADDR_SIZE = 10) (
     output reg [DATA_SIZE-1:0] immediate_ex,
     output reg [3:0] inst_30_and_14_to_12_ex,
     output reg [4:0] inst_11_to_7_ex,
-    output reg [6:0] inst_6_to_0_ex
+    output reg [6:0] inst_6_to_0_ex,
+    output reg [4:0] inst_19_to_15_ex,
+    output reg [4:0] inst_24_to_20_ex
 );
 
 initial begin
@@ -64,6 +68,8 @@ always @(posedge clk or posedge clear) begin
         inst_30_and_14_to_12_ex <= 0;
         inst_11_to_7_ex <= 0;
         inst_6_to_0_ex <= 0;
+        inst_19_to_15_ex <= 0;
+        inst_24_to_20_ex <= 0;
     end else begin
         branch_ex <= branch_id;
         mem_read_ex <= mem_read_id;
@@ -77,6 +83,8 @@ always @(posedge clk or posedge clear) begin
         inst_30_and_14_to_12_ex <= inst_30_and_14_to_12_id;
         inst_11_to_7_ex <= inst_11_to_7_id;
         inst_6_to_0_ex <= inst_6_to_0_id;
+        inst_19_to_15_ex <= inst_19_to_15_id;
+        inst_24_to_20_ex <= inst_24_to_20_id;
     end
 end    
 
