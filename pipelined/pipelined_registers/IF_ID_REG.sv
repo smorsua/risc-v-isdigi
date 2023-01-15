@@ -9,7 +9,7 @@ module IF_ID_REG #(parameter DATA_SIZE = 32, parameter ADDR_SIZE = 10) (
     output [DATA_SIZE-1:0] inst_id
 );
 
-always_ff @(posedge clk or posedge clear) begin
+always_ff @(posedge clk or posedge enable) begin
     if(enable == 1) begin
         pc_id <= pc_if;
     end else begin

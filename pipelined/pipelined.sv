@@ -272,7 +272,7 @@ assign mem_write = mem_write_mem;
 assign mem_read = mem_read_mem;
 
 wire PCSrc;
-assign PCSrc = branch_mem & ((idata[14:12] == 000 && address_alu_zero)|| (idata[14:12] != 000 && !address_alu_zero));
+assign PCSrc = branch_mem & ((idata[14:12] == 000 && address_alu_zero_mem)|| (idata[14:12] != 000 && !address_alu_zero_mem));
 
 wire [1:0] mem_to_reg_wb;
 wire [DATA_SIZE-1:0] ddata_r_wb, address_alu_result_wb;

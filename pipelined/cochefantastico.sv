@@ -272,7 +272,7 @@ assign mem_write = mem_write_mem;
 assign mem_read = mem_read_mem;
 
 wire PCSrc;
-assign PCSrc = branch_mem & ((inst_14_to_12_mem == 'b001 && !address_alu_zero_mem) || (inst_14_to_12_mem != 'b001 && address_alu_zero_mem));
+assign PCSrc = branch_mem & ((idata[14:12] == 000 && address_alu_zero_mem)|| (idata[14:12] != 000 && !address_alu_zero_mem));
 
 wire [1:0] mem_to_reg_wb;
 wire [DATA_SIZE-1:0] ddata_r_wb, address_alu_result_wb;
@@ -321,10 +321,29 @@ defparam rom_registered.addr_width = ADDR_SIZE;
 defparam rom_registered.data_width = DATA_SIZE;
 defparam rom_registered.file = "./leds_placa.txt" ;
 
+///////////////////MUX MEM CONTROLLER \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+wire [DATA_SIZE-1:0] second_operand_wire;
+wire [DATA_SIZE-1:0] myInput_alu_src_2_mux[2];
+assign myInput_mem_controller[0] = ddata_r;
+assign myInput_mem_controller[1] = ;
+MUX #(.SIZE(DATA_SIZE), .INPUTS(2)) mem_controller (
+    .all_inputs(myInput_mem_controller),
+    .sel(sel_mem_controller),
+    .result(second_operand_wire)
+);
+////////////////////////MODULO GPIO\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+module GPIO
+#(parameter DATA_SIZE = 32, parameter ADDR_SIZE = 10)(
+    input                   CLK,
+    input                   RESET_N,
+    input  [15:0]             DIN,
+    output [15:0]        DOUT
+);
+////////////////////////////DECODER LEDS\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 reg [7:0] aux;
-always @(data_mux_result_wire)
+always @(ddata_r) //depende de los valores leidos
 begin
-case(data_mux_result_wire)
+case(ddata_r)
 	32'd1 : aux = 8'b10000000;
 	32'd2 : aux = 8'b01000000;
 	32'd3 : aux = 8'b00100000;
@@ -344,6 +363,8 @@ case(data_mux_result_wire)
 endcase
 end
 assign LED = aux;
+
+
 
 endmodule
 
