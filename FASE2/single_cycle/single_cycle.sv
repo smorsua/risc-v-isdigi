@@ -176,7 +176,238 @@ logic [4:0] rs2;
 logic [4:0] rd;
 logic [31:0] immediate;
 
+sequence s1;
+  logic [31:0]  src1,src2;
+  logic [4:0]   add_destino;
+  (1, src1=registros.banco_registros[idata[19:15]], /*inmediato*/src2={ {21{idata[31]}}, idata[30:20] },add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]==src1+src2 );
+endsequence
+idea1: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]==7'b0010011 &&idata[14:12]==3'b000 &&idata[11:7]!=5'b00000|->s1 )
+else $error("I format addi");
 
+/*SLLI*/
+
+sequence s2;
+  logic [31:0]  src1,src2;
+  logic [4:0]   add_destino;
+  (1, src1=registros.banco_registros[idata[19:15]], src2={ {21{idata[31]}}, idata[30:20] },add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]==src1<<src2 );
+endsequence
+
+idea2: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]==7'b0010011 &&idata[14:12]==3'b001 &&idata[11:7]!=5'b00000|->s2 )
+else $error("I format SLLI");
+
+/*SLTIU*/
+sequence s3;
+  logic [31:0]  src1,src2;
+  logic [4:0]   add_destino;
+  (1, src1=registros.banco_registros[idata[19:15]], src2={ {21{idata[31]}}, idata[30:20] },add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]!=(src1<src2) );
+endsequence
+
+idea3: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]==7'b0010011 &&idata[14:12]==3'b001 && idata[11:7]!=5'b00000|->s3 )
+else $error("I format SLTIU");
+
+/*XORI*/
+sequence s4;
+  logic [31:0]  src1,src2;
+  logic [4:0]   add_destino;
+  (1, src1=registros.banco_registros[idata[19:15]], src2={ {21{idata[31]}}, idata[30:20] },add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]==(src1^src2) );
+endsequence
+
+idea4: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]==7'b0010011 &&idata[14:12]==3'b100 && idata[11:7]!=5'b00000|->s4 )
+else $error("I format XORI");
+
+/*SLTI*/
+sequence s5;
+  logic [31:0]  src1,src2;
+  logic [4:0]   add_destino;
+  (1, src1=registros.banco_registros[idata[19:15]], src2={ {21{idata[31]}}, idata[30:20] },add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]!=(signed'(src1)<signed'(src2)) );
+endsequence
+
+idea5: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]==7'b0010011 &&idata[14:12]==3'b010 && idata[11:7]!=5'b00000|->s5 )
+else $error("I format SLTI");
+
+/*ORI*/
+sequence s6;
+  logic [31:0]  src1,src2;
+  logic [4:0]   add_destino;
+  (1, src1=registros.banco_registros[idata[19:15]], src2={ {21{idata[31]}}, idata[30:20] },add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]==(src1|src2) );
+endsequence
+
+idea6: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]==7'b0010011 &&idata[14:12]==3'b110 && idata[11:7]!=5'b00000|->s6 )
+else $error("I format ORI");
+
+/*ANDI*/
+sequence s7;
+  logic [31:0]  src1,src2;
+  logic [4:0]   add_destino;
+  (1, src1=registros.banco_registros[idata[19:15]], src2={ {21{idata[31]}}, idata[30:20] },add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]==(src1 & src2) );
+endsequence
+
+idea7: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]==7'b0010011 &&idata[14:12]==3'b111 && idata[11:7]!=5'b00000|->s7 )
+else $error("I format ORI");
+
+
+
+
+
+
+
+/*R-FORMAT*/
+
+/*ADD ----- S10*/
+sequence s10;
+  logic [31:0]  src1,src2;
+  logic [4:0]   add_destino;
+  (1, src1=registros.banco_registros[idata[19:15]], src2=registros.banco_registros[idata[24:20]],add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]== src1 + src2 );
+endsequence
+
+idea10: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]== 7'b0110011 && idata[14:12]==3'b000 && idata[31:25]== 7'b0000000 |-> s10 )
+else $error("R-format ADD");
+
+/*SUB ----- S11*/
+sequence s11;
+  logic [31:0]  src1,src2;
+  logic [4:0]   add_destino;
+  (1, src1=registros.banco_registros[idata[19:15]], src2=registros.banco_registros[idata[24:20]],add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]== src1 - src2 );
+endsequence
+
+idea11: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]== 7'b0110011 && idata[14:12]==3'b000 && idata[31:25]== 7'b0100000 |-> s11 )
+else $error("R-format SUB");
+
+/*SLL*/
+sequence s12;
+  logic [31:0]  src1,src2;
+  logic [4:0]   add_destino;
+  (1, src1=registros.banco_registros[idata[19:15]], src2=registros.banco_registros[idata[24:20]],add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]== src1<<src2 );
+endsequence
+
+idea12: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0] == 7'b0110011 && idata[14:12]==3'b001 |-> s12 )
+else $error("R-format SLL");
+
+/*SLT*/
+sequence s13;
+  logic [31:0]  src1,src2;
+  logic [4:0]   add_destino;
+  (1, src1=registros.banco_registros[idata[19:15]], src2=registros.banco_registros[idata[24:20]],add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]==  (!(signed'(src1) < signed'(src2))) );
+endsequence
+
+idea13: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]== 7'b0110011 && idata[14:12]==3'b010 |-> s13 )
+else $error("R-format SLT");
+
+/*SLT 3'b010: assert(data_mux_result_wire == (!(signed'(data_1_wire) < signed'(data_2_wire)))) */
+
+/*SLTU*/
+sequence s14;
+  logic [31:0]  src1,src2;
+  logic [4:0]   add_destino;
+  (1, src1=registros.banco_registros[idata[19:15]], src2=registros.banco_registros[idata[24:20]],add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]==  (!(src1 < src2)) );
+endsequence
+
+idea14: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]== 7'b0110011 && idata[14:12]==3'b011 |-> s14 )
+else $error("R-format SLTU");
+
+
+/*XOR*/
+sequence s15;
+  logic [31:0]  src1,src2;
+  logic [4:0]   add_destino;
+  (1, src1=registros.banco_registros[idata[19:15]], src2=registros.banco_registros[idata[24:20]],add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]== src1 ^ src2 );
+endsequence
+
+idea15: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]== 7'b0110011 && idata[14:12]==3'b100 |-> s15 )
+else $error("R-format XOR");
+
+/*SRL*/
+sequence s16;
+  logic [31:0]  src1,src2;
+  logic [4:0]   add_destino;
+  (1, src1=registros.banco_registros[idata[19:15]], src2=registros.banco_registros[idata[24:20]],add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]== src1 >> src2 );
+endsequence
+
+idea16: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]== 7'b0110011 && idata[14:12]==3'b101  && idata[31:25]== 7'b0000000 |-> s16 )
+else $error("R-format SRL");
+
+/*SRA*/
+sequence s17;
+  logic [31:0]  src1,src2;
+  logic [4:0]   add_destino;
+  (1, src1=registros.banco_registros[idata[19:15]], src2=registros.banco_registros[idata[24:20]],add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]== src1 >> src2 );
+endsequence
+
+idea17: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]== 7'b0110011 && idata[14:12]==3'b101  && idata[31:25]== 7'b0100000|-> s17 )
+else $error("R-format SRA");
+
+/*OR*/
+sequence s18;
+  logic [31:0]  src1,src2;
+  logic [4:0]   add_destino;
+  (1, src1=registros.banco_registros[idata[19:15]], src2=registros.banco_registros[idata[24:20]],add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]== src1 | src2 );
+endsequence
+
+idea18: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]== 7'b0110011 && idata[14:12]==3'b110 |-> s18 )
+else $error("R-format OR");
+
+/*AND*/
+sequence s19;
+  logic [31:0]  src1,src2;
+  logic [4:0]   add_destino;
+  (1, src1=registros.banco_registros[idata[19:15]], src2=registros.banco_registros[idata[24:20]],add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]== src1 & src2 );
+endsequence
+
+idea19: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]== 7'b0110011 && idata[14:12]==3'b111 |-> s19 )
+else $error("R-format AND");
+
+/*S-FORMAT*/
+/*sw*/
+sequence s20;
+  logic [31:0]  src1,src2;
+  logic [4:0]   add_destino;
+  (1, src1=registros.banco_registros[idata[19:15]], src2=registros.banco_registros[idata[24:20]],add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]== src1 + immediate );
+endsequence
+
+idea20: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]== 7'b0100011 && idata[14:12]==3'b010 |-> s20 )
+else $error("S-format SW");
+
+
+/*B-FORMAT*/
+/*BEQ*/
+
+idea21: assert property (@(posedge CLK) address_alu_zero == '1 && idata[6:0] == 'b1100011 |-> (branch_target_wire == (immediate + PC)) ) else $fatal("No realiza correctamente el salto condicional");
+/*sequence s21;
+  logic [31:0]  src1,src2;
+  logic [4:0]   add_destino;
+  (1, src1=registros.banco_registros[idata[19:15]], src2=registros.banco_registros[idata[24:20]],add_destino=idata[11:7]) ##1 (address_alu_zero == 1'b1);
+endsequence
+
+idea21: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]== 7'b1100011 && idata[14:12]==3'b000 && ((idata[19:15] - idata[24:20]) == 1'b0)|-> s21 )
+else $error("B-format BEQ");*/
+/*U FORMAT*/
+/*AUIPC*/
+sequence s22;
+  logic [31:0]  src1,src2;
+  logic [4:0]   add_destino;
+  (1, src1=registros.banco_registros[idata[11:7]],/*inmediato*/ src2=registros.banco_registros[idata[31:12]],add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]== PC + src2 );
+endsequence
+idea22: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]== 7'b0010111 && idata[11:7]!=5'b00000 |-> s22 )
+else $error("U-format AUIPC");
+
+/*LUI*/
+sequence s23;
+  logic [31:0]  src1,src2;
+  logic [4:0]   add_destino;
+  (1, src1=registros.banco_registros[idata[11:7]],/*inmediato*/ src2=registros.banco_registros[idata[31:12]],add_destino=idata[11:7]) ##1 (registros.banco_registros[add_destino]== src2 );
+endsequence
+idea23: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]== 7'b0110111 && idata[11:7]!=5'b00000 |-> s23 )
+else $error("U-format LUI");
+
+/*BNE*/
+/*sequence s24;
+  logic [31:0]  src1,src2;
+  logic [4:0]   add_destino;
+  (1, src1=registros.banco_registros[idata[19:15]], src2=registros.banco_registros[idata[24:20]],add_destino=idata[11:7]) ##1 (address_alu_zero == 1'b1);
+endsequence
+
+idea24: assert property (@(posedge CLK) disable iff (RESET_N!=1'b1) idata[6:0]== 7'b1100011 && idata[14:12]==3'b001 && ((idata[19:15] - idata[24:20]) != 1'b0)|-> s24 )
+else $error("B-format BNE");*/
 
 endmodule
 
