@@ -60,7 +60,7 @@ ALU #(.SIZE(ADDR_SIZE + 2)) pc_alu(
 assign iaddr = PC[11:2];
 wire branch_ex, reg_write_ex, mem_read_ex, mem_write_ex, alu_src_ex;
 wire [DATA_SIZE-1:0] inst_id;
-wire if_id_clear;
+wire if_id_enable;
 wire control_mux_sel;
 
 wire [1:0] mem_to_reg_ex, AuipcLui_ex;
@@ -78,14 +78,14 @@ hazard_detection #(.SIZE(DATA_SIZE)) hazard_detection(
     .ex_mem_read(mem_read_ex),
     .ex_register_rd(inst_11_to_7_ex),
     .PCWrite(PCWrite),
-    .if_id_clear(if_id_clear),
+    .if_id_enable(if_id_enable),
     .enable_nop_mux(control_mux_sel)
     );
 
 wire [ADDR_SIZE-1+2:0] pc_id;
 IF_ID_REG #(.DATA_SIZE(DATA_SIZE), .ADDR_SIZE(ADDR_SIZE)) if_id_reg(
     .clk(CLK),
-    .clear(if_id_clear),
+    .enable(if_id_enable),
     .pc_if(PC),
     .inst_if(idata),
     .pc_id(pc_id),
