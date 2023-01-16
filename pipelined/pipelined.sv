@@ -281,12 +281,12 @@ data_forwarding #(.SIZE(DATA_SIZE)) data_forwarding(
     .reg_write_ex(reg_write_ex),
     .reg_write_wb(reg_write_wb),
     .reg_write_wb_aux(reg_write_wb_aux),
-    .inst_11_to_7_mem(inst_11_to_7_mem),
-    .inst_11_to_7_wb(inst_11_to_7_wb),
-    .inst_11_to_7_wb_aux(inst_11_to_7_wb_aux),
-    .inst_19_to_15_ex(inst_19_to_15_ex),
-    .inst_24_to_20_ex(inst_24_to_20_ex),
-    .inst_6_to_0_ex(inst_6_to_0_ex),
+    .rd_mem(inst_11_to_7_mem),
+    .rd_wb(inst_11_to_7_wb),
+    .rd_wb_aux(inst_11_to_7_wb_aux),
+    .rs1_ex(inst_19_to_15_ex),
+    .rs2_ex(inst_24_to_20_ex),
+    .opcode_ex(inst_6_to_0_ex),
     .forwardA(forwardA),
     .forwardB(forwardB)
 );
