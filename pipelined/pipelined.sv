@@ -223,6 +223,12 @@ logic [4:0] inst_11_to_7_wb_aux;
 logic reg_write_wb_aux;
 logic [DATA_SIZE-1:0] data_mux_result_wire_aux;
 
+initial begin
+    reg_write_wb_aux = 0;
+    inst_11_to_7_wb_aux = 0;
+    data_mux_result_wire_aux = 0;
+end
+
 assign myInput_alu_src_2_mux[0] = read_data_2_ex;
 assign myInput_alu_src_2_mux[1] = immediate_ex;
 MUX #(.SIZE(DATA_SIZE), .INPUTS(2)) alu_src_2_mux (
@@ -352,7 +358,7 @@ MEM_WB_REG mem_wb_reg(
 
 //Vamos a incluir un registro auxiliar para retrasar un ciclo la señal rd_wb, con el fin de poder tener otro tipo de data forwarding,
 //porque nos hemos encontrado problemas porque se solapan y no coge el valor correcto, por eso vamos a aguantar un ciclo más la señal.
-always_ff @( posedge CLK ) 
+always @( posedge CLK ) 
 begin
     reg_write_wb_aux <= reg_write_wb;
     inst_11_to_7_wb_aux <= inst_11_to_7_wb;
