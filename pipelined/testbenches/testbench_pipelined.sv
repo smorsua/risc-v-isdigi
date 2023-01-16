@@ -17,7 +17,13 @@ logic  [(data_width-1):0] ddata_r;
 logic [(addr_width-1):0] iaddr;
 logic  [(data_width-1):0] idata;
 
-ram_registered ram_registered(CLK, daddr, MemWrite, MemRead, ddata_w, ddata_r);
+ram_registered ram_registered(
+    .CLK(CLK),
+    .daddr(daddr),
+    .MemWrite(MemWrite),
+    .MemRead(MemRead),
+    .ddata_w(ddata_w),
+    .ddata_r(ddata_r));
 defparam ram_registered.addr_width = addr_width;
 defparam ram_registered.data_width = data_width;
 
@@ -26,7 +32,18 @@ defparam rom_registered.addr_width = addr_width;
 defparam rom_registered.data_width = data_width;
 defparam rom_registered.file = "test_jump_predictor.txt" ;
 
-pipelined pipelined(CLK, RESET_N, CLEAR, idata, iaddr, daddr, ddata_r, ddata_w, MemWrite, MemRead);
+pipelined pipelined(
+    .CLK(CLK),
+    .RESET_N(RESET_N),
+    .CLEAR(CLEAR),
+    .idata(idata),
+    .iaddr(iaddr),
+    .daddr(daddr),
+    .ddata_r(ddata_r),
+    .ddata_w(ddata_w),
+    .MemWrite(MemWrite),
+    .MemRead(MemRead));
+
 defparam pipelined.ADDR_SIZE = addr_width;
 defparam pipelined.DATA_SIZE = data_width;
 
@@ -45,7 +62,6 @@ initial
         CLEAR = 0;
         #(T*500);
         $stop;
-
     end
 
 endmodule
