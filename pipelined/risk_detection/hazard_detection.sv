@@ -2,7 +2,6 @@
 `define HAZARD_DETECTION_GUARD
 
 module hazard_detection #(parameter SIZE = 32) (
-    //input CLK,
     input [4:0] id_rs1,
     input [4:0] id_rs2,
     input ex_mem_read,
@@ -23,37 +22,6 @@ always_comb begin
         if_id_enable = 1;
     end
 end
-
-
-
-
-
-
-
-
-// logic clear_aux;
-
-// always_ff @(posedge CLK) begin
-//     if ( (instruction[14:12] == 3'b010) && (instruction[6:0] == 7'b0000011) ) begin
-//         clear_aux <= 1'b1;
-//     end
-//     else  begin
-//         clear_aux <= 1'b0;
-//     end
-// end
-
-// assign CLEAR = clear_aux;
-// always_comb begin
-//     if ( (instruction[14:12] == 3'b010) && (instruction[6:0] == 7'b0000011) ) begin
-//     PC_frozen = 1'b1;
-//     enable_mux = 1'b1;
-
-//     end
-//     else  begin
-//         PC_frozen = 1'b0;
-//         enable_mux = 1'b0;
-//     end
-// end
 
 endmodule
 
