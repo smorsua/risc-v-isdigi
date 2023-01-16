@@ -19,20 +19,56 @@ module data_forwarding #(parameter SIZE) (
 
 always_comb begin 
 //RSB format
-if(opcode_ex == R_FORMAT || opcode_ex == B_FORMAT) begin
-    r_format_and_b_format_forwarding();
+$display("-------------------- new instruction --------------------");
+$display("opcode_ex: %b", opcode_ex);
+$display("rs1_ex: %b", rs1_ex);
+$display("rs2_ex: %b", rs2_ex);
+$display("rd_mem: %b", rd_mem);
+$display("rd_wb: %b", rd_wb);
+$display("rd_wb_aux: %b", rd_wb_aux);
+$display("reg_write_mem: %b", reg_write_mem);
+$display("reg_write_wb: %b", reg_write_wb);
+$display("reg_write_wb_aux: %b", reg_write_wb_aux);
+
+casex (opcode_ex)
+    R_FORMAT: begin
+        r_format_and_b_format_forwarding();
+        $display("R format");
+    end
+    B_FORMAT: begin
+        r_format_and_b_format_forwarding();
+        $display("B format");
+    end
+    S_FORMAT: begin
+        s_format_forwarding();
+        $display("S format");
+    end
+    I_FORMAT: begin
+        i_format_forwarding();
+        $display("I format");
+    end
+    default: begin
+        forwardA = 2'b00;
+        forwardB = 2'b00;
+        $display("default");
+    end
+endcase
 end
-else if(opcode_ex == S_FORMAT) begin
-    s_format_forwarding();
-end
-else if (opcode_ex == I_FORMAT) begin    
-    i_format_forwarding();
-end
-else begin // U_FORMAT and J_FORMAT
-    forwardA = 2'b00;
-    forwardB = 2'b00;
-end
-end
+// if(1==1) begin
+//     r_format_and_b_format_forwarding();
+//     $display("R or B format");
+// end
+// else if(opcode_ex == S_FORMAT) begin
+//     s_format_forwarding();
+// end
+// else if (opcode_ex == I_FORMAT) begin    
+//     i_format_forwarding();
+// end
+// else begin // U_FORMAT and J_FORMAT
+//     forwardA = 2'b00;
+//     forwardB = 2'b00;
+// end
+// end
 
 task r_format_and_b_format_forwarding();
     if(reg_write_mem && (rd_mem != 0) && (rd_mem == rs1_ex))
