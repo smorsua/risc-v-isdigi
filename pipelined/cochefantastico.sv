@@ -312,7 +312,8 @@ MUX #(.SIZE(ADDR_SIZE+2), .INPUTS(2)) pc_mux(
 );
 assign reg_write_data = data_mux_result_wire; //para el golden
 
-ram_registered ram_registered(CLK, daddr, mem_write, mem_read, ddata_w, ddata_r);
+wire [DATA_SIZE-1:0]ddata_r_ram;
+ram_registered ram_registered(CLK, daddr, mem_write, mem_read, ddata_w, ddata_r_ram);
 defparam ram_registered.addr_width = ADDR_SIZE;
 defparam ram_registered.data_width = DATA_SIZE;
 
@@ -321,29 +322,32 @@ defparam rom_registered.addr_width = ADDR_SIZE;
 defparam rom_registered.data_width = DATA_SIZE;
 defparam rom_registered.file = "./leds_placa.txt" ;
 
-///////////////////MUX MEM CONTROLLER \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-wire [DATA_SIZE-1:0] second_operand_wire;
-wire [DATA_SIZE-1:0] myInput_alu_src_2_mux[2];
-assign myInput_mem_controller[0] = ddata_r;
-assign myInput_mem_controller[1] = ;
+wire enable_GPIO; //ENABLE DE ESCRITURA
+wire mem_read_GPIO; //ENABLE DE LECTURA
+wire [DATA_SIZE-1:0] ddata_w_GPIO, ddata_r_GPIO;
+wire [ADDR_SIZE-1:0] daddr_GPIO;
+ram_registered ram_GPIO(CLK, daddr_GPIO, enable_GPIO, mem_read_GPIO, ddata_w_GPIO, ddata_r_GPIO);
+defparam ram_GPIO.addr_width = ADDR_SIZE;
+defparam ram_GPIO.data_width = DATA_SIZE;
+
+
+////////////////////////////////////INVERSOR(HACIA PLACA)\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+assign mem_write = (daddr[10] == 1'b0)?1'b1:1'b0;
+assign enable_GPIO = !mem_write;
+//////////////////////////////////////////////MUX(HACIA MICRO)\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+wire [DATA_SIZE-1:0] myInput_mem_controller[2];
+assign myInput_mem_controller[0] = ddata_r_ram;
+assign myInput_mem_controller[1] =  ddata_r_GPIO;
 MUX #(.SIZE(DATA_SIZE), .INPUTS(2)) mem_controller (
     .all_inputs(myInput_mem_controller),
-    .sel(sel_mem_controller),
-    .result(second_operand_wire)
-);
-////////////////////////MODULO GPIO\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-module GPIO
-#(parameter DATA_SIZE = 32, parameter ADDR_SIZE = 10)(
-    input                   CLK,
-    input                   RESET_N,
-    input  [15:0]             DIN,
-    output [15:0]        DOUT
+    .sel(daddr[10]),
+    .result(ddata_r)
 );
 ////////////////////////////DECODER LEDS\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 reg [7:0] aux;
-always @(ddata_r) //depende de los valores leidos
+always @(ddata_r_GPIO) //depende de los valores leidos
 begin
-case(ddata_r)
+case(ddata_r_GPIO)
 	32'd1 : aux = 8'b10000000;
 	32'd2 : aux = 8'b01000000;
 	32'd3 : aux = 8'b00100000;
