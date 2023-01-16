@@ -11,15 +11,15 @@ localparam  T = 20, addr_width = 10, data_width = 32;
 logic CLK;
 logic RESET_N;
 logic CLEAR;
-logic [7:0]LED;
+
 
 
 
 cochefantastico cochefantastico(
     .CLK(CLK),
     .RESET_N(RESET_N),
-    .CLEAR(CLEAR),
-    .LED(LED)
+    .CLEAR(CLEAR)
+
     );
 defparam cochefantastico.ADDR_SIZE = addr_width;
 defparam cochefantastico.DATA_SIZE = data_width;
