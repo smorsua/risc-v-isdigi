@@ -315,7 +315,7 @@ EX_MEM_REG #(.DATA_SIZE(32), .ADDR_SIZE(10)) ex_mem_reg  (
     .inst_11_to_7_ex(inst_11_to_7_ex),
     .address_alu_result_ex(address_alu_result_ex),
     .address_alu_zero_ex(address_alu_zero_ex),
-    .read_data_2_ex(read_data_2_ex),
+    .read_data_2_ex(second_operand_wire),
     .inst_14_to_12_ex(inst_30_and_14_to_12_ex[2:0]),
 
     .branch_mem(branch_mem),
