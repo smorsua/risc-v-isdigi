@@ -229,13 +229,6 @@ initial begin
     data_mux_result_wire_aux = 0;
 end
 
-assign myInput_alu_src_2_mux[0] = read_data_2_ex;
-assign myInput_alu_src_2_mux[1] = immediate_ex;
-MUX #(.SIZE(DATA_SIZE), .INPUTS(2)) alu_src_2_mux (
-    .all_inputs(myInput_alu_src_2_mux),
-    .sel(alu_src_ex),
-    .result(second_operand_wire)
-);
 
 wire [3:0] ALUSelection_wire;
 ALU_CONTROL alu_control(
@@ -245,35 +238,43 @@ ALU_CONTROL alu_control(
     .ALUSelection(ALUSelection_wire)
 );
 wire [DATA_SIZE-1:0] address_alu_result_mem;
-wire [DATA_SIZE-1:0] forwardA_mux [4];
-wire [DATA_SIZE-1:0] result_fordwardA;
-assign forwardA_mux [0] = read_data_1_ex;
-assign forwardA_mux [1] = data_mux_result_wire;
-assign forwardA_mux [2] =  address_alu_result_mem;
-assign forwardA_mux [3] = data_mux_result_wire_aux;
-MUX #(.SIZE(DATA_SIZE), .INPUTS(4)) forwardAmux(
-    .all_inputs(forwardA_mux),
+wire [DATA_SIZE-1:0] rs1_mux_input [4];
+wire [DATA_SIZE-1:0] rs1_mux_result;
+assign rs1_mux_input [0] = read_data_1_ex;
+assign rs1_mux_input [2] =  address_alu_result_mem;
+assign rs1_mux_input [1] = data_mux_result_wire;
+assign rs1_mux_input [3] = data_mux_result_wire_aux;
+MUX #(.SIZE(DATA_SIZE), .INPUTS(4)) rs1_mux(
+    .all_inputs(rs1_mux_input),
     .sel(forwardA),
-    .result(result_fordwardA)
+    .result(rs1_mux_result)
 );
 
-wire [DATA_SIZE-1:0] forwardB_mux [4];
-wire [DATA_SIZE-1:0] result_fordwardB;
-assign forwardB_mux [0] = second_operand_wire;
-assign forwardB_mux [1] = data_mux_result_wire;
-assign forwardB_mux [2] =  address_alu_result_mem;
-assign forwardB_mux [3] = data_mux_result_wire_aux;
-MUX #(.SIZE(DATA_SIZE), .INPUTS(4)) forwardBmux(
-    .all_inputs(forwardB_mux),
+wire [DATA_SIZE-1:0] rs2_mux_input [4];
+wire [DATA_SIZE-1:0] rs2_mux_result;
+assign rs2_mux_input [0] = read_data_2_ex;
+assign rs2_mux_input [2] =  address_alu_result_mem;
+assign rs2_mux_input [1] = data_mux_result_wire;
+assign rs2_mux_input [3] = data_mux_result_wire_aux;
+MUX #(.SIZE(DATA_SIZE), .INPUTS(4)) rs2_mux(
+    .all_inputs(rs2_mux_input),
     .sel(forwardB),
-    .result(result_fordwardB)
+    .result(rs2_mux_result)
+);
+
+assign myInput_alu_src_2_mux[0] = rs2_mux_result;
+assign myInput_alu_src_2_mux[1] = immediate_ex;
+MUX #(.SIZE(DATA_SIZE), .INPUTS(2)) alu_src_2_mux (
+    .all_inputs(myInput_alu_src_2_mux),
+    .sel(alu_src_ex),
+    .result(second_operand_wire)
 );
 
 wire [DATA_SIZE-1:0] address_alu_result_ex;
 wire address_alu_zero_ex;
 ALU #(.SIZE(DATA_SIZE)) address_alu(
-    .A(result_fordwardA),
-    .B(result_fordwardB),
+    .A(rs1_mux_result),
+    .B(second_operand_wire),
     .OPERATION(ALUSelection_wire),
     .RESULT(address_alu_result_ex),
     .ZERO(address_alu_zero_ex)
