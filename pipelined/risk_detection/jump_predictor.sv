@@ -3,6 +3,7 @@
 
 `include "../../Shared/Control/instruction_type.sv"
 
+
 module jump_predictor #(parameter PC_SIZE = 12) (
     input CLK,
     input RESET_N,
@@ -16,7 +17,7 @@ module jump_predictor #(parameter PC_SIZE = 12) (
     output force_nop
 );
 
-const initialPrediction = 1;
+const logic initialPrediction = 1;
 
 reg [1:0] jumpAddrToPredictionCounter[(2 ** PC_SIZE) - 1:0];
 reg previous_prediction;
