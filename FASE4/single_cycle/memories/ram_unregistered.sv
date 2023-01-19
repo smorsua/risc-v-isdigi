@@ -23,6 +23,8 @@ module ram_unregistered
     begin
 	 if(d_rw)
 		ram[daddr] <= ddata_w;
+	else
+		ram[daddr] <= ram[daddr];
 	end
 
 	assign 	ddata_r = ram[daddr];

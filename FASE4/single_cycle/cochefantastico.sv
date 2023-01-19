@@ -30,18 +30,18 @@ wire [DATA_SIZE-1:0]  ddata_r;
 wire [DATA_SIZE-1:0]  ddata_w;
 wire mem_write;
 wire mem_read;
+wire d_rw;
 
 
 wire reg_write_enable;
 wire [DATA_SIZE-1:0] reg_write_data;
 wire [4:0] write_register;
 
-single_cycle main(CLK, RESET_N, idata, iaddr, daddr, ddata_r, ddata_w, d_rw);
+single_cycle main(CLK, RESET_N, idata, iaddr, daddr, ddata_r, ddata_w, d_rw,reg_write_data,reg_write_enable,write_register);
 defparam main.ADDR_WIDTH = ADDR_SIZE;
 defparam main.SIZE = DATA_SIZE;
 
 wire [DATA_SIZE-1:0]ddata_r_ram;
-//wire [DATA_SIZE-1:0]ddata_w;
 wire [ADDR_SIZE-1:0] daddr_ram;
 wire d_rw_ram;
 
@@ -69,13 +69,13 @@ defparam ram_GPIO.data_width = DATA_SIZE;
 reg addr12_reg;
 always @(posedge CLK)
     begin
-        addr12_reg<= daddr[9];
+        addr12_reg<= daddr[6];
 
     end
 
 ////////////////////////////////////INVERSOR(HACIA PLACA)\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-assign d_rw_ram = (addr12_reg == 1'b0)? d_rw:1'b0;
-assign d_rw_GPIO = !d_rw_ram;
+assign d_rw_ram = (daddr[6] == 1'b0)? d_rw:1'b0;
+assign d_rw_GPIO = (d_rw==1'b1)? !d_rw_ram: 1'b0;
 //////////////////////////////////////////////MUX(HACIA MICRO)\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 wire [DATA_SIZE-1:0] myInput_mem_controller[2];
 assign myInput_mem_controller[0] = ddata_r_ram;
