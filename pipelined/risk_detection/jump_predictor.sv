@@ -14,7 +14,8 @@ module jump_predictor #(parameter PC_SIZE = 12) (
     input should_have_jumped,
     output reg do_jump,
     output reg [PC_SIZE - 1:0] predictor_jump_pc,
-    output force_nop
+    output force_nop,
+    output reg isRecoveringFromMistake
 );
 
 const logic initialPrediction = 1;
@@ -23,7 +24,6 @@ reg [1:0] jumpAddrToPredictionCounter[(2 ** PC_SIZE) - 1:0];
 reg previous_prediction;
 reg [PC_SIZE-1:0] previous_jump_pc;
 reg [PC_SIZE-1:0] pcInCaseOfWrongPrediction; 
-reg isRecoveringFromMistake; // If we predicted a jump but it didn't happen, we need to recover from that mistake
 wire prediction_was_correct;
 
 integer i;
@@ -31,6 +31,7 @@ initial begin
     previous_prediction = 0;
     previous_jump_pc = 0;
     pcInCaseOfWrongPrediction = 0;
+    isRecoveringFromMistake = 0;
     for(i = 0; i < $size(jumpAddrToPredictionCounter); i += 1) begin
         jumpAddrToPredictionCounter[i] = initialPrediction;        
     end

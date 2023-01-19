@@ -49,7 +49,8 @@ end
 wire do_jump_wire;
 
 wire [ADDR_SIZE + 2 - 1:0] final_pc;
-assign final_pc = (PCWrite) ? next_pc_wire : PC;
+wire isRecoveringFromMistakeWire;
+assign final_pc = (PCWrite && !isRecoveringFromMistakeWire) ? next_pc_wire : PC;
 always @(posedge CLK or negedge RESET_N) begin
     if(RESET_N == 0) begin
         PC <= 0;
@@ -400,7 +401,8 @@ jump_predictor #(.PC_SIZE(ADDR_SIZE + 2)) jump_predictor(
     .should_have_jumped(should_have_jumped_wire),
     .do_jump(do_jump_wire),
     .predictor_jump_pc(predictor_jump_pc_wire),
-    .force_nop(force_nop_wire)
+    .force_nop(force_nop_wire),
+    .isRecoveringFromMistake(isRecoveringFromMistakeWire)
 );
 
 wire [ADDR_SIZE-1+2:0] myInput_pc_mux[2];
