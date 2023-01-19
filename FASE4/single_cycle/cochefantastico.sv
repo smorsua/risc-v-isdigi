@@ -74,7 +74,7 @@ always @(posedge CLK)
     end
 
 ////////////////////////////////////INVERSOR(HACIA PLACA)\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-assign d_rw_ram = (daddr[9] == 1'b0)? d_rw:1'b0;
+assign d_rw_ram = (addr12_reg == 1'b0)? d_rw:1'b0;
 assign d_rw_GPIO = !d_rw_ram;
 //////////////////////////////////////////////MUX(HACIA MICRO)\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 wire [DATA_SIZE-1:0] myInput_mem_controller[2];
