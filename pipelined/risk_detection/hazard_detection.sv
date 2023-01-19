@@ -1,4 +1,4 @@
-`ifndef HAZARD_DETECTION_GUARD
+`ifndef HAZARD_DETECTION_GUARD 
 `define HAZARD_DETECTION_GUARD
 
 module hazard_detection #(parameter SIZE = 32) (

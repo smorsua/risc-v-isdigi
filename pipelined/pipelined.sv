@@ -339,7 +339,7 @@ assign mem_write = mem_write_mem;
 assign mem_read = mem_read_mem;
 
 wire should_have_jumped_wire;
-assign should_have_jumped_wire = branch_ex && ((inst_30_and_14_to_12_ex[2:0] == 'b001 && !address_alu_zero_ex) || (inst_30_and_14_to_12_ex[2:0] != 'b001 && address_alu_zero_ex));
+assign should_have_jumped_wire = branch_ex && ((inst_30_and_14_to_12_ex[2:0] == 'b000 && address_alu_zero_ex) || (inst_30_and_14_to_12_ex[2:0] != 'b000 && !address_alu_zero_ex));
 
 logic [1:0] mem_to_reg_wb;
 logic [DATA_SIZE-1:0] ddata_r_wb, address_alu_result_wb;
@@ -381,10 +381,10 @@ MUX #(.SIZE(DATA_SIZE), .INPUTS(3)) data_mux (
 
 assign reg_write_data = data_mux_result_wire; //para el golden
 
-wire [ADDR_SIZE - 1 + 2:0] jump_alu_result;
-ALU #(.SIZE(ADDR_SIZE + 2)) jump_alu(
-    .A(pc_id),
-    .B(immediate_id[11:0]),
+wire [ADDR_SIZE + 2 - 1 :0] jump_alu_result;
+ALU #(.SIZE(DATA_SIZE)) jump_alu(
+    .A({{30{1'b0}},pc_id}),
+    .B(immediate_id),
     .OPERATION(ADD),
     .RESULT(jump_alu_result),
     .ZERO()

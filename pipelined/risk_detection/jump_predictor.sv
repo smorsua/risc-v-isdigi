@@ -22,7 +22,8 @@ const logic initialPrediction = 1;
 reg [1:0] jumpAddrToPredictionCounter[(2 ** PC_SIZE) - 1:0];
 reg previous_prediction;
 reg [PC_SIZE-1:0] previous_jump_pc;
-reg [PC_SIZE-1:0] pcInCaseOfWrongPrediction;
+reg [PC_SIZE-1:0] pcInCaseOfWrongPrediction; 
+reg isRecoveringFromMistake; // If we predicted a jump but it didn't happen, we need to recover from that mistake
 wire prediction_was_correct;
 
 integer i;
@@ -56,17 +57,20 @@ end
 
 // Update rest of variables
 always @(posedge CLK) begin
+    isRecoveringFromMistake <= !prediction_was_correct;
     previous_jump_pc <= jump_pc;
     previous_prediction <= isLikelyToJump();
     pcInCaseOfWrongPrediction <= isLikelyToJump() ? next_consecutive_pc : jump_pc;
 end
 
-always_comb do_jump = isLikelyToJump() || !prediction_was_correct;
+always_comb do_jump = (isLikelyToJump() || !prediction_was_correct) && !isRecoveringFromMistake;
 
 always_comb predictor_jump_pc = getPredictorJumpPc();
 
 assign force_nop = !prediction_was_correct;
 
+wire isLikelyToJumpWire;
+assign isLikelyToJumpWire = isLikelyToJump();
 function bit isLikelyToJump();
     return opcode == J_FORMAT || (opcode == B_FORMAT && jumpAddrToPredictionCounter[jump_pc] >= 2);
 endfunction
