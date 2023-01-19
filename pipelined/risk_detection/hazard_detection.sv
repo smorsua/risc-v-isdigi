@@ -4,15 +4,17 @@
 module hazard_detection #(parameter SIZE = 32) (
     input [4:0] id_rs1,
     input [4:0] id_rs2,
-    input ex_mem_read,
-    input [4:0]ex_register_rd,
+    input mem_read_mem,
+    input [4:0]rd_register_mem,
+    input reg_write_mem,
     output reg PCWrite,
     output reg enable_nop_mux,
     output reg if_id_enable
 );
 
 always_comb begin
-    if(ex_mem_read && (ex_register_rd == id_rs1 || ex_register_rd == id_rs2)) begin
+
+    if(mem_read_mem && reg_write_mem &&(rd_register_mem == id_rs1 || rd_register_mem == id_rs2)) begin
         PCWrite = 0;
         enable_nop_mux = 1;
         if_id_enable = 0;

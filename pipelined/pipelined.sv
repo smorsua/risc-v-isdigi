@@ -91,12 +91,15 @@ wire [4:0] inst_11_to_7_ex;
 wire [6:0] inst_6_to_0_ex;
 wire [8:0] salida_mux_control;
 wire [8:0] input_mux_control[2];
+wire [4:0] inst_11_to_7_mem;
+wire reg_write_mem, mem_read_mem;
 
 hazard_detection #(.SIZE(DATA_SIZE)) hazard_detection(
     .id_rs1(inst_id[19:15]),
     .id_rs2(inst_id[24:20]),
-    .ex_mem_read(mem_read_ex),
-    .ex_register_rd(inst_11_to_7_ex),
+    .mem_read_mem(mem_read_mem),
+    .rd_register_mem(inst_11_to_7_mem),
+    .reg_write_mem(reg_write_mem),
     .PCWrite(PCWrite),
     .if_id_enable(if_id_enable),
     .enable_nop_mux(control_mux_sel)
@@ -280,9 +283,8 @@ ALU #(.SIZE(DATA_SIZE)) address_alu(
     .ZERO(address_alu_zero_ex)
 );
 
-wire [4:0] inst_11_to_7_mem;
 
-wire reg_write_mem;
+
 data_forwarding #(.SIZE(DATA_SIZE)) data_forwarding(
     .reg_write_mem(reg_write_mem), 
     .reg_write_ex(reg_write_ex),
@@ -297,7 +299,7 @@ data_forwarding #(.SIZE(DATA_SIZE)) data_forwarding(
     .forwardA(forwardA),
     .forwardB(forwardB)
 );
-logic branch_mem, mem_read_mem, mem_write_mem;
+logic branch_mem, mem_write_mem;
 logic [1:0] mem_to_reg_mem, AuipcLui_mem;
 logic [DATA_SIZE-1:0] read_data_2_mem;
 logic [ADDR_SIZE-1+2:0] jump_alu_result_mem;

@@ -41,8 +41,8 @@ pipelined pipelined(
     .daddr(daddr),
     .ddata_r(ddata_r),
     .ddata_w(ddata_w),
-    .MemWrite(MemWrite),
-    .MemRead(MemRead));
+    .mem_write(MemWrite),
+    .mem_read(MemRead));
 
 defparam pipelined.ADDR_SIZE = addr_width;
 defparam pipelined.DATA_SIZE = data_width;

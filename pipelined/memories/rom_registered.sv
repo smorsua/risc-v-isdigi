@@ -2,7 +2,7 @@
 `define ROM_REGISTERED_GUARD
 
 module rom_registered
-#(parameter data_width=32, parameter addr_width=10, parameter file)
+#(parameter data_width=32, parameter addr_width=10, parameter file = "./fibonacci.txt")
 (
 	input CLK,
 	input [addr_width - 1:0] iaddr,
