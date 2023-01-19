@@ -47,7 +47,7 @@ wire d_rw_ram;
 
 
 
-ram_unregistered ram_unregistered(CLK, daddr_ram, d_rw_ram, ddata_w, ddata_r_ram);
+ram_unregistered ram_unregistered(CLK, daddr, d_rw_ram, ddata_w, ddata_r_ram);
 defparam ram_unregistered.addr_width = ADDR_SIZE;
 defparam ram_unregistered.data_width = DATA_SIZE;
 
@@ -61,7 +61,7 @@ wire d_rw_GPIO;
 wire [DATA_SIZE-1:0]  ddata_r_GPIO;
 wire [ADDR_SIZE-1:0] daddr_GPIO;
 
-ram_unregistered ram_GPIO(CLK, daddr_GPIO, d_rw_GPIO, ddata_w, ddata_r_GPIO);
+ram_unregistered ram_GPIO(CLK, daddr, d_rw_GPIO, ddata_w, ddata_r_GPIO);
 defparam ram_GPIO.addr_width = ADDR_SIZE;
 defparam ram_GPIO.data_width = DATA_SIZE;
 
