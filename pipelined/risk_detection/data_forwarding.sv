@@ -54,21 +54,7 @@ casex (opcode_ex)
     end
 endcase
 end
-// if(1==1) begin
-//     r_format_and_b_format_forwarding();
-//     $display("R or B format");
-// end
-// else if(opcode_ex == S_FORMAT) begin
-//     s_format_forwarding();
-// end
-// else if (opcode_ex == I_FORMAT) begin    
-//     i_format_forwarding();
-// end
-// else begin // U_FORMAT and J_FORMAT
-//     forwardA = 2'b00;
-//     forwardB = 2'b00;
-// end
-// end
+
 
 task r_format_and_b_format_forwarding();
     if(reg_write_mem && (rd_mem != 0) && (rd_mem == rs1_ex))
@@ -101,7 +87,14 @@ task s_format_forwarding();
     else
         forwardA = 2'b00;
 
-    forwardB = 2'b00;
+    if(reg_write_mem && (rd_mem != 0) && (rd_mem == rs2_ex))
+        forwardB = 2'b10;
+    else if(reg_write_wb && (rd_wb != 0) && (rd_wb == rs2_ex))
+        forwardB = 2'b01;
+    else if(reg_write_wb_aux && (rd_wb_aux != 0) && (rd_wb_aux == rs2_ex))
+        forwardB = 2'b11;
+    else
+        forwardB = 2'b00;
 endtask
 
 task i_format_forwarding();
