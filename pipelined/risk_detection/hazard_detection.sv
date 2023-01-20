@@ -14,7 +14,7 @@ module hazard_detection #(parameter SIZE = 32) (
 
 always_comb begin
 
-    if(mem_read_mem && reg_write_mem &&(rd_register_mem == id_rs1 || rd_register_mem == id_rs2)) begin
+    if(mem_read_mem && reg_write_mem && (rd_register_mem == id_rs1 || rd_register_mem == id_rs2)) begin
         PCWrite = 0;
         enable_nop_mux = 1;
         if_id_enable = 0;

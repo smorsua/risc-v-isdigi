@@ -27,7 +27,8 @@ ram_registered ram_registered(
 defparam ram_registered.addr_width = addr_width;
 defparam ram_registered.data_width = data_width;
 
-rom_registered rom_registered(.CLK(CLK), .iaddr(iaddr), .idata(idata));
+wire rom_enable;
+rom_registered rom_registered(.CLK(CLK), .enable(rom_enable), .iaddr(iaddr), .idata(idata));
 defparam rom_registered.addr_width = addr_width;
 defparam rom_registered.data_width = data_width;
 defparam rom_registered.file = "test_jump_predictor.txt" ;
@@ -38,6 +39,7 @@ pipelined pipelined(
     .CLEAR(CLEAR),
     .idata(idata),
     .iaddr(iaddr),
+    .rom_enable(rom_enable),
     .daddr(daddr),
     .ddata_r(ddata_r),
     .ddata_w(ddata_w),

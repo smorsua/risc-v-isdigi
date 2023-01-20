@@ -33,6 +33,7 @@ module pipelined
     input  [DATA_SIZE-1:0]  ddata_r,
     output [DATA_SIZE-1:0]  ddata_w,
     output mem_write, mem_read,
+    output rom_enable,
     output [DATA_SIZE-1:0] reg_write_data,
     output reg_write_enable,
     output [4:0] write_register
@@ -46,11 +47,9 @@ initial begin
     PC = 0;
 end
 
-wire do_jump_wire;
-
 wire [ADDR_SIZE + 2 - 1:0] final_pc;
 wire isRecoveringFromMistakeWire;
-assign final_pc = (PCWrite && !isRecoveringFromMistakeWire) ? next_pc_wire : PC;
+assign final_pc = (!PCWrite || isRecoveringFromMistakeWire) ? PC : next_pc_wire;
 always @(posedge CLK or negedge RESET_N) begin
     if(RESET_N == 0) begin
         PC <= 0;
@@ -68,11 +67,12 @@ ALU #(.SIZE(ADDR_SIZE + 2)) pc_alu(
     .ZERO()
 );
 
+wire do_jump_wire;
 wire [ADDR_SIZE + 2 - 1: 0] predictor_jump_pc_wire;
 
 wire [9:0] iaddr_mux_control[2];
-assign iaddr_mux_control[0] = PC[11:2];
-assign iaddr_mux_control[1] = predictor_jump_pc_wire[11:2];
+assign iaddr_mux_control[0] = PC[ADDR_SIZE + 2 - 1 : 2];
+assign iaddr_mux_control[1] = predictor_jump_pc_wire[ADDR_SIZE + 2 - 1 : 2];
 MUX #(.SIZE(ADDR_SIZE), .INPUTS(2)) iaddr_mux(
     .all_inputs(iaddr_mux_control),
     .sel(do_jump_wire),
@@ -104,13 +104,24 @@ hazard_detection #(.SIZE(DATA_SIZE)) hazard_detection(
     .PCWrite(PCWrite),
     .if_id_enable(if_id_enable),
     .enable_nop_mux(control_mux_sel)
-    );
+);
+
+assign rom_enable = if_id_enable;
+
+wire [ADDR_SIZE+ 2 - 1 : 0] pc_id_mux_input[2], pc_id_mux_result;
+assign pc_id_mux_input[0] = PC;
+assign pc_id_mux_input[1] = predictor_jump_pc_wire;
+MUX #(.SIZE(ADDR_SIZE + 2), .INPUTS(2)) pc_id_mux(
+    .all_inputs(pc_id_mux_input),
+    .sel(do_jump_wire),
+    .result(pc_id_mux_result)
+);
 
 wire [ADDR_SIZE-1+2:0] pc_id;
 IF_ID_REG #(.DATA_SIZE(DATA_SIZE), .ADDR_SIZE(ADDR_SIZE)) if_id_reg(
     .clk(CLK),
     .enable(if_id_enable),
-    .pc_if(PC),
+    .pc_if(pc_id_mux_result),
     .inst_if(idata),
     .pc_id(pc_id),
     .inst_id(inst_id)
@@ -284,8 +295,6 @@ ALU #(.SIZE(DATA_SIZE)) address_alu(
     .ZERO(address_alu_zero_ex)
 );
 
-
-
 data_forwarding #(.SIZE(DATA_SIZE)) data_forwarding(
     .reg_write_mem(reg_write_mem), 
     .reg_write_ex(reg_write_ex),
@@ -383,9 +392,9 @@ MUX #(.SIZE(DATA_SIZE), .INPUTS(3)) data_mux (
 assign reg_write_data = data_mux_result_wire; //para el golden
 
 wire [ADDR_SIZE + 2 - 1 :0] jump_alu_result;
-ALU #(.SIZE(DATA_SIZE)) jump_alu(
-    .A({{30{1'b0}},pc_id}),
-    .B(immediate_id),
+ALU #(.SIZE(ADDR_SIZE + 2)) jump_alu(
+    .A(pc_id),
+    .B(immediate_id[ADDR_SIZE + 2 - 1 : 0]),
     .OPERATION(ADD),
     .RESULT(jump_alu_result),
     .ZERO()

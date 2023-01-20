@@ -60,8 +60,8 @@ end
 always @(posedge CLK) begin
     isRecoveringFromMistake <= !prediction_was_correct;
     previous_jump_pc <= jump_pc;
-    previous_prediction <= isLikelyToJump();
-    pcInCaseOfWrongPrediction <= isLikelyToJump() ? next_consecutive_pc : jump_pc;
+    previous_prediction <= isLikelyToJump() && !isRecoveringFromMistake;
+    pcInCaseOfWrongPrediction <= isLikelyToJump() && !isRecoveringFromMistake ? next_consecutive_pc : jump_pc;
 end
 
 always_comb do_jump = (isLikelyToJump() || !prediction_was_correct) && !isRecoveringFromMistake;
@@ -70,8 +70,6 @@ always_comb predictor_jump_pc = getPredictorJumpPc();
 
 assign force_nop = !prediction_was_correct;
 
-wire isLikelyToJumpWire;
-assign isLikelyToJumpWire = isLikelyToJump();
 function bit isLikelyToJump();
     return opcode == J_FORMAT || (opcode == B_FORMAT && jumpAddrToPredictionCounter[jump_pc] >= 2);
 endfunction
