@@ -1,0 +1,2 @@
+Para la correcta ejecución de la fase 4 en placa, lo primero que se tiene que realilzar es la descompresión del archivo, y sacarlo de la carpeta risk-v-isdigi, es decir,
+la carpeta resultante Fase 4 con estructura debe estar en la misma carpeta que risk-v-isdigi
